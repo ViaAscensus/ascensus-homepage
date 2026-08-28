@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anamnesebogen – ASCENSUS</title>
+<meta name="description" content="Ausführlicher Anamnesebogen für Dein Ernährungscoaching bei ASCENSUS.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{
+  --olive:#556B4E;
+  --olive-dark:#3E5039;
+  --sand:#B59A5D;
+  --offwhite:#F5F3EE;
+  --paper:#FFFFFF;
+  --ink:#232323;
+  --ink-60:rgba(35,35,35,.68);
+  --ink-40:rgba(35,35,35,.45);
+  --line:rgba(85,107,78,.18);
+  --alert:#A94438;
+  --maxw:720px;
+  --gut:clamp(1.25rem,5vw,2.5rem);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--offwhite);
+  color:var(--ink);
+  font-family:'Inter','Inter var',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:17px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:var(--olive)}
+:focus-visible{outline:2px solid var(--olive);outline-offset:3px;border-radius:2px}
+
+/* ---------- Kopf ---------- */
+.topbar{
+  border-bottom:1px solid var(--line);
+  background:var(--offwhite);
+}
+.topbar .inner{
+  max-width:var(--maxw);margin:0 auto;padding:1.1rem var(--gut);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.topbar img{height:30px;width:auto}
+.backlink{
+  font-size:.85rem;letter-spacing:.06em;text-decoration:none;
+  color:var(--ink-60);white-space:nowrap;
+}
+.backlink:hover{color:var(--olive)}
+.topnav{display:flex;align-items:center;gap:1.1rem}
+.lang{
+  font-size:.78rem;letter-spacing:.12em;font-weight:600;
+  text-decoration:none;color:var(--ink-40);
+  padding:.2rem .45rem;border:1px solid var(--line);border-radius:3px;
+}
+.lang:hover{color:var(--olive);border-color:var(--olive)}
+.topnav[hidden]{display:none}
+
+.shell{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut) 5rem}
+
+/* ---------- Fortschritt: der Aufstieg ---------- */
+.climb{
+  position:sticky;top:0;z-index:10;
+  background:var(--offwhite);
+  padding:1.25rem 0 1rem;
+  border-bottom:1px solid var(--line);
+}
+.climb-meta{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:1rem;margin-bottom:.7rem;
+}
+.climb-step{
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sand);font-weight:600;
+}
+.climb-count{font-size:.7rem;letter-spacing:.14em;color:var(--ink-40)}
+.climb-track{
+  height:2px;background:var(--line);position:relative;overflow:hidden;
+}
+.climb-fill{
+  position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(90deg,var(--olive),var(--sand));
+  transition:width .45s cubic-bezier(.22,.61,.36,1);
+}
+
+/* ---------- Schritte ---------- */
+.step{display:none;padding-top:2.5rem}
+.step.active{display:block;animation:rise .4s cubic-bezier(.22,.61,.36,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.step h2{
+  font-size:clamp(1.35rem,4.5vw,1.7rem);
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--olive);font-weight:600;line-height:1.25;
+}
+.step .sub{
+  margin-top:.65rem;font-size:.95rem;color:var(--ink-60);max-width:46ch;
+}
+
+.field{margin-top:1.9rem}
+.field > label,
+.group > legend{
+  display:block;font-size:.88rem;font-weight:600;
+  letter-spacing:.01em;margin-bottom:.55rem;line-height:1.4;
+}
+.optional{font-weight:400;color:var(--ink-40);font-size:.8rem}
+.req{color:var(--sand);font-weight:700;margin-left:.2em}
+.legend-req{
+  font-size:.78rem;color:var(--ink-40);margin-top:1.5rem;
+  padding-top:.9rem;border-top:1px solid var(--line);
+}
+.legend-req .req{margin:0 .15em 0 0}
+.hint{font-size:.78rem;color:var(--ink-40);margin-top:.45rem;line-height:1.5}
+
+input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{
+  width:100%;padding:.8rem .9rem;font-size:1rem;font-family:inherit;
+  color:var(--ink);background:var(--paper);
+  border:1px solid var(--line);border-radius:4px;
+  transition:border-color .15s,box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--olive);
+  box-shadow:0 0 0 3px rgba(85,107,78,.11);
+}
+textarea{min-height:6rem;resize:vertical;line-height:1.55}
+::placeholder{color:rgba(35,35,35,.3);font-style:italic}
+select{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23556B4E' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:540px){.row{grid-template-columns:1fr}}
+
+/* Auswahl-Chips */
+.group{border:0;margin-top:1.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:.55rem}
+.chips label{
+  display:flex;align-items:center;gap:.5rem;
+  font-size:.92rem;font-weight:400;
+  padding:.6rem 1rem;background:var(--paper);
+  border:1px solid var(--line);border-radius:100px;
+  cursor:pointer;transition:border-color .15s,background .15s;
+  margin:0;
+}
+.chips input{accent-color:var(--olive);margin:0}
+.chips label:hover{border-color:rgba(85,107,78,.4)}
+.chips label:has(input:checked){
+  border-color:var(--olive);background:rgba(85,107,78,.07);font-weight:600;
+}
+.chips label.none:has(input:checked){
+  border-color:var(--ink-40);background:rgba(35,35,35,.05);color:var(--ink-60);
+}
+.other{margin-top:.9rem;display:none}
+.other.open{display:block;animation:rise .25s ease both}
+.other label{font-size:.8rem;font-weight:400;color:var(--ink-40);margin-bottom:.4rem}
+.group .hint{margin-top:.7rem}
+.chips label:has(input[data-other]){border-style:dashed}
+.other-field{
+  width:100%;margin-top:.9rem;padding:.8rem .9rem;font-size:1rem;font-family:inherit;
+  color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:4px;
+  min-height:4.5rem;resize:vertical;line-height:1.55;
+}
+.other-field:focus{outline:none;border-color:var(--olive);box-shadow:0 0 0 3px rgba(85,107,78,.11)}
+.other-field{margin-top:.85rem}
+.other-field[hidden]{display:none !important}
+.group .hint{margin-top:.6rem}
+
+/* Einwilligung */
+.consent{
+  background:var(--paper);border-left:3px solid var(--sand);
+  border-radius:0 4px 4px 0;padding:1.4rem 1.5rem;margin-top:1.9rem;
+}
+.consent p{font-size:.88rem;color:var(--ink-60);line-height:1.65}
+.consent p + p{margin-top:.8rem}
+.consent .check{
+  display:flex;align-items:flex-start;gap:.7rem;
+  margin-top:1.2rem;cursor:pointer;
+}
+.consent .check input{
+  accent-color:var(--olive);width:1.15rem;height:1.15rem;
+  margin-top:.15rem;flex-shrink:0;
+}
+.consent .check span{font-size:.95rem;color:var(--ink);font-weight:500}
+
+/* Fehler */
+.invalid input,.invalid select,.invalid textarea{border-color:var(--alert)}
+.err{
+  display:none;font-size:.8rem;color:var(--alert);margin-top:.4rem;font-weight:500;
+}
+.invalid .err{display:block}
+.group.invalid legend{color:var(--alert)}
+.group.invalid > .err{display:block}
+.check-inline{
+  display:flex;align-items:center;gap:.6rem;margin-top:1.4rem;
+  font-size:.9rem;color:var(--ink-60);cursor:pointer;
+}
+.check-inline input{accent-color:var(--olive);width:1.05rem;height:1.05rem}
+.field.off input{opacity:.4;pointer-events:none;background:rgba(35,35,35,.03)}
+
+.credo{
+  margin-top:1.25rem;padding:1.35rem 1.5rem;
+  background:var(--paper);border-left:3px solid var(--sand);border-radius:0 4px 4px 0;
+}
+.credo p{font-size:.92rem;line-height:1.7;color:var(--ink-60)}
+.credo p + p{margin-top:.85rem}
+.credo p:first-child{color:var(--ink);font-weight:500}
+
+.howto{margin-top:1.9rem;border-top:1px solid var(--line);padding-top:1.1rem}
+.howto summary{
+  cursor:pointer;list-style:none;font-size:.85rem;font-weight:600;
+  letter-spacing:.03em;color:var(--olive);display:flex;align-items:center;gap:.5rem;
+}
+.howto summary::-webkit-details-marker{display:none}
+.howto summary::before{
+  content:"+";color:var(--sand);font-weight:700;font-size:1rem;line-height:1;
+}
+.howto[open] summary::before{content:"–"}
+.howto dl{margin-top:1.1rem}
+.howto dt{
+  font-size:.82rem;font-weight:600;color:var(--ink);
+  letter-spacing:.02em;margin-top:.9rem;
+}
+.howto dt:first-child{margin-top:0}
+.howto dd{font-size:.85rem;color:var(--ink-60);line-height:1.6;margin-top:.2rem}
+.howto-note{
+  margin-top:1.2rem;padding-top:.9rem;border-top:1px solid var(--line);
+  font-size:.8rem;color:var(--ink-40);line-height:1.6;font-style:italic;
+}
+
+/* Steuerung */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;margin-top:3rem;padding-top:1.75rem;
+  border-top:1px solid var(--line);
+}
+.btn{
+  font-family:inherit;font-size:.85rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:.95rem 2rem;border-radius:4px;border:1px solid transparent;
+  cursor:pointer;transition:background .15s,color .15s,border-color .15s;
+}
+.btn-primary{background:var(--olive);color:#fff}
+.btn-primary:hover{background:var(--olive-dark)}
+.btn-primary:disabled{background:var(--line);color:var(--ink-40);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--ink-60);border-color:var(--line);padding:.95rem 1.4rem}
+.btn-ghost:hover{color:var(--olive);border-color:var(--olive)}
+.btn-ghost[hidden]{display:none}
+#next,#send{margin-left:auto}
+.nav[hidden]{display:none}
+.lang[hidden]{display:none}
+[hidden]{display:none !important}
+
+/* Intro + Abschluss */
+.intro h1,.done h1{
+  font-size:clamp(1.8rem,6vw,2.6rem);font-weight:300;
+  letter-spacing:.07em;text-transform:uppercase;line-height:1.2;
+  color:var(--olive);
+}
+.intro .kicker,.done .kicker{
+  font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--sand);font-weight:600;margin-bottom:.9rem;
+}
+.intro .lead{margin-top:1.5rem;font-size:1.05rem;color:var(--ink-60);max-width:50ch}
+.notes{margin-top:2.5rem;border-top:1px solid var(--line);padding-top:1.75rem}
+.notes li{
+  list-style:none;position:relative;padding-left:1.6rem;
+  font-size:.92rem;color:var(--ink-60);line-height:1.6;
+}
+.notes li + li{margin-top:.9rem}
+.notes li::before{
+  content:"";position:absolute;left:.35rem;top:.62rem;
+  width:5px;height:5px;border-radius:50%;background:var(--sand);
+}
+.notes strong{color:var(--ink);font-weight:600}
+
+.done{padding-top:3.5rem;text-align:center}
+.done .lead{margin-top:1.5rem;color:var(--ink-60);max-width:46ch;margin-inline:auto}
+.seal{width:64px;height:64px;margin:0 auto 1.75rem}
+
+/* Status */
+.status{
+  margin-top:1.25rem;font-size:.9rem;min-height:1.4rem;
+  text-align:right;
+}
+.status.err-msg{color:var(--alert);text-align:left;line-height:1.6}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+footer{
+  border-top:1px solid var(--line);margin-top:4rem;
+  padding:2rem var(--gut);text-align:center;
+  font-size:.78rem;color:var(--ink-40);
+}
+footer a{color:var(--ink-40);text-decoration:none;margin:0 .5rem}
+footer a:hover{color:var(--olive)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <a href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <span class="topnav" id="topnav">
+      <a class="lang" href="anamnesis.html" hreflang="en" lang="en">EN</a>
+      <a class="backlink" href="index.html">← Startseite</a>
+    </span>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Fortschritt -->
+  <div class="climb" id="climb" hidden>
+    <div class="climb-meta">
+      <span class="climb-step" id="climbLabel">Persönliche Angaben</span>
+      <span class="climb-count" id="climbCount">01 / 11</span>
+    </div>
+    <div class="climb-track"><div class="climb-fill" id="climbFill"></div></div>
+  </div>
+
+  <form id="form" novalidate>
+
+    <!-- ============ INTRO ============ -->
+    <section class="step active intro" data-title="Start">
+      <p class="kicker">Ausführliche Anamnese</p>
+      <h1>Bevor wir<br>loslegen</h1>
+      <p class="lead">
+        Damit wir unsere gemeinsame Zeit für Dich nutzen und nicht für Formalitäten,
+        sammle ich hier vorab das Wichtigste über Dich, Deinen Alltag und Deine Ziele.
+      </p>
+
+      <ul class="notes">
+        <li><strong>Plane etwa 10 bis 15 Minuten ein.</strong> Das meiste ist Anklicken. Frei schreiben musst Du nur an drei Stellen.</li>
+        <li><strong>Lass die Seite bis zum Absenden offen.</strong> Deine Angaben werden bewusst nicht auf Deinem Gerät zwischengespeichert. Erst mit dem letzten Klick gehen sie an mich.</li>
+        <li><strong>Antworte so, wie es wirklich ist.</strong> Es gibt hier nichts zu beschönigen — je ehrlicher das Bild, desto brauchbarer der Plan.</li>
+        <li><strong>Fast alles ist mit <span class="req">*</span> markiert</strong> — dieser Bogen ist die Grundlage für Dein Strategiegespräch, und ich werte ihn vorher aus. Überall, wo nichts zutrifft, gibt es eine passende Antwort zum Anklicken.</li>
+      </ul>
+
+      <div class="nav">
+        <span></span>
+        <button type="button" class="btn btn-primary" data-next>Los geht's</button>
+      </div>
+    </section>
+
+    <!-- ============ 01 ============ -->
+    <section class="step" data-title="Persönliche Angaben">
+      <h2>Persönliche Angaben</h2>
+      <p class="legend-req"><span class="req">*</span> Pflichtangabe. Trifft nichts zu, gibt es dafür eine Auswahl.</p>
+
+      <div class="row">
+        <div class="field">
+          <label for="vorname">Vorname<span class="req">*</span></label>
+          <input type="text" id="vorname" name="vorname" autocomplete="given-name" required>
+          <span class="err">Bitte trag Deinen Vornamen ein.</span>
+        </div>
+        <div class="field">
+          <label for="nachname">Nachname<span class="req">*</span></label>
+          <input type="text" id="nachname" name="nachname" autocomplete="family-name" required>
+          <span class="err">Bitte trag Deinen Nachnamen ein.</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">E-Mail-Adresse<span class="req">*</span></label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+        <span class="err">Bitte trag eine gültige E-Mail-Adresse ein.</span>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="geburtsdatum">Geburtsdatum<span class="req">*</span></label>
+          <input type="date" id="geburtsdatum" name="geburtsdatum" required>
+          <span class="err">Bitte trag Dein Geburtsdatum ein.</span>
+        </div>
+        <div class="field">
+          <label for="geschlecht">Geschlecht<span class="req">*</span></label>
+          <select id="geschlecht" name="geschlecht" required>
+            <option value="" selected disabled>Bitte wählen</option>
+            <option>Männlich</option>
+            <option>Weiblich</option>
+            <option>Divers / nicht-binär</option>
+            <option>Keine Angabe</option>
+          </select>
+          <span class="err">Bitte wähle eine Option.</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="alltag">Wie sieht Dein Arbeitsalltag aus?<span class="req">*</span></label>
+        <select id="alltag" name="alltag" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Klassischer 9-to-5-Job mit festem Rhythmus</option>
+          <option>Schichtarbeit</option>
+          <option>Remote / Homeoffice</option>
+          <option>Selbstständig / freiberuflich</option>
+          <option>Studium / Ausbildung</option>
+          <option>Teilzeit</option>
+          <option>Anders</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+
+      <div class="field">
+        <label for="sport">Wie viel bewegst Du Dich sportlich?<span class="req">*</span></label>
+        <select id="sport" name="sport" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Kein Sport</option>
+          <option>Gelegentlich (seltener als 1× pro Woche)</option>
+          <option>Regelmäßig (1–2× pro Woche)</option>
+          <option>Regelmäßig (3× pro Woche oder mehr)</option>
+          <option>Leistungs- / Wettkampfsport</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+
+      <div class="field">
+        <label for="tracker">Trägst Du eine Sportuhr oder einen Fitness-Tracker?<span class="req">*</span></label>
+        <select id="tracker" name="tracker" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Garmin</option>
+          <option>Apple Watch</option>
+          <option>Fitbit</option>
+          <option>Polar</option>
+          <option>Whoop</option>
+          <option>Samsung Galaxy Watch</option>
+          <option>Andere</option>
+          <option>Nein, keine</option>
+        </select>
+        <p class="hint">Viele Modelle lassen sich später mit der Coaching-App verbinden.</p>
+      </div>
+
+      <div class="field">
+        <label for="tracker_sonstiges">Welches Modell?</label>
+        <input type="text" id="tracker_sonstiges" name="tracker_sonstiges" placeholder="z. B. Oura Ring, Coros, Suunto …">
+      </div>
+    </section>
+
+    <!-- ============ 02 ============ -->
+    <section class="step" data-title="Deine Ziele">
+      <h2>Deine Ziele</h2>
+
+      <fieldset class="group" data-required>
+        <legend>Was möchtest Du erreichen? <span class="optional">Mehrfachauswahl möglich</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" name="ziel" value="Ernährung umstellen &amp; gesündere Gewohnheiten"> Ernährung umstellen</label>
+          <label><input type="checkbox" name="ziel" value="Gewichtsabnahme / Fettreduktion"> Gewicht reduzieren</label>
+          <label><input type="checkbox" name="ziel" value="Muskelaufbau / Körperstraffung"> Muskeln aufbauen</label>
+          <label><input type="checkbox" name="ziel" value="Mehr Energie im Alltag"> Mehr Energie im Alltag</label>
+          <label><input type="checkbox" name="ziel" value="Sportliche Leistungsfähigkeit"> Sportliche Leistung</label>
+          <label><input type="checkbox" name="ziel" value="Sonstiges"> Etwas anderes</label>
+        </div>
+        <span class="err">Bitte wähle mindestens ein Ziel.</span>
+      </fieldset>
+
+      <div class="field">
+        <label for="zieltext">Magst Du Dein Ziel genauer beschreiben?</label>
+        <textarea id="zieltext" name="zieltext" placeholder="z. B. Ich möchte tagsüber fitter sein und abends weniger Heißhunger haben …"></textarea>
+      </div>
+    </section>
+
+    <!-- ============ 03 ============ -->
+    <section class="step" data-title="Haushalt &amp; Lebenssituation">
+      <h2>Haushalt &amp; Lebenssituation</h2>
+      <p class="sub">Für eine Person zu kochen ist etwas anderes als für eine Familie.</p>
+
+      <div class="field">
+        <label for="haushalt_personen">Wie viele Personen leben in Deinem Haushalt (Dich eingerechnet)?<span class="req">*</span></label>
+        <select id="haushalt_personen" name="haushalt_personen" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>1 — ich lebe allein</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5 oder mehr</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+
+      <div class="field">
+        <label for="haushalt_kinder">Leben Kinder im Haushalt?<span class="req">*</span></label>
+        <select id="haushalt_kinder" name="haushalt_kinder" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Nein</option>
+          <option>Ja, unter 6 Jahren</option>
+          <option>Ja, 6–12 Jahre</option>
+          <option>Ja, Jugendliche (13–18)</option>
+          <option>Ja, verschiedene Altersgruppen</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="haushalt_essen">Wenn Ihr mehrere seid: Wie oft esst Ihr zusammen?<span class="req">*</span></label>
+        <select id="haushalt_essen" name="haushalt_essen" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Täglich (fast alle Mahlzeiten gemeinsam)</option>
+          <option>Einmal am Tag (z. B. abends)</option>
+          <option>Mehrmals pro Woche</option>
+          <option>Selten / jeder isst für sich</option>
+          <option>Ich esse allein</option>
+        </select>
+      </div>
+
+      <fieldset class="group" data-required data-merge="haushalt_besonderes">
+        <legend>Gibt es an Deiner Wohnsituation etwas, das Deine Ernährung beeinflusst? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Schichtdienst"> Schichtdienst</label>
+          <label><input type="checkbox" value="Viel unterwegs / Reisen"> Viel unterwegs / Reisen</label>
+          <label><input type="checkbox" value="Angehörige zu versorgen"> Angehörige zu versorgen</label>
+          <label><input type="checkbox" value="Zwei Haushalte"> Zwei Haushalte</label>
+          <label><input type="checkbox" value="Partner isst ganz anders"> Partner isst ganz anders</label>
+          <label><input type="checkbox" value="Kleine Küche / wenig Ausstattung"> Kleine Küche / wenig Ausstattung</label>
+          <label><input type="checkbox" value="Nein, nichts Besonderes"> Nein, nichts Besonderes</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Beschreib es kurz …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+    </section>
+
+    <!-- ============ 04 ============ -->
+    <section class="step" data-title="Körperdaten">
+      <h2>Körperdaten</h2>
+      <div class="credo">
+        <p>Die folgenden Daten dienen der Veranschaulichung Deiner kommenden
+        Veränderung — nicht als Dogma. Kilo-Zahlen und BMI geben Orientierung,
+        sind aber nicht der heilige Gral.</p>
+        <p>Statt ein starres Wunschgewicht zu jagen, steuern wir einen gesunden
+        Korridor an: für eine Körperzusammensetzung, die sich im Alltag gut anfühlt
+        und im Spiegel überzeugt. Genau deshalb fragen wir hier bewusst nicht nach
+        einem Wunschgewicht.</p>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="groesse">Größe (cm)<span class="req">*</span></label>
+          <input type="number" id="groesse" name="groesse" min="100" max="230" step="1" inputmode="numeric" required>
+          <span class="err">Bitte trag Deine Größe ein.</span>
+        </div>
+        <div class="field">
+          <label for="gewicht">Aktuelles Gewicht (kg)<span class="req">*</span></label>
+          <input type="number" id="gewicht" name="gewicht" min="30" max="300" step="0.5" inputmode="decimal" required>
+          <span class="err">Bitte trag Dein Gewicht ein.</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="bauchumfang">Bauchumfang (cm)<span class="req">*</span></label>
+          <input type="number" id="bauchumfang" name="bauchumfang" min="40" max="200" step="0.5" inputmode="decimal" required data-massband>
+          <p class="hint">Auf Höhe des Bauchnabels gemessen.</p>
+        </div>
+        <div class="field">
+          <label for="taille">Taille (cm)<span class="req">*</span></label>
+          <input type="number" id="taille" name="taille" min="40" max="200" step="0.5" inputmode="decimal" required data-massband>
+          <p class="hint">Schmalste Stelle, oberhalb des Nabels.</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="brustumfang">Brustumfang (cm)<span class="req">*</span></label>
+          <input type="number" id="brustumfang" name="brustumfang" min="50" max="200" step="0.5" inputmode="decimal" required data-massband>
+        </div>
+        <div class="field">
+          <label for="bizeps">Bizepsumfang (cm)<span class="req">*</span></label>
+          <input type="number" id="bizeps" name="bizeps" min="15" max="70" step="0.5" inputmode="decimal" required data-massband>
+          <p class="hint">Dickste Stelle, entspannt.</p>
+        </div>
+      </div>
+
+      <details class="howto">
+        <summary>Wie messe ich richtig?</summary>
+        <dl>
+          <dt>Bauchumfang</dt>
+          <dd>Maßband waagerecht um die stärkste Stelle des Bauches, etwa auf
+              Bauchnabel-Höhe. Leicht ausgeatmet, Band liegt locker an.</dd>
+          <dt>Taillenumfang</dt>
+          <dd>Die schmalste Stelle zwischen unterem Rippenbogen und Beckenkamm —
+              meist etwas oberhalb des Bauchnabels.</dd>
+          <dt>Brustumfang</dt>
+          <dd>Maßband waagerecht um den Brustkorb, auf Höhe der Brustwarzen.
+              Bei Frauen über der stärksten Stelle der Brust.</dd>
+          <dt>Bizeps</dt>
+          <dd>Oberarm entspannt hängen lassen, an der dicksten Stelle messen —
+              etwa auf halber Strecke zwischen Schulter und Ellbogen.</dd>
+        </dl>
+        <p class="howto-note">Alle Maße ohne Bekleidung oder in leichter Unterwäsche
+        nehmen — und später immer an derselben Stelle, damit die Werte vergleichbar
+        bleiben.</p>
+      </details>
+
+      <label class="check-inline">
+        <input type="checkbox" id="kein_massband" name="kein_massband">
+        Ich habe gerade kein Maßband zur Hand — wir messen im Gespräch
+      </label>
+    </section>
+
+    <!-- ============ 05 ============ -->
+    <section class="step" data-title="Essen &amp; Trinken">
+      <h2>Essen &amp; Trinken im Alltag</h2>
+      <p class="sub">Hier geht es um Deinen Alltag, wie er wirklich ist — nicht um Perfektion.</p>
+
+      <div class="field">
+        <label for="ernaehrungsweise">Wie ernährst Du Dich?<span class="req">*</span></label>
+        <select id="ernaehrungsweise" name="ernaehrungsweise" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Mischkost (ich esse alles)</option>
+          <option>Flexitarisch (bewusst wenig Fleisch)</option>
+          <option>Vegetarisch</option>
+          <option>Pescetarisch (Fisch, kein Fleisch)</option>
+          <option>Vegan</option>
+          <option>Anders</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+
+      <div class="field">
+        <label for="mahlzeiten">Wie viele Mahlzeiten isst Du am Tag?<span class="req">*</span></label>
+        <select id="mahlzeiten" name="mahlzeiten" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>1–2 Mahlzeiten</option>
+          <option>3 Mahlzeiten</option>
+          <option>4–5 Mahlzeiten</option>
+          <option>Unregelmäßig</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+
+      <fieldset class="group">
+        <legend>Frühstückst Du?</legend>
+        <div class="chips">
+          <label><input type="radio" name="fruehstueck" value="Ja, regelmäßig"> Ja, regelmäßig</label>
+          <label><input type="radio" name="fruehstueck" value="Manchmal"> Manchmal</label>
+          <label><input type="radio" name="fruehstueck" value="Nein"> Nein</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group" data-required data-merge="snacks">
+        <legend>Wie sieht es bei Dir mit Snacks aus? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Süßes am Nachmittag"> Süßes am Nachmittag</label>
+          <label><input type="checkbox" value="Salziges am Abend"> Salziges am Abend</label>
+          <label><input type="checkbox" value="Obst zwischendurch"> Obst zwischendurch</label>
+          <label><input type="checkbox" value="Nüsse"> Nüsse</label>
+          <label><input type="checkbox" value="Riegel / Proteinriegel"> Riegel / Proteinriegel</label>
+          <label><input type="checkbox" value="Kuchen oder Gebäck im Büro"> Kuchen oder Gebäck im Büro</label>
+          <label><input type="checkbox" value="Kaum Snacks"> Kaum Snacks</label>
+          <label><input type="checkbox" value="Nein, ich snacke kaum"> Nein, ich snacke kaum</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Wann und was genau? …"></textarea>
+        <p class="hint">Wann Du snackst, ist oft aufschlussreicher als was.</p>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <fieldset class="group" data-required data-merge="trinken">
+        <legend>Was trinkst Du über den Tag? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Wasser, unter 1 Liter"> Wasser, unter 1 Liter</label>
+          <label><input type="checkbox" value="Wasser, 1–2 Liter"> Wasser, 1–2 Liter</label>
+          <label><input type="checkbox" value="Wasser, mehr als 2 Liter"> Wasser, mehr als 2 Liter</label>
+          <label><input type="checkbox" value="Saft oder Schorle"> Saft oder Schorle</label>
+          <label><input type="checkbox" value="Softdrinks"> Softdrinks</label>
+          <label><input type="checkbox" value="Light-Getränke"> Light-Getränke</label>
+          <label><input type="checkbox" value="Tee"> Tee</label>
+          <label><input type="checkbox" value="Milch / Milchgetränke"> Milch / Milchgetränke</label>
+          <label><input type="checkbox" value="Weiß ich nicht genau"> Weiß ich nicht genau</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Sonst noch etwas? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <div class="field">
+        <label for="kaffee">Wie viel Koffein trinkst Du am Tag?<span class="req">*</span></label>
+        <select id="kaffee" name="kaffee" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Gar nichts Koffeinhaltiges</option>
+          <option>1–2 Tassen</option>
+          <option>3–4 Tassen</option>
+          <option>5 Tassen oder mehr</option>
+        </select>
+        <p class="hint">Kaffee, Cola, Energydrinks, schwarzer und grüner Tee zusammengerechnet. Relevant unter anderem für die Eisenaufnahme.</p>
+      </div>
+
+      <div class="field">
+        <label for="kochen">Kochst Du selbst oder isst Du häufig auswärts?<span class="req">*</span></label>
+        <select id="kochen" name="kochen" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Ich koche überwiegend selbst</option>
+          <option>Gemischt — teils selbst gekocht, teils Fertiggerichte oder auswärts</option>
+          <option>Überwiegend Fertiggerichte oder auswärts (Kantine, Lieferdienst, Restaurant)</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+
+      <fieldset class="group" data-required data-merge="vorlieben">
+        <legend>Welche Lebensmittel magst Du nicht oder isst Du kaum? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Gemüse"> Gemüse</label>
+          <label><input type="checkbox" value="Obst"> Obst</label>
+          <label><input type="checkbox" value="Fisch"> Fisch</label>
+          <label><input type="checkbox" value="Fleisch"> Fleisch</label>
+          <label><input type="checkbox" value="Hülsenfrüchte"> Hülsenfrüchte</label>
+          <label><input type="checkbox" value="Vollkornprodukte"> Vollkornprodukte</label>
+          <label><input type="checkbox" value="Milchprodukte"> Milchprodukte</label>
+          <label><input type="checkbox" value="Scharfes"> Scharfes</label>
+          <label><input type="checkbox" value="Nichts davon — ich esse fast alles"> Nichts davon — ich esse fast alles</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was magst Du gar nicht? …"></textarea>
+        <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <fieldset class="group" data-required data-merge="allergien">
+        <legend>Gibt es Lebensmittel, die Du nicht verträgst? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Nein, nichts"> Nein, nichts</label>
+          <label><input type="checkbox" value="Laktose"> Laktose</label>
+          <label><input type="checkbox" value="Gluten / Weizen"> Gluten / Weizen</label>
+          <label><input type="checkbox" value="Fruktose"> Fruktose</label>
+          <label><input type="checkbox" value="Histamin"> Histamin</label>
+          <label><input type="checkbox" value="Nüsse"> Nüsse</label>
+          <label><input type="checkbox" value="Soja"> Soja</label>
+          <label><input type="checkbox" value="Ei"> Ei</label>
+          <label><input type="checkbox" value="Meeresfrüchte"> Meeresfrüchte</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was noch — und wie äußert es sich? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn Du alles verträgst, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <fieldset class="group" data-merge="supplemente">
+        <legend>Nimmst Du Nahrungsergänzungsmittel? <span class="optional">Mehrfachauswahl</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Nein, keine"> Nein, keine</label>
+          <label><input type="checkbox" value="Vitamin D"> Vitamin D</label>
+          <label><input type="checkbox" value="Magnesium"> Magnesium</label>
+          <label><input type="checkbox" value="Omega-3"> Omega-3</label>
+          <label><input type="checkbox" value="Eisen"> Eisen</label>
+          <label><input type="checkbox" value="Vitamin B12"> Vitamin B12</label>
+          <label><input type="checkbox" value="Proteinpulver"> Proteinpulver</label>
+          <label><input type="checkbox" value="Kreatin"> Kreatin</label>
+          <label><input type="checkbox" value="Multivitaminpräparat"> Multivitaminpräparat</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was noch? …"></textarea>
+      </fieldset>
+    </section>
+
+    <!-- ============ 06 ============ -->
+    <section class="step" data-title="Lebensstil">
+      <h2>Lebensstil</h2>
+
+      <div class="field">
+        <label for="schlaf">Wie viel schläfst Du im Schnitt?<span class="req">*</span></label>
+        <select id="schlaf" name="schlaf" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Weniger als 6 Stunden</option>
+          <option>6–7 Stunden</option>
+          <option>7–8 Stunden</option>
+          <option>Mehr als 8 Stunden</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+
+      <div class="field">
+        <label for="stress">Wie würdest Du Dein aktuelles Stresslevel beschreiben?<span class="req">*</span></label>
+        <select id="stress" name="stress" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option>Niedrig — überwiegend entspannt</option>
+          <option>Mittel — normale Belastung</option>
+          <option>Hoch — häufig unter Druck</option>
+        </select>
+        <span class="err">Bitte wähle eine Option.</span>
+      </div>
+    </section>
+
+    <!-- ============ 07 ============ -->
+    <section class="step" data-title="Deine Motivation">
+      <h2>Deine Motivation</h2>
+
+      <div class="field">
+        <label for="warum">Warum gerade jetzt?<span class="req">*</span></label>
+        <textarea id="warum" name="warum" required placeholder="z. B. Ein Arzttermin hat mich wachgerüttelt. Oder: Ich habe ein konkretes Ziel — eine Hochzeit, einen Wettkampf …"></textarea>
+        <span class="err">Ein, zwei Sätze genügen — aber diese Frage brauche ich.</span>
+      </div>
+
+      <fieldset class="group" data-required data-merge="erwartung">
+        <legend>Was erwartest Du von unserer Zusammenarbeit? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Klare, alltagstaugliche Empfehlungen"> Klare, alltagstaugliche Empfehlungen</label>
+          <label><input type="checkbox" value="Verständnis für die Zusammenhänge"> Verständnis für die Zusammenhänge</label>
+          <label><input type="checkbox" value="Struktur und feste Vorgaben"> Struktur und feste Vorgaben</label>
+          <label><input type="checkbox" value="Jemanden, der nachhakt"> Jemanden, der nachhakt</label>
+          <label><input type="checkbox" value="Flexibilität ohne Verbote"> Flexibilität ohne Verbote</label>
+          <label><input type="checkbox" value="Fachliche Einordnung meiner Werte"> Fachliche Einordnung meiner Werte</label>
+          <label><input type="checkbox" value="Bin da noch offen"> Bin da noch offen</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was ist Dir sonst wichtig? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+    </section>
+
+    <!-- ============ 08 ============ -->
+    <section class="step" data-title="Medizinische Angaben">
+      <h2>Medizinische Angaben</h2>
+      <div class="credo">
+        <p>Alle hier abgefragten medizinischen Angaben sind komplett freiwillig.</p>
+        <p>Was Du lieber im Gespräch sagst, lässt Du hier einfach frei.</p>
+      </div>
+
+      <fieldset class="group" data-merge="diagnosen">
+        <legend>Gibt es Diagnosen oder Beschwerden, von denen ich wissen sollte? <span class="optional">Mehrfachauswahl</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Nein, nichts bekannt"> Nein, nichts bekannt</label>
+          <label><input type="checkbox" value="Bluthochdruck"> Bluthochdruck</label>
+          <label><input type="checkbox" value="Schilddrüsenunterfunktion"> Schilddrüsenunterfunktion</label>
+          <label><input type="checkbox" value="Schilddrüsenüberfunktion"> Schilddrüsenüberfunktion</label>
+          <label><input type="checkbox" value="Typ-2-Diabetes"> Typ-2-Diabetes</label>
+          <label><input type="checkbox" value="Reizdarm"> Reizdarm</label>
+          <label><input type="checkbox" value="Erhöhte Blutfettwerte"> Erhöhte Blutfettwerte</label>
+          <label><input type="checkbox" value="Gicht / erhöhte Harnsäure"> Gicht / erhöhte Harnsäure</label>
+          <label><input type="checkbox" value="Reflux / Sodbrennen"> Reflux / Sodbrennen</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was genau? …"></textarea>
+      </fieldset>
+
+      <fieldset class="group" data-merge="medikamente">
+        <legend>Nimmst Du regelmäßig Medikamente? <span class="optional">Mehrfachauswahl</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Nein, keine"> Nein, keine</label>
+          <label><input type="checkbox" value="Blutdruckmittel"> Blutdruckmittel</label>
+          <label><input type="checkbox" value="Schilddrüsenhormone (z. B. L-Thyroxin)"> Schilddrüsenhormone (z. B. L-Thyroxin)</label>
+          <label><input type="checkbox" value="Metformin oder andere Diabetesmittel"> Metformin oder andere Diabetesmittel</label>
+          <label><input type="checkbox" value="Cholesterinsenker"> Cholesterinsenker</label>
+          <label><input type="checkbox" value="Magensäureblocker"> Magensäureblocker</label>
+          <label><input type="checkbox" value="Antidepressiva"> Antidepressiva</label>
+          <label><input type="checkbox" value="Hormonelle Verhütung"> Hormonelle Verhütung</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Welche noch? …"></textarea>
+        <p class="hint">Wenn Du das lieber im Gespräch sagst, lass es hier frei.</p>
+      </fieldset>
+
+    </section>
+
+    <!-- ============ 09 ============ -->
+    <section class="step" data-title="Alltag im Detail">
+      <h2>Alltag im Detail</h2>
+      <p class="sub">Ein paar Dinge, die beim Essen mehr mitspielen, als man denkt.</p>
+
+      <fieldset class="group" data-required data-merge="schlafqualitaet">
+        <legend>Wie schläfst Du? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Gut — ich schlafe durch"> Gut — ich schlafe durch</label>
+          <label><input type="checkbox" value="Ich schlafe schwer ein"> Ich schlafe schwer ein</label>
+          <label><input type="checkbox" value="Ich wache nachts oft auf"> Ich wache nachts oft auf</label>
+          <label><input type="checkbox" value="Ich wache früh auf und komme nicht zurück"> Ich wache früh auf und komme nicht zurück</label>
+          <label><input type="checkbox" value="Ich schlafe unruhig"> Ich schlafe unruhig</label>
+          <label><input type="checkbox" value="Wechselhaft"> Wechselhaft</label>
+          <label><input type="checkbox" value="Nein, ich schlafe gut"> Nein, ich schlafe gut</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Magst Du es genauer beschreiben? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend>Rauchst Du?</legend>
+        <div class="chips">
+          <label><input type="radio" name="rauchen" value="Nein"> Nein</label>
+          <label><input type="radio" name="rauchen" value="Gelegentlich"> Gelegentlich</label>
+          <label><input type="radio" name="rauchen" value="Regelmäßig"> Regelmäßig</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend>Trinkst Du Alkohol?</legend>
+        <div class="chips">
+          <label><input type="radio" name="alkohol" value="Kein Alkohol"> Gar nicht</label>
+          <label><input type="radio" name="alkohol" value="Gelegentlich"> Gelegentlich</label>
+          <label><input type="radio" name="alkohol" value="Regelmäßig"> Regelmäßig</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group" data-required data-merge="bewegung">
+        <legend>Wie viel bewegst Du Dich im Alltag — abseits vom Sport? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Überwiegend sitzend"> Überwiegend sitzend</label>
+          <label><input type="checkbox" value="Kurze Wege zu Fuß"> Kurze Wege zu Fuß</label>
+          <label><input type="checkbox" value="Täglicher Spaziergang"> Täglicher Spaziergang</label>
+          <label><input type="checkbox" value="Rad statt Auto"> Rad statt Auto</label>
+          <label><input type="checkbox" value="Stehender oder gehender Beruf"> Stehender oder gehender Beruf</label>
+          <label><input type="checkbox" value="Treppen statt Aufzug"> Treppen statt Aufzug</label>
+          <label><input type="checkbox" value="Am Wochenende deutlich aktiver"> Am Wochenende deutlich aktiver</label>
+          <label><input type="checkbox" value="Weiß ich nicht genau"> Weiß ich nicht genau</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Wie sieht es genauer aus? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <fieldset class="group" data-required data-merge="stressmuster">
+        <legend>Was passiert bei Stress mit Deinem Essen? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Ich esse mehr Süßes"> Ich esse mehr Süßes</label>
+          <label><input type="checkbox" value="Ich esse unregelmäßig"> Ich esse unregelmäßig</label>
+          <label><input type="checkbox" value="Ich vergesse zu essen"> Ich vergesse zu essen</label>
+          <label><input type="checkbox" value="Ich greife zu Fertigem"> Ich greife zu Fertigem</label>
+          <label><input type="checkbox" value="Ich trinke mehr Alkohol"> Ich trinke mehr Alkohol</label>
+          <label><input type="checkbox" value="Ich esse abends spät"> Ich esse abends spät</label>
+          <label><input type="checkbox" value="Stress ändert bei mir nichts am Essen"> Stress ändert bei mir nichts am Essen</label>
+          <label><input type="checkbox" value="Nein, ändert sich nicht"> Nein, ändert sich nicht</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was stresst Dich, und wie gehst Du damit um? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+    </section>
+
+    <!-- ============ 10 ============ -->
+    <section class="step" data-title="Deine Geschichte">
+      <h2>Deine Geschichte</h2>
+      <p class="sub">Was Du bisher versucht hast — und was dabei herauskam. Stichpunkte genügen, keine Romane.</p>
+
+      <fieldset class="group" data-required data-merge="frueher">
+        <legend>Hast Du früher schon etwas versucht? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Nein, das ist mein erster Anlauf"> Nein, das ist mein erster Anlauf</label>
+          <label><input type="checkbox" value="Kalorienzählen"> Kalorienzählen</label>
+          <label><input type="checkbox" value="Low Carb"> Low Carb</label>
+          <label><input type="checkbox" value="Intervallfasten"> Intervallfasten</label>
+          <label><input type="checkbox" value="Weight Watchers"> Weight Watchers</label>
+          <label><input type="checkbox" value="Formula-Diät / Shakes"> Formula-Diät / Shakes</label>
+          <label><input type="checkbox" value="Verzicht auf Zucker"> Verzicht auf Zucker</label>
+          <label><input type="checkbox" value="Vegan oder vegetarisch"> Vegan oder vegetarisch</label>
+          <label><input type="checkbox" value="Ernährungsberatung"> Ernährungsberatung</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was davon lief gut, was nicht? …"></textarea>
+        <p class="hint">So schlage ich Dir keine Wege vor, die bei Dir schon einmal nicht funktioniert haben.</p>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <fieldset class="group" data-required data-merge="hindernisse">
+        <legend>Was sind im Alltag Deine größten Hürden? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Zu wenig Zeit"> Zu wenig Zeit</label>
+          <label><input type="checkbox" value="Abends zu müde zum Kochen"> Abends zu müde zum Kochen</label>
+          <label><input type="checkbox" value="Kantine ohne gute Optionen"> Kantine ohne gute Optionen</label>
+          <label><input type="checkbox" value="Unterwegs / auswärts essen"> Unterwegs / auswärts essen</label>
+          <label><input type="checkbox" value="Umfeld isst anders"> Umfeld isst anders</label>
+          <label><input type="checkbox" value="Heißhunger am Abend"> Heißhunger am Abend</label>
+          <label><input type="checkbox" value="Ich weiß nicht, was richtig ist"> Ich weiß nicht, was richtig ist</label>
+          <label><input type="checkbox" value="Motivation hält nicht lange"> Motivation hält nicht lange</label>
+          <label><input type="checkbox" value="Nein, keine nennenswerten"> Nein, keine nennenswerten</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was noch? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <fieldset class="group" data-required data-merge="staerken">
+        <legend>Was läuft schon gut? <span class="optional">Mehrfachauswahl</span><span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="checkbox" value="Ich trinke genug"> Ich trinke genug</label>
+          <label><input type="checkbox" value="Ich koche gern"> Ich koche gern</label>
+          <label><input type="checkbox" value="Ich koche gern vor"> Ich koche gern vor</label>
+          <label><input type="checkbox" value="Fester Tagesrhythmus"> Fester Tagesrhythmus</label>
+          <label><input type="checkbox" value="Ich bewege mich regelmäßig"> Ich bewege mich regelmäßig</label>
+          <label><input type="checkbox" value="Ich schlafe gut"> Ich schlafe gut</label>
+          <label><input type="checkbox" value="Ich esse gern Gemüse"> Ich esse gern Gemüse</label>
+          <label><input type="checkbox" value="Ich bleibe dran, wenn ich einen Plan habe"> Ich bleibe dran, wenn ich einen Plan habe</label>
+          <label><input type="checkbox" value="Weiß ich gerade nicht"> Weiß ich gerade nicht</label>
+          <label><input type="checkbox" data-other> Etwas anderes …</label>
+        </div>
+        <textarea class="other-field" data-otherfield hidden placeholder="Was noch? …"></textarea>
+              <span class="err">Bitte wähle mindestens eine Antwort — wenn nichts zutrifft, gibt es dafür eine Option.</span>
+      </fieldset>
+
+      <div class="field">
+        <label for="bild">Wie stellst Du Dir Dein Leben in einem Jahr vor — in Bezug auf Ernährung und Wohlbefinden?<span class="req">*</span></label>
+        <textarea id="bild" name="bild" required placeholder="z. B. Ich möchte im Alltag Energie haben, nicht ständig ans Essen denken und ohne schlechtes Gewissen genießen …"></textarea>
+      </div>
+    </section>
+
+    <!-- ============ 11 ============ -->
+    <section class="step" data-title="Einwilligung">
+      <h2>Einwilligung</h2>
+      <p class="sub">Fast geschafft — nur noch dieser eine Haken.</p>
+
+      <div class="consent">
+        <p>
+          Ich willige ein, dass ASCENSUS (Patrick Spengler, Buber-Neumann-Weg 32,
+          60439 Frankfurt am Main) die von mir gemachten Angaben zum Zweck meiner
+          individuellen Ernährungsberatung verarbeitet. Das schließt ausdrücklich
+          Gesundheitsdaten im Sinne von Art. 9 DSGVO ein — etwa Angaben zu
+          Vorerkrankungen, Medikamenten, Unverträglichkeiten und Körpermaßen.
+        </p>
+        <p>
+          Die Daten werden vertraulich behandelt, auf einem Server innerhalb der EU
+          gespeichert und nicht an Dritte weitergegeben. Ich kann diese Einwilligung
+          jederzeit formlos per E-Mail an
+          <a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a> mit Wirkung
+          für die Zukunft widerrufen. Weitere Einzelheiten stehen in der
+          <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung</a>.
+        </p>
+        <label class="check">
+          <input type="checkbox" id="einwilligung" name="einwilligung" required>
+          <span>Ich habe das gelesen und willige ein.</span>
+        </label>
+      </div>
+      <span class="err" id="consentErr">Ohne Deine Einwilligung darf ich die Angaben nicht verarbeiten.</span>
+
+      <!-- Spamschutz: für Menschen unsichtbar -->
+      <div class="hp" aria-hidden="true">
+        <label for="webseite">Bitte nicht ausfüllen</label>
+        <input type="text" id="webseite" name="webseite" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- ============ NAVIGATION ============ -->
+    <div class="nav" id="nav" hidden>
+      <button type="button" class="btn btn-ghost" id="prev">Zurück</button>
+      <button type="button" class="btn btn-primary" id="next">Weiter</button>
+      <button type="submit" class="btn btn-primary" id="send" hidden>Absenden</button>
+    </div>
+
+  </form>
+
+  <!-- ============ ABSCHLUSS ============ -->
+  <section class="done" id="done" hidden>
+    <img class="seal" src="seal.png" alt="" aria-hidden="true">
+    <p class="kicker">Angekommen</p>
+    <h1>Danke,<br><span id="doneName">alles da</span></h1>
+    <p class="lead">
+      Dein Bogen ist bei mir eingegangen. Ich schaue ihn mir vor unserem Termin in
+      Ruhe an — Du musst nichts weiter tun. Eine Bestätigung liegt gleich in Deinem
+      Postfach.
+    </p>
+    <p class="lead" style="margin-top:2rem">
+      <a href="index.html">Zurück zur Startseite</a>
+    </p>
+  </section>
+
+</div>
+
+<footer>
+  <a href="index.html">Startseite</a>
+  <a href="impressum.html" target="_blank" rel="noopener">Impressum</a>
+  <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutz</a>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===== HIER ANPASSEN ===== */
+  var ENDPOINT = 'https://n8n.ascensus.fit/webhook/anamnese';
+  /* ========================= */
+
+  var form     = document.getElementById('form');
+  var steps    = Array.prototype.slice.call(form.querySelectorAll('.step'));
+  var nav      = document.getElementById('nav');
+  var prevBtn  = document.getElementById('prev');
+  var nextBtn  = document.getElementById('next');
+  var sendBtn  = document.getElementById('send');
+  var climb    = document.getElementById('climb');
+  var fill     = document.getElementById('climbFill');
+  var label    = document.getElementById('climbLabel');
+  var count    = document.getElementById('climbCount');
+  var status   = document.getElementById('status');
+  var doneBox  = document.getElementById('done');
+  var consentErrEl = document.getElementById('consentErr');
+  var langLink = document.querySelector('.lang');
+
+  var current  = 0;
+  var last     = steps.length - 1;
+  var opened   = Date.now();
+  var sent     = false;
+  var touched  = false;
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function show(i){
+    steps[current].classList.remove('active');
+    current = i;
+    steps[current].classList.add('active');
+
+    var isIntro = (current === 0);
+    if (langLink) langLink.hidden = !isIntro;   // Wechsel nur vor dem Start
+    climb.hidden = isIntro;
+    nav.hidden   = isIntro;
+    prevBtn.hidden = (current <= 1);
+    nextBtn.hidden = (current === last);
+    sendBtn.hidden = (current !== last);
+
+    if (!isIntro){
+      label.textContent = steps[current].dataset.title;
+      count.textContent = pad(current) + ' / ' + pad(last);
+      fill.style.width  = ((current / last) * 100) + '%';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    var first = steps[current].querySelector('input,select,textarea,button');
+    if (first && !isIntro) { first.focus({ preventScroll: true }); }
+  }
+
+  /* --- Prüfung eines Schritts --- */
+  function check(step){
+    var ok = true;
+    var fields = step.querySelectorAll('[required]');
+
+    Array.prototype.forEach.call(fields, function(el){
+      var wrap = el.closest('.field') || el.closest('.consent');
+      var valid = el.type === 'checkbox' ? el.checked : String(el.value).trim() !== '';
+
+      if (valid && el.type === 'email'){
+        valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim());
+      }
+      if (valid && el.type === 'number'){
+        var n = parseFloat(el.value);
+        if (el.min !== '' && n < parseFloat(el.min)) valid = false;
+        if (el.max !== '' && n > parseFloat(el.max)) valid = false;
+      }
+
+      if (el.id === 'einwilligung'){
+        consentErrEl.style.display = valid ? 'none' : 'block';
+      } else if (wrap){
+        wrap.classList.toggle('invalid', !valid);
+      }
+
+      if (!valid && ok){ ok = false; el.focus({ preventScroll: false }); }
+    });
+
+    // Auswahlgruppen: mindestens eine Antwort, und "Etwas anderes" braucht Text
+    Array.prototype.forEach.call(step.querySelectorAll('fieldset[data-required]'), function(fs){
+      var any   = fs.querySelector('.chips input:checked');
+      var other = fs.querySelector('.chips input[data-other]');
+      var free  = fs.querySelector('[data-otherfield]');
+      var valid = !!any;
+      if (valid && other && other.checked && String(free.value).trim() === '') valid = false;
+
+      fs.classList.toggle('invalid', !valid);
+      if (!valid && ok){
+        ok = false;
+        fs.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    });
+
+    return ok;
+  }
+
+  /* --- Eingaben lösen die Fehlermarkierung --- */
+  form.addEventListener('input', function(e){
+    touched = true;
+    var wrap = e.target.closest('.field');
+    if (wrap) wrap.classList.remove('invalid');
+    if (e.target.id === 'einwilligung') consentErrEl.style.display = 'none';
+  });
+  form.addEventListener('change', function(){ touched = true; });
+
+  /* --- Auswahlgruppen: "Etwas anderes" klappt das Textfeld auf, --- */
+  /* --- "Nein/Keine" schließt die übrigen Antworten aus          --- */
+  var NONE = /^(nein|kein|nichts|gar nicht|ändert sich nicht|weiß ich|bin da noch offen)/i;
+
+  function openField(fs, on, focus){
+    var f = fs.querySelector('[data-otherfield]');
+    if (!f) return;
+    f.hidden = !on;
+    if (on && focus) { f.focus(); } else if (!on) { f.value = ''; }
+  }
+
+  form.addEventListener('change', function(e){
+    var cb = e.target;
+    if (cb.type !== 'checkbox') return;
+    var fs = cb.closest('fieldset[data-merge]');
+    if (!fs) return;
+
+    fs.classList.remove('invalid');
+    if (cb.hasAttribute('data-other')) openField(fs, cb.checked, true);
+    if (!cb.checked) return;
+
+    var boxes = fs.querySelectorAll('.chips input[type=checkbox]');
+    var mine  = NONE.test(cb.value || '');
+
+    Array.prototype.forEach.call(boxes, function(o){
+      if (o === cb) return;
+      var other = NONE.test(o.value || '');
+      if (mine || other){
+        if (o.checked){
+          o.checked = false;
+          if (o.hasAttribute('data-other')) openField(fs, false, false);
+        }
+      }
+    });
+  });
+
+  /* --- Navigation --- */
+  form.addEventListener('click', function(e){
+    if (e.target.hasAttribute('data-next')) show(1);
+  });
+  nextBtn.addEventListener('click', function(){
+    if (check(steps[current])) show(Math.min(current + 1, last));
+  });
+  prevBtn.addEventListener('click', function(){
+    show(Math.max(current - 1, 1));
+  });
+
+  /* --- Schutz vor versehentlichem Verlassen --- */
+  window.addEventListener('beforeunload', function(e){
+    if (touched && !sent){ e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* --- Ohne Maßband: Umfänge deaktivieren --- */
+  var massband = document.getElementById('kein_massband');
+  if (massband){
+    massband.addEventListener('change', function(){
+      Array.prototype.forEach.call(form.querySelectorAll('[data-massband]'), function(el){
+        var wrap = el.closest('.field');
+        if (massband.checked){
+          el.value = ''; el.required = false; el.disabled = true;
+          if (wrap){ wrap.classList.add('off'); wrap.classList.remove('invalid'); }
+        } else {
+          el.required = true; el.disabled = false;
+          if (wrap) wrap.classList.remove('off');
+        }
+      });
+    });
+  }
+
+  /* --- Daten einsammeln --- */
+  function collect(){
+    var data = {};
+    var els = form.querySelectorAll('input,select,textarea');
+
+    Array.prototype.forEach.call(els, function(el){
+      if (!el.name || el.name === 'webseite') return;
+
+      if (el.type === 'checkbox' && el.name === 'ziel'){
+        if (el.checked){ (data.ziel = data.ziel || []).push(el.value); }
+      } else if (el.type === 'checkbox'){
+        data[el.name] = el.checked;
+      } else if (el.type === 'radio'){
+        if (el.checked) data[el.name] = el.value;
+      } else {
+        var v = String(el.value).trim();
+        if (v !== '') data[el.name] = v;
+      }
+    });
+
+    if (Array.isArray(data.ziel)) data.ziel = data.ziel.join(', ');
+
+    // Auswahlgruppen zu einem Textwert zusammenfassen
+    Array.prototype.forEach.call(form.querySelectorAll('fieldset[data-merge]'), function(fs){
+      var parts = [];
+      Array.prototype.forEach.call(fs.querySelectorAll('.chips input:checked'), function(cb){
+        if (!cb.hasAttribute('data-other')) parts.push(cb.value);
+      });
+      var free = fs.querySelector('[data-otherfield]');
+      if (free && String(free.value).trim() !== '') parts.push(String(free.value).trim());
+      if (parts.length) data[fs.dataset.merge] = parts.join(', ');
+    });
+    data.eingereicht_am = new Date().toISOString();
+    data.formular       = 'anamnese-ausfuehrlich';
+    return data;
+  }
+
+  /* --- Absenden --- */
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!check(steps[last])) return;
+
+    // Spamschutz: Honeypot + Mindestdauer
+    if (document.getElementById('webseite').value !== ''){ return; }
+    if (Date.now() - opened < 15000){
+      status.className = 'status err-msg';
+      status.textContent = 'Einen Moment noch — bitte versuch es gleich noch einmal.';
+      return;
+    }
+
+    sendBtn.disabled = true;
+    status.className = 'status';
+    status.textContent = 'Wird übermittelt …';
+
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(collect())
+    })
+    .then(function(res){
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      sent = true;
+      var vorname = document.getElementById('vorname').value.trim();
+      document.getElementById('doneName').textContent = vorname ? vorname + '.' : 'alles da.';
+      form.hidden   = true;
+      climb.hidden  = true;
+      doneBox.hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(function(){
+      sendBtn.disabled = false;
+      status.className = 'status err-msg';
+      status.innerHTML = 'Die Übermittlung hat nicht geklappt. Bitte lass diese Seite ' +
+        'offen und versuch es in einer Minute noch einmal. Wenn es dann immer noch ' +
+        'nicht geht, schreib mir kurz an <a href="mailto:patrick@ascensus.fit">' +
+        'patrick@ascensus.fit</a> — wir gehen den Bogen dann im Gespräch durch.';
+    });
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>
