@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trainingsbuch – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+<style>
+  :root{
+    --bg: #14151a;
+    --surface: #1b1d24;
+    --border: rgba(242,241,237,0.12);
+    --border-strong: rgba(242,241,237,0.22);
+    --text: #f2f1ed;
+    --text-dim: #9a9ca5;
+    --accent: #e8c547;
+    --accent-text: #14151a;
+    --leicht: #6fcf97;
+    --okay: #7fa7c9;
+    --hart: #e4572e;
+    --radius: 6px;
+    --olive: #556B4E;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    padding-bottom: 48px;
+  }
+
+  h1,h2{ font-family:'Space Grotesk', system-ui, sans-serif; margin:0; }
+
+  /* Top navbar (heller Rahmen wie im übrigen Mitgliederbereich) */
+  .navbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 16px 18px; background: var(--offwhite); color: var(--anthrazit);
+  }
+  .navbar img{ height: 30px; }
+  .navbar .nav-right{ display:flex; align-items:center; gap:16px; }
+  .navbar a.back{ color: var(--anthrazit); text-decoration:none; font-size:0.85rem; opacity:0.7; font-family:'IBM Plex Sans', system-ui, sans-serif; }
+  .navbar button.logout{
+    background:none; border:none; color: var(--anthrazit); opacity:0.65;
+    font-size:0.85rem; cursor:pointer; font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+
+  header.page-head{
+    padding: 20px 18px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  header.page-head h1{ font-size: 1.35rem; font-weight:700; letter-spacing:-0.01em; }
+  header.page-head p{ margin: 4px 0 0; color: var(--text-dim); font-size: 0.85rem; }
+
+  section{ padding: 18px; border-bottom: 1px solid var(--border); }
+
+  /* Timer */
+  #timer-section{
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+  }
+  #timer-section h2{ font-size: 0.95rem; font-weight:600; color: var(--text-dim); margin-bottom: 12px; }
+  .timer-display{
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(3.2rem, 20vw, 4.5rem);
+    text-align: center;
+    letter-spacing: -0.02em;
+    padding: 10px 0 4px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .timer-display.done{
+    border-color: var(--accent);
+    color: var(--accent);
+    animation: pulse 0.9s ease-in-out 3;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .timer-display.done{ animation: none; }
+  }
+  @keyframes pulse{
+    0%,100%{ opacity: 1; }
+    50%{ opacity: 0.45; }
+  }
+  .presets{
+    display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;
+  }
+  .chip{
+    flex:1; min-width: 64px;
+    padding:10px 0;
+    text-align:center;
+    background: var(--surface);
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    font-size:0.9rem;
+    font-weight:500;
+    cursor:pointer;
+  }
+  .chip:active{ transform: scale(0.96); }
+  .chip.active{ border-color: var(--accent); color: var(--accent); }
+
+  .custom-row{ display:flex; gap:8px; margin-top:8px; }
+  .custom-row input{
+    flex:1; background: var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding:10px 12px; font-size:0.9rem;
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  .custom-row button{
+    background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+    color: var(--text-dim); padding:0 16px; font-size:0.9rem; cursor:pointer;
+  }
+
+  .timer-controls{ display:flex; gap:8px; margin-top:14px; }
+  .btn{
+    flex:1; padding:13px 0; border-radius: var(--radius); border:1px solid var(--border-strong);
+    font-family:'IBM Plex Sans', system-ui, sans-serif; font-weight:600; font-size:0.95rem; cursor:pointer;
+    background: transparent; color: var(--text);
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn-primary{ background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .btn:disabled{ opacity:0.6; cursor:default; }
+
+  /* Form */
+  #form-section h2{ font-size: 0.95rem; font-weight:600; color: var(--text-dim); margin-bottom: 12px; }
+  .field{ margin-bottom: 12px; }
+  .field label{ display:block; font-size:0.8rem; color: var(--text-dim); margin-bottom:5px; }
+  .field input{
+    width:100%; background: var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding:11px 12px; font-size:0.95rem;
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  .field input:focus-visible, .chip:focus-visible, .btn:focus-visible{
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+  .row3{ display:flex; gap:8px; }
+  .row3 .field{ flex:1; }
+  .hint{ font-size:0.78rem; color: var(--text-dim); margin-top:-6px; margin-bottom:12px; min-height: 1em; }
+  .formmsg{ font-size:0.82rem; margin-top:8px; min-height:1.1em; }
+  .formmsg.error{ color: var(--hart); }
+
+  .tendenz-picker{ display:flex; gap:8px; margin-bottom:16px; }
+  .tendenz-btn{
+    flex:1; padding:11px 0; text-align:center; border-radius: var(--radius);
+    border:1px solid var(--border); background: var(--surface); color: var(--text-dim);
+    font-family:'IBM Plex Sans', system-ui, sans-serif; font-weight:500; font-size:0.88rem; cursor:pointer;
+  }
+  .tendenz-btn[data-val="leicht"].active{ border-color: var(--leicht); color: var(--leicht); }
+  .tendenz-btn[data-val="okay"].active{ border-color: var(--okay); color: var(--okay); }
+  .tendenz-btn[data-val="hart"].active{ border-color: var(--hart); color: var(--hart); }
+
+  /* Log */
+  #log-section h2{ font-size: 0.95rem; font-weight:600; color: var(--text-dim); margin-bottom: 4px; }
+  .date-group{ margin-top: 18px; }
+  .date-group h3{
+    font-family:'Space Grotesk', system-ui, sans-serif; font-size:0.95rem; font-weight:600;
+    margin: 0 0 8px; color: var(--text);
+  }
+  .entry{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 10px 0; border-top: 1px solid var(--border);
+  }
+  .entry:first-of-type{ border-top: none; }
+  .entry-main{ display:flex; flex-direction:column; }
+  .entry-ex{ font-size:0.95rem; font-weight:500; }
+  .entry-detail{ font-size:0.82rem; color: var(--text-dim); margin-top:2px; }
+  .entry-right{ display:flex; align-items:center; gap:10px; }
+  .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .dot.leicht{ background: var(--leicht); }
+  .dot.okay{ background: var(--okay); }
+  .dot.hart{ background: var(--hart); }
+  .del{
+    background:none; border:none; color: var(--text-dim); font-size:1.1rem;
+    cursor:pointer; padding:4px 6px; line-height:1;
+  }
+  .empty{ color: var(--text-dim); font-size:0.9rem; padding: 8px 0; }
+  .loading{ color: var(--text-dim); font-size:0.9rem; padding: 20px 0; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <a href="mitglieder-dashboard.html" aria-label="Zum Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+  <div class="nav-right">
+    <a class="back" href="mitglieder-dashboard.html">← Mitgliederbereich</a>
+    <button class="logout" id="logoutBtn">Ausloggen</button>
+  </div>
+</div>
+
+<header class="page-head">
+  <h1>Trainingsbuch</h1>
+  <p>Verlauf, Tendenz &amp; Pausen-Timer</p>
+</header>
+
+<section id="timer-section">
+  <h2>Pausen-Timer</h2>
+  <div class="timer-display" id="timerDisplay">01:30</div>
+  <div class="presets">
+    <div class="chip" data-secs="60">60 s</div>
+    <div class="chip active" data-secs="90">90 s</div>
+    <div class="chip" data-secs="120">120 s</div>
+    <div class="chip" data-secs="180">180 s</div>
+  </div>
+  <div class="custom-row">
+    <input type="number" id="customSecs" placeholder="eigene Zeit (Sek.)" inputmode="numeric">
+    <button id="setCustom">Setzen</button>
+  </div>
+  <div class="timer-controls">
+    <button class="btn btn-primary" id="startPause">Start</button>
+    <button class="btn" id="resetTimer">Reset</button>
+  </div>
+</section>
+
+<section id="form-section">
+  <h2>Neuer Eintrag</h2>
+  <div class="field">
+    <label for="fDate">Datum</label>
+    <input type="date" id="fDate">
+  </div>
+  <div class="field">
+    <label for="fExercise">Übung</label>
+    <input type="text" id="fExercise" list="exerciseList" placeholder="z. B. Armbeuger" autocomplete="off">
+    <datalist id="exerciseList"></datalist>
+  </div>
+  <div class="hint" id="lastHint"></div>
+  <div class="row3">
+    <div class="field">
+      <label for="fWeight">Gewicht (kg)</label>
+      <input type="number" id="fWeight" step="0.5" inputmode="decimal">
+    </div>
+    <div class="field">
+      <label for="fReps">Wdh.</label>
+      <input type="number" id="fReps" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label for="fSets">Sätze</label>
+      <input type="number" id="fSets" value="1" inputmode="numeric">
+    </div>
+  </div>
+  <div class="tendenz-picker" id="tendenzPicker">
+    <div class="tendenz-btn" data-val="leicht">Leicht</div>
+    <div class="tendenz-btn active" data-val="okay">Okay</div>
+    <div class="tendenz-btn" data-val="hart">Hart</div>
+  </div>
+  <button class="btn btn-primary" id="saveEntry" style="width:100%;">Eintrag speichern</button>
+  <div class="formmsg" id="formMsg"></div>
+</section>
+
+<section id="log-section">
+  <h2>Verlauf</h2>
+  <div id="logContainer"><div class="loading">Lade Einträge …</div></div>
+</section>
+
+<script>
+  // ---------- Auth guard ----------
+  const pb = new PocketBase('https://pb.ascensus.fit');
+  if (!pb.authStore.isValid) {
+    window.location.href = 'mitglieder-login.html';
+  }
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    pb.authStore.clear();
+    window.location.href = 'mitglieder-login.html';
+  });
+
+  // ---------- State ----------
+  let entries = [];
+  let selectedTendenz = 'okay';
+
+  async function loadEntries(){
+    try{
+      const records = await pb.collection('trainingsbuch_entries').getFullList({ sort: '-date' });
+      entries = records;
+    }catch(e){
+      entries = [];
+      console.error('Laden fehlgeschlagen', e);
+    }
+    renderLog();
+    updateExerciseList();
+  }
+
+  function formatDateHeading(iso){
+    const d = new Date(iso.slice(0,10) + 'T00:00:00');
+    return d.toLocaleDateString('de-DE', {day:'numeric', month:'long', year:'numeric'});
+  }
+
+  function renderLog(){
+    const container = document.getElementById('logContainer');
+    if(entries.length === 0){
+      container.innerHTML = '<div class="empty">Noch keine Einträge. Trag deinen ersten Satz oben ein.</div>';
+      return;
+    }
+    const dates = [...new Set(entries.map(e => e.date.slice(0,10)))].sort().reverse();
+    container.innerHTML = dates.map(date => {
+      const dayEntries = entries.filter(e => e.date.slice(0,10) === date);
+      const rows = dayEntries.map(e => `
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-ex">${escapeHtml(e.exercise)}</div>
+            <div class="entry-detail">${e.weight > 0 ? e.weight + ' kg × ' : ''}${e.reps} × ${e.sets}</div>
+          </div>
+          <div class="entry-right">
+            <span class="dot ${e.tendenz}" title="${e.tendenz}"></span>
+            <button class="del" data-id="${e.id}" aria-label="Eintrag löschen">×</button>
+          </div>
+        </div>
+      `).join('');
+      return `<div class="date-group"><h3>${formatDateHeading(date)}</h3>${rows}</div>`;
+    }).join('');
+
+    container.querySelectorAll('.del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        try{
+          await pb.collection('trainingsbuch_entries').delete(id);
+          entries = entries.filter(e => e.id !== id);
+          renderLog();
+          updateExerciseList();
+        }catch(e){
+          console.error('Löschen fehlgeschlagen', e);
+        }
+      });
+    });
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function updateExerciseList(){
+    const names = [...new Set(entries.map(e => e.exercise))].sort();
+    document.getElementById('exerciseList').innerHTML =
+      names.map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
+  }
+
+  // ---------- Form: last-value hint ----------
+  const fExercise = document.getElementById('fExercise');
+  fExercise.addEventListener('input', () => {
+    const q = fExercise.value.trim().toLowerCase();
+    const hintEl = document.getElementById('lastHint');
+    if(!q){ hintEl.textContent = ''; return; }
+    const matches = entries.filter(e => e.exercise.toLowerCase() === q)
+                            .sort((a,b) => b.date.localeCompare(a.date));
+    if(matches.length){
+      const m = matches[0];
+      hintEl.textContent = `Letztes Mal (${formatShort(m.date)}): ${m.weight > 0 ? m.weight + ' kg × ' : ''}${m.reps} × ${m.sets} · ${m.tendenz}`;
+    } else {
+      hintEl.textContent = '';
+    }
+  });
+
+  function formatShort(iso){
+    const d = new Date(iso.slice(0,10) + 'T00:00:00');
+    return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+  }
+
+  // ---------- Tendenz picker ----------
+  document.getElementById('tendenzPicker').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tendenz-btn');
+    if(!btn) return;
+    document.querySelectorAll('.tendenz-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTendenz = btn.dataset.val;
+  });
+
+  // ---------- Save entry ----------
+  document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
+
+  document.getElementById('saveEntry').addEventListener('click', async () => {
+    const formMsg = document.getElementById('formMsg');
+    formMsg.textContent = '';
+    formMsg.classList.remove('error');
+
+    const date = document.getElementById('fDate').value;
+    const exercise = fExercise.value.trim();
+    const weight = parseFloat(document.getElementById('fWeight').value) || 0;
+    const reps = parseInt(document.getElementById('fReps').value) || 0;
+    const sets = parseInt(document.getElementById('fSets').value) || 1;
+
+    if(!date || !exercise || !reps){
+      formMsg.textContent = 'Bitte Datum, Übung und Wiederholungen ausfüllen.';
+      formMsg.classList.add('error');
+      return;
+    }
+
+    const saveBtn = document.getElementById('saveEntry');
+    saveBtn.disabled = true;
+
+    try{
+      await pb.collection('trainingsbuch_entries').create({
+        member: pb.authStore.model.id,
+        date, exercise, weight, reps, sets,
+        tendenz: selectedTendenz
+      });
+      await loadEntries();
+
+      fExercise.value = '';
+      document.getElementById('fWeight').value = '';
+      document.getElementById('fReps').value = '';
+      document.getElementById('fSets').value = '1';
+      document.getElementById('lastHint').textContent = '';
+    }catch(e){
+      formMsg.textContent = 'Eintrag konnte nicht gespeichert werden.';
+      formMsg.classList.add('error');
+      console.error(e);
+    }finally{
+      saveBtn.disabled = false;
+    }
+  });
+
+  // ---------- Timer ----------
+  let totalSecs = 90;
+  let remaining = 90;
+  let timerInterval = null;
+  let isRunning = false;
+  let audioCtx = null;
+
+  const timerDisplay = document.getElementById('timerDisplay');
+  const startPauseBtn = document.getElementById('startPause');
+
+  function renderTimer(){
+    const m = Math.floor(remaining / 60).toString().padStart(2,'0');
+    const s = (remaining % 60).toString().padStart(2,'0');
+    timerDisplay.textContent = `${m}:${s}`;
+  }
+  renderTimer();
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      stopTimer();
+      totalSecs = Number(chip.dataset.secs);
+      remaining = totalSecs;
+      renderTimer();
+    });
+  });
+
+  document.getElementById('setCustom').addEventListener('click', () => {
+    const val = parseInt(document.getElementById('customSecs').value);
+    if(!val || val <= 0) return;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    stopTimer();
+    totalSecs = val;
+    remaining = val;
+    renderTimer();
+  });
+
+  function playBeep(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = 880;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
+    }catch(e){ /* Audio nicht verfügbar */ }
+  }
+
+  function tick(){
+    remaining -= 1;
+    renderTimer();
+    if(remaining <= 0){
+      stopTimer();
+      timerDisplay.classList.add('done');
+      playBeep();
+      try{ navigator.vibrate && navigator.vibrate([200,100,200]); }catch(e){}
+      setTimeout(() => timerDisplay.classList.remove('done'), 2800);
+    }
+  }
+
+  function startTimer(){
+    if(remaining <= 0) remaining = totalSecs;
+    isRunning = true;
+    startPauseBtn.textContent = 'Pause';
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function stopTimer(){
+    isRunning = false;
+    startPauseBtn.textContent = 'Start';
+    clearInterval(timerInterval);
+  }
+
+  startPauseBtn.addEventListener('click', () => {
+    if(isRunning) stopTimer();
+    else startTimer();
+  });
+
+  document.getElementById('resetTimer').addEventListener('click', () => {
+    stopTimer();
+    remaining = totalSecs;
+    renderTimer();
+  });
+
+  // ---------- Init ----------
+  loadEntries();
+</script>
+
+</body>
+</html>
