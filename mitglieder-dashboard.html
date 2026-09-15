@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mitgliederbereich – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+<style>
+  :root{
+    --olive: #556B4E;
+    --sand: #B59A5D;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--offwhite); color: var(--anthrazit);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  header{ padding: 20px; border-bottom: 1px solid rgba(35,35,35,0.1); }
+  .navbar{ display:flex; align-items:center; justify-content:space-between; max-width: 960px; margin:0 auto; }
+  .navbar img{ height: 34px; }
+  .logout{ background:none; border:none; color: var(--anthrazit); opacity:0.65; font-size:0.85rem; cursor:pointer; font-family:inherit; }
+
+  main{ max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+  h1{
+    font-size: 1.6rem; font-weight: 600; color: var(--olive);
+    text-transform: uppercase; letter-spacing: 2px; margin: 0 0 6px;
+  }
+  .welcome{ font-size:0.95rem; opacity:0.7; margin: 0 0 32px; }
+
+  .modules{ display:flex; flex-direction:column; gap:12px; }
+  .module{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 20px 22px; background:#fff; border: 1px solid rgba(35,35,35,0.1);
+    border-radius: 4px; text-decoration:none; color: var(--anthrazit);
+  }
+  .module.disabled{ opacity:0.55; pointer-events:none; }
+  .module-name{ font-weight:600; font-size:1rem; }
+  .module-status{ font-size:0.8rem; color: var(--sand); text-transform:uppercase; letter-spacing:1px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <img src="logo-wordmark.png" alt="ASCENSUS">
+    <button class="logout" id="logoutBtn">Ausloggen</button>
+  </div>
+</header>
+
+<main>
+  <h1>Mitgliederbereich</h1>
+  <p class="welcome" id="welcome"></p>
+
+  <div class="modules">
+    <a href="trainingsbuch.html" class="module disabled">
+      <span class="module-name">Trainingsbuch</span>
+      <span class="module-status">Folgt</span>
+    </a>
+  </div>
+</main>
+
+<script>
+  const pb = new PocketBase('https://pb.ascensus.fit');
+
+  if (!pb.authStore.isValid) {
+    window.location.href = 'mitglieder-login.html';
+  } else {
+    document.getElementById('welcome').textContent =
+      'Willkommen, ' + (pb.authStore.model?.email || '');
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    pb.authStore.clear();
+    window.location.href = 'mitglieder-login.html';
+  });
+</script>
+
+</body>
+</html>
