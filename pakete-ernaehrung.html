@@ -319,7 +319,7 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
           <li>2 Wochen App-Nachlaufzeit</li>
         </ul>
         <div class="plan-actions">
-          <a class="btn btn-ghost" href="https://buy.stripe.com/dRm8wI1hMgvmcGKfVd0kE00">Fundament buchen · 149 €</a>
+          <a class="btn btn-ghost" href="STRIPE_LINK_FUNDAMENT">Fundament buchen · 149 €</a>
         </div>
       </article>
 
@@ -342,7 +342,7 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
           <li>Voller App-Zugriff: Nährwerte, Rezepte, Einkaufslisten</li>
         </ul>
         <div class="plan-actions">
-          <a class="btn btn-sand" href="https://buy.stripe.com/8x24gs3pUfri9uyfVd0kE02">Weg buchen · 199 €</a>
+          <a class="btn btn-sand" href="STRIPE_LINK_WEG">Weg buchen · 199 €</a>
         </div>
       </article>
 
@@ -365,9 +365,9 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
           <li>Abschlussgespräch mit Fahrplan für die Zeit danach</li>
         </ul>
         <div class="plan-actions">
-          <a class="btn btn-ghost" href="https://buy.stripe.com/9B69AM1hM0wofSW9wP0kE03">Einmalzahlung · 357 €</a>
+          <a class="btn btn-ghost" href="STRIPE_LINK_NACHHALTIGKEIT_EINMALIG">Einmalzahlung · 357 €</a>
           <span class="plan-or">oder</span>
-          <a class="btn btn-ghost" href="https://buy.stripe.com/5kQ28ke4ycf6cGK8sL0kE01">3× monatlich · 119 €</a>
+          <a class="btn btn-ghost" href="STRIPE_LINK_NACHHALTIGKEIT_RATE">3× monatlich · 119 €</a>
         </div>
       </article>
     </div>
@@ -468,4 +468,91 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
         </div>
         <div class="up-item">
           <div class="up-from">Fundament → Nachhaltigkeit</div>
-          <div class="up-price">+&nbsp;250&
+          <div class="up-price">+&nbsp;250&nbsp;€</div>
+          <p>Direkt in die volle, langfristige Begleitung wechseln.</p>
+          <a class="btn btn-ghost btn-sm" href="https://wa.me/4915679810556?text=Hallo%20Patrick%2C%20ich%20interessiere%20mich%20f%C3%BCr%20das%20Upgrade%20von%20Das%20Fundament%20zu%20Die%20Nachhaltigkeit." target="_blank" rel="noopener">Interesse am Upgrade</a>
+        </div>
+        <div class="up-item">
+          <div class="up-from">Der Weg → Nachhaltigkeit</div>
+          <div class="up-price">+&nbsp;200&nbsp;€</div>
+          <p>Aus vier Wochen werden drei Monate Begleitung.</p>
+          <a class="btn btn-ghost btn-sm" href="https://wa.me/4915679810556?text=Hallo%20Patrick%2C%20ich%20interessiere%20mich%20f%C3%BCr%20das%20Upgrade%20von%20Der%20Weg%20zu%20Die%20Nachhaltigkeit." target="_blank" rel="noopener">Interesse am Upgrade</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ERSTGESPRÄCH ============ -->
+<section class="call">
+  <div class="wrap reveal">
+    <div class="call-grid">
+      <div>
+        <p class="eyebrow">Fragen offen?</p>
+        <h2>Lass uns kurz sprechen</h2>
+        <p style="margin-top:1.3rem">
+          Du bist Dir noch nicht sicher, welches Paket passt, oder hast einfach
+          noch eine Frage? In einem kurzen, kostenlosen Gespräch klären wir das.
+        </p>
+        <ul>
+          <li>sprechen wir über Deine Situation, Deine Ziele und Deine Motivation</li>
+          <li>klären wir offene Fragen zu den Paketen</li>
+          <li>finden wir gemeinsam das passende Paket für Dich</li>
+        </ul>
+      </div>
+      <div class="call-box">
+        <div class="dur">30</div>
+        <div class="durlbl">Minuten · kostenlos</div>
+        <a class="btn btn-sand" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Termin buchen</a>
+        <p style="margin-top:1rem;font-size:.8rem;color:rgba(245,243,238,.6)">
+          Unverbindlich. Kein Verkaufsgespräch.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="icon-olive.png" alt="" aria-hidden="true" width="52" height="52">
+        <div>
+          <div style="font-size:1rem;letter-spacing:.2em;text-transform:uppercase;color:var(--offwhite);font-weight:500">
+            Ascensus
+          </div>
+          <div style="font-size:.82rem;margin-top:.4rem">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="fslogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div class="foot-links">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+        <a href="agb.html">AGB</a>
+        <a href="widerruf.html">Widerruf</a>
+      </div>
+    </div>
+    <div class="copyright">© <span id="yr">2026</span> ASCENSUS · Patrick Spengler</div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+const hdr = document.getElementById('hdr');
+function onScroll(){ hdr.classList.toggle('scrolled', window.scrollY > 10); }
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+} else {
+  document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+}
+</script>
+</body>
+</html>
