@@ -233,6 +233,19 @@
   .stats-summary strong{ color: var(--text); }
   .chart-scroll{ overflow-x:auto; padding: 8px 18px 18px; }
   .chart-scroll svg{ display:block; }
+  .exercise-history{ padding: 4px 18px 18px; border-top: 1px solid var(--border); margin-top: 4px; }
+  .exercise-block{ margin-top: 18px; }
+  .exercise-block h3{
+    font-family:'Space Grotesk', system-ui, sans-serif; font-size:0.95rem; font-weight:600;
+    margin: 0 0 4px;
+  }
+  .exercise-entry{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 9px 0; border-top: 1px solid var(--border); gap:10px;
+  }
+  .exercise-block .exercise-entry:first-of-type{ border-top: none; }
+  .exercise-entry-date{ font-size:0.78rem; color: var(--text-dim); min-width: 62px; flex-shrink:0; }
+  .exercise-entry-detail{ font-size:0.85rem; flex:1; }
 </style>
 </head>
 <body>
@@ -286,6 +299,7 @@
   </div>
   <div class="stats-summary" id="statsSummary"></div>
   <div class="chart-scroll" id="chartScroll"></div>
+  <div class="exercise-history" id="exerciseHistory"></div>
 </div>
 
 <!-- ========== Neues Training ========== -->
@@ -398,6 +412,14 @@
     return weight > 0 ? weight + ' kg × ' : 'Körpergewicht × ';
   }
 
+  function formatEntryDetail(e){
+    const base = `${formatLoad(e.weight)}${e.reps} × ${e.sets}`;
+    if(e.weight > 0){
+      return `${base} · ${Math.round(e.weight * e.reps * e.sets)} kg Workload`;
+    }
+    return `${base} · ${e.reps * e.sets} Wdh. gesamt`;
+  }
+
   function formatDateHeading(iso){
     const d = new Date(iso.slice(0,10) + 'T00:00:00');
     return d.toLocaleDateString('de-DE', {day:'numeric', month:'long', year:'numeric'});
@@ -452,7 +474,7 @@
       <div class="entry">
         <div class="entry-main">
           <div class="entry-ex">${escapeHtml(e.exercise)}</div>
-          <div class="entry-detail">${formatLoad(e.weight)}${e.reps} × ${e.sets}</div>
+          <div class="entry-detail">${formatEntryDetail(e)}</div>
         </div>
         <div class="entry-right">
           <span class="tendenz-label ${e.tendenz}">
@@ -543,6 +565,33 @@
       `${dates.length} Trainingstag${dates.length === 1 ? '' : 'e'} im Zeitraum`;
 
     chartScroll.innerHTML = buildBarChart(dates, volumes);
+    document.getElementById('exerciseHistory').innerHTML = buildExerciseHistory(inRange);
+  }
+
+  function buildExerciseHistory(inRange){
+    const byExercise = {};
+    inRange.forEach(e => {
+      if(!byExercise[e.exercise]) byExercise[e.exercise] = [];
+      byExercise[e.exercise].push(e);
+    });
+
+    const names = Object.keys(byExercise).sort();
+    return names.map(name => {
+      const rows = byExercise[name]
+        .slice()
+        .sort((a,b) => a.date.localeCompare(b.date))
+        .map(e => `
+          <div class="exercise-entry">
+            <span class="exercise-entry-date">${formatShort(e.date)}</span>
+            <span class="exercise-entry-detail">${formatEntryDetail(e)}</span>
+            <span class="tendenz-label ${e.tendenz}">
+              <span class="dot ${e.tendenz}"></span>
+              ${e.tendenz}
+            </span>
+          </div>
+        `).join('');
+      return `<div class="exercise-block"><h3>${escapeHtml(name)}</h3>${rows}</div>`;
+    }).join('');
   }
 
   function buildBarChart(dates, volumes){
