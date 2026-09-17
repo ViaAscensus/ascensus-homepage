@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Einmaliger Import – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+<style>
+  :root{
+    --olive: #556B4E;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+    --error: #A9432F;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--offwhite); color: var(--anthrazit);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: 24px 20px 60px;
+  }
+  .wrap{ max-width: 520px; margin: 0 auto; }
+  h1{
+    font-size: 1.3rem; font-weight: 600; color: var(--olive);
+    text-transform: uppercase; letter-spacing: 2px; margin: 0 0 16px;
+  }
+  p{ font-size:0.92rem; line-height:1.5; }
+  ul{ font-size:0.88rem; line-height:1.7; padding-left:20px; }
+  button{
+    padding: 13px 22px; border:none; border-radius: 4px;
+    background: var(--olive); color:#fff; font-family: inherit;
+    font-size:0.95rem; font-weight:600; cursor:pointer; margin-top:16px;
+  }
+  button:disabled{ opacity:0.6; cursor:default; }
+  .log{ margin-top:20px; font-size:0.85rem; line-height:1.6; white-space:pre-wrap; }
+  .error{ color: var(--error); }
+  .done{ color: var(--olive); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Einmaliger Import</h1>
+  <p>Trägt die 15 bereits bekannten Sätze vom 07.09. und 14.09.2026 in Dein Trainingsbuch ein. Nur einmal ausführen – danach kann die Datei wieder aus dem Repo gelöscht werden.</p>
+  <button id="importBtn">Import starten</button>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+  const pb = new PocketBase('https://pb.ascensus.fit');
+  if (!pb.authStore.isValid) {
+    document.getElementById('log').textContent = 'Bitte zuerst einloggen (mitglieder-login.html), dann diese Seite erneut aufrufen.';
+    document.getElementById('importBtn').disabled = true;
+  }
+
+  const legacyEntries = [
+    { date:'2026-09-07', exercise:'Schrägbank Bauch Crunch', weight:0,  reps:15, sets:3, tendenz:'okay' },
+    { date:'2026-09-07', exercise:'Armbeuger',                weight:45, reps:8,  sets:2, tendenz:'okay' },
+    { date:'2026-09-07', exercise:'Butterfly',                 weight:85, reps:8,  sets:2, tendenz:'hart' },
+    { date:'2026-09-07', exercise:'MTS Rudern',                weight:35, reps:8,  sets:2, tendenz:'leicht' },
+    { date:'2026-09-07', exercise:'Armstrecker',                weight:75, reps:8,  sets:2, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'Rückenstrecker',            weight:75, reps:10, sets:3, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'Butterfly',                 weight:85, reps:8,  sets:2, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'Armstrecker',                weight:80, reps:8,  sets:2, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'Armbeuger',                 weight:45, reps:8,  sets:1, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'Armbeuger',                 weight:50, reps:8,  sets:1, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'MTS Rudern',                weight:40, reps:8,  sets:1, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'MTS Rudern',                weight:45, reps:8,  sets:1, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'Beinstrecker',              weight:75, reps:8,  sets:2, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'Beinbeuger',                weight:75, reps:8,  sets:2, tendenz:'okay' },
+    { date:'2026-09-14', exercise:'MTS Zug',                   weight:45, reps:8,  sets:2, tendenz:'okay' }
+  ];
+
+  document.getElementById('importBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('importBtn');
+    const log = document.getElementById('log');
+    btn.disabled = true;
+    log.textContent = '';
+
+    let ok = 0, failed = 0;
+    for (const entry of legacyEntries) {
+      try {
+        await pb.collection('trainingsbuch_entries').create({
+          member: pb.authStore.model.id,
+          ...entry
+        });
+        ok++;
+        log.textContent += `✓ ${entry.date} – ${entry.exercise}\n`;
+      } catch (err) {
+        failed++;
+        log.textContent += `✗ ${entry.date} – ${entry.exercise} (Fehler)\n`;
+      }
+    }
+
+    log.textContent += `\n${ok} von ${legacyEntries.length} Einträgen importiert.`;
+    if (failed > 0) {
+      log.innerHTML += `<div class="error">${failed} fehlgeschlagen – siehe Konsole.</div>`;
+    } else {
+      log.innerHTML += `<div class="done">Fertig. Diese Datei kann jetzt aus dem Repo gelöscht werden.</div>`;
+    }
+    btn.disabled = false;
+  });
+</script>
+</body>
+</html>
