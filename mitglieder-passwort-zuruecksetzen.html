@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neues Passwort – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+<style>
+  :root{
+    --olive: #556B4E;
+    --sand: #B59A5D;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+    --error: #A9432F;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--offwhite); color: var(--anthrazit);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh; display:flex; flex-direction:column;
+  }
+  header{ padding: 24px 20px; }
+  .navbar{ display:flex; align-items:center; justify-content:space-between; max-width: 960px; margin:0 auto; }
+  .navbar img{ height: 34px; }
+  .navbar a.back{ color: var(--anthrazit); text-decoration:none; font-size:0.9rem; opacity:0.7; }
+
+  main{ flex:1; display:flex; align-items:center; justify-content:center; padding: 20px; }
+  .card{
+    width: 100%; max-width: 380px;
+    background: #fff; border: 1px solid rgba(35,35,35,0.1);
+    border-radius: 4px; padding: 36px 30px;
+  }
+  h1{
+    font-size: 1.4rem; font-weight: 600; color: var(--olive);
+    text-transform: uppercase; letter-spacing: 2px; margin: 0 0 22px;
+  }
+  label{ display:block; font-size:0.85rem; margin-bottom:6px; }
+  input{
+    width:100%; padding: 11px 12px; margin-bottom:16px;
+    border: 1px solid rgba(35,35,35,0.25); border-radius: 4px;
+    font-family: inherit; font-size:0.95rem; background: var(--offwhite);
+  }
+  input:focus-visible{ outline: 2px solid var(--olive); outline-offset:1px; }
+  button{
+    width:100%; padding: 13px 0; border:none; border-radius: 4px;
+    background: var(--olive); color:#fff; font-family: inherit;
+    font-size:0.95rem; font-weight:600; cursor:pointer;
+  }
+  button:disabled{ opacity:0.6; cursor:default; }
+  .msg{ font-size:0.85rem; margin-top:14px; min-height: 1.2em; }
+  .msg.error{ color: var(--error); }
+  .state{ text-align:center; font-size:0.9rem; line-height:1.6; }
+  .state.error{ color: var(--error); }
+  #setForm{ display:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <a href="index.html" aria-label="Zur Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <a class="back" href="index.html">← Startseite</a>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <h1>Neues Passwort</h1>
+    <div id="invalid" class="state error" style="display:none;">
+      Dieser Link ist ungültig oder abgelaufen. Fordere über den Login-Bereich einen neuen an.
+    </div>
+
+    <form id="setForm">
+      <label for="pw">Neues Passwort</label>
+      <input type="password" id="pw" required minlength="8" autocomplete="new-password">
+      <label for="pw2">Passwort wiederholen</label>
+      <input type="password" id="pw2" required minlength="8" autocomplete="new-password">
+      <button type="submit" id="submitBtn">Passwort speichern</button>
+      <div class="msg" id="msg"></div>
+    </form>
+  </div>
+</main>
+
+<script>
+  const pb = new PocketBase('https://pb.ascensus.fit');
+  const token = new URLSearchParams(window.location.search).get('token');
+
+  const invalidEl = document.getElementById('invalid');
+  const formEl = document.getElementById('setForm');
+  const msg = document.getElementById('msg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  if (!token) {
+    invalidEl.style.display = 'block';
+  } else {
+    formEl.style.display = 'block';
+  }
+
+  formEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = '';
+    msg.classList.remove('error');
+
+    const pw = document.getElementById('pw').value;
+    const pw2 = document.getElementById('pw2').value;
+
+    if (pw !== pw2) {
+      msg.textContent = 'Die Passwörter stimmen nicht überein.';
+      msg.classList.add('error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Einen Moment …';
+
+    try {
+      await pb.collection('members').confirmPasswordReset(token, pw, pw2);
+      window.location.href = 'mitglieder-login.html?reset=success';
+    } catch (err) {
+      formEl.style.display = 'none';
+      invalidEl.style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>
