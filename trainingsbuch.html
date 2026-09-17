@@ -200,6 +200,12 @@
   .row3{ display:flex; gap:8px; }
   .row3 .field{ flex:1; }
   .hint{ font-size:0.78rem; color: var(--text-dim); margin-top:-6px; margin-bottom:12px; min-height: 1em; }
+  .bw-check{
+    display:flex; align-items:center; gap:8px; margin-bottom:14px;
+    font-size:0.85rem; color: var(--text-dim); cursor:pointer;
+  }
+  .bw-check input{ width:auto; margin:0; accent-color: var(--accent); }
+  .field input:disabled{ opacity:0.4; }
   .formmsg{ font-size:0.82rem; margin-top:8px; min-height:1.1em; }
   .formmsg.error{ color: var(--hart); }
 
@@ -345,10 +351,14 @@
       <datalist id="exerciseList"></datalist>
     </div>
     <div class="hint" id="lastHint"></div>
+    <label class="bw-check">
+      <input type="checkbox" id="fBodyweight">
+      Nur Körpergewicht (kein Zusatzgewicht)
+    </label>
     <div class="row3">
       <div class="field">
         <label for="fWeight">Gewicht (kg)</label>
-        <input type="number" id="fWeight" step="0.5" inputmode="decimal">
+        <input type="number" id="fWeight" step="0.5" inputmode="decimal" placeholder="z. B. Zusatzgewicht">
       </div>
       <div class="field">
         <label for="fReps">Wdh.</label>
@@ -680,6 +690,19 @@
     return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
   }
 
+  // ---------- Nur-Körpergewicht-Checkbox ----------
+  const fBodyweight = document.getElementById('fBodyweight');
+  const fWeight = document.getElementById('fWeight');
+  fBodyweight.addEventListener('change', () => {
+    if(fBodyweight.checked){
+      fWeight.value = '';
+      fWeight.disabled = true;
+    } else {
+      fWeight.disabled = false;
+      fWeight.focus();
+    }
+  });
+
   // ---------- Tendenz picker ----------
   document.getElementById('tendenzPicker').addEventListener('click', (e) => {
     const btn = e.target.closest('.tendenz-btn');
@@ -697,7 +720,7 @@
 
     const date = document.getElementById('fDate').value;
     const exercise = fExercise.value.trim();
-    const weight = parseFloat(document.getElementById('fWeight').value) || 0;
+    const weight = fBodyweight.checked ? 0 : (parseFloat(document.getElementById('fWeight').value) || 0);
     const reps = parseInt(document.getElementById('fReps').value) || 0;
     const sets = parseInt(document.getElementById('fSets').value) || 1;
 
@@ -720,6 +743,8 @@
 
       fExercise.value = '';
       document.getElementById('fWeight').value = '';
+      fWeight.disabled = false;
+      fBodyweight.checked = false;
       document.getElementById('fReps').value = '';
       document.getElementById('fSets').value = '1';
       document.getElementById('lastHint').textContent = '';
