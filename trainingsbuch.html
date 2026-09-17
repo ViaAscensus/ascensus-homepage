@@ -111,6 +111,13 @@
   .dot.leicht{ background: var(--leicht); }
   .dot.okay{ background: var(--okay); }
   .dot.hart{ background: var(--hart); }
+  .tendenz-label{
+    display:flex; align-items:center; gap:6px;
+    font-size:0.78rem; text-transform:capitalize; color: var(--text-dim);
+  }
+  .tendenz-label.leicht{ color: var(--leicht); }
+  .tendenz-label.okay{ color: var(--okay); }
+  .tendenz-label.hart{ color: var(--hart); }
   .del{
     background:none; border:none; color: var(--text-dim); font-size:1.1rem;
     cursor:pointer; padding:4px 6px; line-height:1;
@@ -205,6 +212,27 @@
   .tendenz-btn[data-val="leicht"].active{ border-color: var(--leicht); color: var(--leicht); }
   .tendenz-btn[data-val="okay"].active{ border-color: var(--okay); color: var(--okay); }
   .tendenz-btn[data-val="hart"].active{ border-color: var(--hart); color: var(--hart); }
+
+  /* ---------- Auswertung ---------- */
+  .stats-link{
+    display:block; margin: 4px 18px 0; color: var(--text-dim); text-decoration:none;
+    font-size:0.85rem; background:none; border:none; cursor:pointer; padding:0;
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  #stats-screen .head{ padding: 16px 18px 4px; }
+  #stats-screen h2{ font-size:1.2rem; font-weight:700; }
+  .range-row{ display:flex; gap:10px; padding: 12px 18px 0; align-items:flex-end; }
+  .range-field{ flex:1; }
+  .range-field label{ display:block; font-size:0.78rem; color: var(--text-dim); margin-bottom:5px; }
+  .range-field input{
+    width:100%; background: var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding:9px 10px; font-size:0.88rem;
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  .stats-summary{ padding: 16px 18px 4px; font-size:0.88rem; color: var(--text-dim); line-height:1.6; }
+  .stats-summary strong{ color: var(--text); }
+  .chart-scroll{ overflow-x:auto; padding: 8px 18px 18px; }
+  .chart-scroll svg{ display:block; }
 </style>
 </head>
 <body>
@@ -226,6 +254,7 @@
     <p class="sub">Deine bisherigen Trainingseinheiten</p>
   </div>
   <button class="new-training-btn" id="newTrainingBtn">+ Neues Training starten</button>
+  <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
   <div id="dayList"></div>
 </div>
 
@@ -237,6 +266,26 @@
   </div>
   <button class="add-to-day-btn" id="addToDayBtn">+ Übung zu diesem Training hinzufügen</button>
   <div id="dayEntries"></div>
+</div>
+
+<!-- ========== Auswertung ========== -->
+<div class="screen" id="stats-screen">
+  <button class="screen-back" id="statsBackBtn">← Übersicht</button>
+  <div class="head">
+    <h2>Auswertung</h2>
+  </div>
+  <div class="range-row">
+    <div class="range-field">
+      <label for="rangeFrom">Von</label>
+      <input type="date" id="rangeFrom">
+    </div>
+    <div class="range-field">
+      <label for="rangeTo">Bis</label>
+      <input type="date" id="rangeTo">
+    </div>
+  </div>
+  <div class="stats-summary" id="statsSummary"></div>
+  <div class="chart-scroll" id="chartScroll"></div>
 </div>
 
 <!-- ========== Neues Training ========== -->
@@ -317,6 +366,7 @@
   const screens = {
     overview: document.getElementById('overview-screen'),
     day: document.getElementById('day-screen'),
+    stats: document.getElementById('stats-screen'),
     new: document.getElementById('new-screen')
   };
   const loadingState = document.getElementById('loadingState');
@@ -342,6 +392,10 @@
     const d = document.createElement('div');
     d.textContent = str;
     return d.innerHTML;
+  }
+
+  function formatLoad(weight){
+    return weight > 0 ? weight + ' kg × ' : 'Körpergewicht × ';
   }
 
   function formatDateHeading(iso){
@@ -398,10 +452,13 @@
       <div class="entry">
         <div class="entry-main">
           <div class="entry-ex">${escapeHtml(e.exercise)}</div>
-          <div class="entry-detail">${e.weight > 0 ? e.weight + ' kg × ' : ''}${e.reps} × ${e.sets}</div>
+          <div class="entry-detail">${formatLoad(e.weight)}${e.reps} × ${e.sets}</div>
         </div>
         <div class="entry-right">
-          <span class="dot ${e.tendenz}" title="${e.tendenz}"></span>
+          <span class="tendenz-label ${e.tendenz}">
+            <span class="dot ${e.tendenz}"></span>
+            ${e.tendenz}
+          </span>
           <button class="del" data-id="${e.id}" aria-label="Eintrag löschen">×</button>
         </div>
       </div>
@@ -435,6 +492,84 @@
 
   document.getElementById('addToDayBtn').addEventListener('click', () => openNew(selectedDate));
 
+  // ---------- Auswertung ----------
+  document.getElementById('statsLink').addEventListener('click', openStats);
+  document.getElementById('statsBackBtn').addEventListener('click', () => {
+    renderOverview();
+    showScreen('overview');
+  });
+  document.getElementById('rangeFrom').addEventListener('change', renderStats);
+  document.getElementById('rangeTo').addEventListener('change', renderStats);
+
+  function openStats(){
+    if(entries.length > 0){
+      const dates = entries.map(e => e.date.slice(0,10)).sort();
+      document.getElementById('rangeFrom').value = dates[0];
+      document.getElementById('rangeTo').value = dates[dates.length - 1];
+    }
+    renderStats();
+    showScreen('stats');
+  }
+
+  function renderStats(){
+    const from = document.getElementById('rangeFrom').value;
+    const to = document.getElementById('rangeTo').value;
+    const summary = document.getElementById('statsSummary');
+    const chartScroll = document.getElementById('chartScroll');
+
+    const inRange = entries.filter(e => {
+      const d = e.date.slice(0,10);
+      return (!from || d >= from) && (!to || d <= to);
+    });
+
+    if(inRange.length === 0){
+      summary.innerHTML = 'Keine Trainings in diesem Zeitraum.';
+      chartScroll.innerHTML = '';
+      return;
+    }
+
+    // Volumen pro Tag: Gewicht × Wiederholungen × Sätze, summiert
+    const byDate = {};
+    inRange.forEach(e => {
+      const d = e.date.slice(0,10);
+      byDate[d] = (byDate[d] || 0) + (e.weight * e.reps * e.sets);
+    });
+    const dates = Object.keys(byDate).sort();
+    const volumes = dates.map(d => byDate[d]);
+    const totalVolume = volumes.reduce((a,b) => a+b, 0);
+
+    summary.innerHTML =
+      `<strong>${Math.round(totalVolume).toLocaleString('de-DE')} kg</strong> Gesamtvolumen · ` +
+      `${dates.length} Trainingstag${dates.length === 1 ? '' : 'e'} im Zeitraum`;
+
+    chartScroll.innerHTML = buildBarChart(dates, volumes);
+  }
+
+  function buildBarChart(dates, volumes){
+    const barWidth = 34;
+    const gap = 14;
+    const chartHeight = 180;
+    const labelHeight = 34;
+    const maxVal = Math.max(...volumes, 1);
+    const width = Math.max(dates.length * (barWidth + gap) + gap, 280);
+    const height = chartHeight + labelHeight;
+
+    const bars = dates.map((d, i) => {
+      const v = volumes[i];
+      const barH = Math.max((v / maxVal) * (chartHeight - 24), 2);
+      const x = gap + i * (barWidth + gap);
+      const y = chartHeight - barH;
+      const shortDate = d.slice(8,10) + '.' + d.slice(5,7) + '.';
+      return `
+        <text x="${x + barWidth/2}" y="${y - 6}" text-anchor="middle" font-size="10" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${Math.round(v)}</text>
+        <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="3" fill="#e8c547"></rect>
+        <text x="${x + barWidth/2}" y="${chartHeight + 20}" text-anchor="middle" font-size="10" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${shortDate}</text>
+      `;
+    }).join('');
+
+    return `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
+  }
+
   // ---------- Neues Training ----------
   function openNew(date){
     document.getElementById('fDate').value = date || new Date().toISOString().slice(0,10);
@@ -463,7 +598,7 @@
                             .sort((a,b) => b.date.localeCompare(a.date));
     if(matches.length){
       const m = matches[0];
-      hintEl.textContent = `Letztes Mal (${formatShort(m.date)}): ${m.weight > 0 ? m.weight + ' kg × ' : ''}${m.reps} × ${m.sets} · ${m.tendenz}`;
+      hintEl.textContent = `Letztes Mal (${formatShort(m.date)}): ${formatLoad(m.weight)}${m.reps} × ${m.sets} · ${m.tendenz}`;
     } else {
       hintEl.textContent = '';
     }
