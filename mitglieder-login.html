@@ -52,7 +52,15 @@
   button:disabled{ opacity:0.6; cursor:default; }
   .msg{ font-size:0.85rem; margin-top:14px; min-height: 1.2em; }
   .msg.error{ color: var(--error); }
+  .msg.success{ color: var(--olive); }
   .hint{ margin-top:22px; font-size:0.82rem; opacity:0.65; line-height:1.5; }
+  .linkbtn{
+    background:none; border:none; padding:0; margin-top:14px;
+    color: var(--olive); font-size:0.85rem; text-decoration:underline;
+    cursor:pointer; font-family:inherit; width:auto;
+  }
+  #resetForm{ display:none; }
+  p.lead{ font-size:0.88rem; line-height:1.5; margin:0 0 20px; opacity:0.8; }
 </style>
 </head>
 <body>
@@ -67,6 +75,7 @@
 <main>
   <div class="card">
     <h1>Mitglieder-Login</h1>
+    <div class="msg success" id="topMsg"></div>
     <form id="loginForm">
       <label for="email">E-Mail</label>
       <input type="email" id="email" required autocomplete="username">
@@ -74,8 +83,19 @@
       <input type="password" id="pw" required autocomplete="current-password">
       <button type="submit" id="submitBtn">Einloggen</button>
       <div class="msg" id="msg"></div>
+      <button type="button" class="linkbtn" id="showResetBtn">Passwort vergessen?</button>
     </form>
-    <p class="hint">Noch keinen Zugang? Du bekommst eine persönliche Einladung von deinem Coach per E-Mail.</p>
+
+    <form id="resetForm">
+      <p class="lead">Trag Deine E-Mail-Adresse ein, wir schicken Dir einen Link zum Zurücksetzen.</p>
+      <label for="resetEmail">E-Mail</label>
+      <input type="email" id="resetEmail" required autocomplete="username">
+      <button type="submit" id="resetSubmitBtn">Link anfordern</button>
+      <div class="msg" id="resetMsg"></div>
+      <button type="button" class="linkbtn" id="showLoginBtn">Zurück zum Login</button>
+    </form>
+
+    <p class="hint" id="inviteHint">Noch keinen Zugang? Du bekommst eine persönliche Einladung von deinem Coach per E-Mail.</p>
   </div>
 </main>
 
@@ -89,6 +109,29 @@
   const form = document.getElementById('loginForm');
   const msg = document.getElementById('msg');
   const submitBtn = document.getElementById('submitBtn');
+  const resetForm = document.getElementById('resetForm');
+  const resetMsg = document.getElementById('resetMsg');
+  const resetSubmitBtn = document.getElementById('resetSubmitBtn');
+  const inviteHint = document.getElementById('inviteHint');
+  const topMsg = document.getElementById('topMsg');
+
+  // Erfolgsmeldung nach abgeschlossenem Reset
+  if (new URLSearchParams(window.location.search).get('reset') === 'success') {
+    topMsg.textContent = 'Passwort erfolgreich geändert. Du kannst Dich jetzt einloggen.';
+  }
+
+  function showReset() {
+    form.style.display = 'none';
+    inviteHint.style.display = 'none';
+    resetForm.style.display = 'block';
+  }
+  function showLogin() {
+    resetForm.style.display = 'none';
+    form.style.display = 'block';
+    inviteHint.style.display = 'block';
+  }
+  document.getElementById('showResetBtn').addEventListener('click', showReset);
+  document.getElementById('showLoginBtn').addEventListener('click', showLogin);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -109,6 +152,26 @@
       submitBtn.disabled = false;
       submitBtn.textContent = 'Einloggen';
     }
+  });
+
+  resetForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resetMsg.textContent = '';
+    resetMsg.classList.remove('error');
+    resetSubmitBtn.disabled = true;
+    resetSubmitBtn.textContent = 'Einen Moment …';
+
+    const email = document.getElementById('resetEmail').value.trim();
+
+    try {
+      await pb.collection('members').requestPasswordReset(email);
+    } catch (err) {
+      // bewusst ignoriert – keine Rückmeldung, ob die E-Mail existiert
+    }
+    resetMsg.textContent = 'Falls ein Konto mit dieser E-Mail existiert, hast Du in Kürze eine Mail mit einem Link erhalten.';
+    resetMsg.classList.add('success');
+    resetSubmitBtn.disabled = false;
+    resetSubmitBtn.textContent = 'Link anfordern';
   });
 </script>
 
