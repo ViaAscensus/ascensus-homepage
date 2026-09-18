@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Webhook-Tester</title>
+<style>
+  body{ margin:0; background:#16171a; color:#f2f1ed; font-family: system-ui, -apple-system, sans-serif; padding:20px; }
+  h1{ font-size:1.1rem; margin:0 0 18px; }
+  label{ display:block; font-size:0.85rem; margin-bottom:6px; opacity:0.8; }
+  input{
+    width:100%; box-sizing:border-box; padding:11px 12px; margin-bottom:14px;
+    border:1px solid #3a3c44; border-radius:6px; background:#1f2119; color:#f2f1ed; font-size:0.95rem;
+  }
+  button{
+    width:100%; padding:13px 0; border:none; border-radius:6px;
+    background:#556B4E; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; margin-bottom:20px;
+  }
+  button:disabled{ opacity:0.6; }
+  pre{
+    background:#1f2119; border:1px solid #3a3c44; border-radius:6px; padding:14px;
+    white-space:pre-wrap; word-break:break-all; font-size:0.82rem; min-height:60px;
+  }
+  .label{ font-size:0.8rem; opacity:0.6; margin-bottom:6px; }
+</style>
+</head>
+<body>
+  <h1>Webhook-Tester</h1>
+  <label for="url">Webhook-URL (aus n8n kopiert)</label>
+  <input type="text" id="url" placeholder="https://n8n.ascensus.fit/webhook-test/nutrilize-gewicht">
+  <label for="email">E-Mail-Adresse</label>
+  <input type="email" id="email" placeholder="patrick@ascensus.fit">
+  <button id="sendBtn">Testen</button>
+  <div class="label">Antwort:</div>
+  <pre id="output">–</pre>
+
+  <script>
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('sendBtn');
+      const out = document.getElementById('output');
+      const url = document.getElementById('url').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if(!url || !email){
+        out.textContent = 'Bitte URL und E-Mail eintragen.';
+        return;
+      }
+
+      btn.disabled = true;
+      out.textContent = 'Sende Anfrage …';
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const text = await res.text();
+        try {
+          out.textContent = JSON.stringify(JSON.parse(text), null, 2);
+        } catch(e) {
+          out.textContent = 'Status ' + res.status + ':\n' + text;
+        }
+      } catch (err) {
+        out.textContent = 'Fehler beim Senden: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
