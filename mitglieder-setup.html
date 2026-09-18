@@ -148,7 +148,8 @@
       await pb.collection('members').create({
         email: invitation.email,
         password: pw,
-        passwordConfirm: pw2
+        passwordConfirm: pw2,
+        Geschlecht: invitation.Geschlecht
       });
 
       await pb.collection('invitations').update(
