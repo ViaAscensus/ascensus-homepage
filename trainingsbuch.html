@@ -7,17 +7,16 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
 <style>
   :root{
-    --bg: #14151a;
-    --surface: #1b1d24;
+    --bg: #16171a;
+    --surface: #1f2119;
     --border: rgba(242,241,237,0.12);
     --border-strong: rgba(242,241,237,0.22);
     --text: #f2f1ed;
     --text-dim: #9a9ca5;
-    --accent: #e8c547;
-    --accent-text: #14151a;
+    --accent: #556B4E;
+    --accent-text: #f2f1ed;
     --leicht: #6fcf97;
     --okay: #7fa7c9;
     --hart: #e4572e;
@@ -208,6 +207,35 @@
   .field input:disabled{ opacity:0.4; }
   .formmsg{ font-size:0.82rem; margin-top:8px; min-height:1.1em; }
   .formmsg.error{ color: var(--hart); }
+  .save-confirm{ display:none; margin-top:14px; }
+  .save-confirm-msg{ color: var(--leicht); font-size:0.88rem; font-weight:600; margin-bottom:10px; }
+  .save-confirm-row{ display:flex; gap:8px; }
+  .btn-finish{ background: var(--hart); border-color: var(--hart); color: #fff; border-radius: 999px; }
+  .tendenz-dist{ padding: 4px 18px 18px; }
+  .tendenz-bar{ display:flex; height:14px; border-radius:7px; overflow:hidden; background: var(--surface); }
+  .tendenz-legend{ display:flex; gap:16px; margin-top:10px; flex-wrap:wrap; font-size:0.8rem; color: var(--text-dim); }
+  .tendenz-legend .dot{ margin-right:5px; }
+  .dist-heading{
+    padding: 14px 18px 0; font-size:0.78rem; color: var(--text-dim);
+    text-transform:uppercase; letter-spacing:0.5px;
+  }
+  .muscle-dist{ padding: 8px 18px 18px; }
+  .mg-row{ display:flex; align-items:center; gap:10px; padding: 6px 0; }
+  .mg-label{ width:80px; flex-shrink:0; font-size:0.82rem; }
+  .mg-bar-track{ flex:1; height:10px; border-radius:5px; background: var(--surface); overflow:hidden; }
+  .mg-bar-fill{ height:100%; background: var(--accent); border-radius:5px; }
+  .mg-value{ width:72px; flex-shrink:0; text-align:right; font-size:0.78rem; color: var(--text-dim); }
+  .body-map{ display:flex; gap:24px; justify-content:center; padding: 6px 18px 4px; flex-wrap:wrap; }
+  .body-map-fig{ text-align:center; }
+  .body-map-fig figcaption{ font-size:0.78rem; color: var(--text-dim); margin-top:4px; }
+  .body-map-legend{
+    display:flex; align-items:center; gap:8px; justify-content:center;
+    font-size:0.72rem; color: var(--text-dim); padding: 2px 18px 14px;
+  }
+  .legend-gradient{
+    width:100px; height:8px; border-radius:4px;
+    background: linear-gradient(90deg, #2a2b27, #556B4E, #B59A5D);
+  }
 
   .tendenz-picker{ display:flex; gap:8px; margin-bottom:16px; }
   .tendenz-btn{
@@ -221,10 +249,13 @@
 
   /* ---------- Auswertung ---------- */
   .stats-link{
-    display:block; margin: 4px 18px 0; color: var(--text-dim); text-decoration:none;
-    font-size:0.85rem; background:none; border:none; cursor:pointer; padding:0;
+    display:block; width: calc(100% - 36px); margin: 10px 18px 16px;
+    padding: 13px 0; text-align:center; color: var(--text);
+    background: var(--surface); border:1px solid var(--border-strong); border-radius: var(--radius);
+    font-size:0.95rem; font-weight:600; cursor:pointer;
     font-family:'IBM Plex Sans', system-ui, sans-serif;
   }
+  .stats-link:active{ transform: scale(0.98); }
   #stats-screen .head{ padding: 16px 18px 4px; }
   #stats-screen h2{ font-size:1.2rem; font-weight:700; }
   .range-row{ display:flex; gap:10px; padding: 12px 18px 0; align-items:flex-end; }
@@ -260,7 +291,12 @@
   .exercise-entries .exercise-entry:first-of-type{ border-top: none; }
   .exercise-entry-date{ font-size:0.78rem; color: var(--text-dim); min-width: 62px; flex-shrink:0; }
   .exercise-entry-detail{ font-size:0.85rem; flex:1; }
+  .trend-chart{ overflow-x:auto; padding: 4px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+  .trend-unit{ font-size:0.72rem; color: var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
+  .trend-pb{ font-size:0.82rem; color: var(--accent); font-weight:600; padding-top:8px; }
+  .trend-chart svg{ display:block; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
 </head>
 <body>
 
@@ -313,6 +349,14 @@
   </div>
   <div class="stats-summary" id="statsSummary"></div>
   <div class="chart-scroll" id="chartScroll"></div>
+  <div class="dist-heading">Tendenz</div>
+  <div class="tendenz-dist" id="tendenzDist"></div>
+  <div class="dist-heading">Muskelgruppen</div>
+  <div class="body-map" id="bodyMap"></div>
+  <div class="body-map-legend">
+    <span>Wenig</span><div class="legend-gradient"></div><span>Viel</span>
+  </div>
+  <div class="muscle-dist" id="muscleDist"></div>
   <div class="exercise-history" id="exerciseHistory"></div>
 </div>
 
@@ -376,482 +420,31 @@
     </div>
     <button class="btn btn-primary" id="saveEntry" style="width:100%;">Eintrag speichern</button>
     <div class="formmsg" id="formMsg"></div>
+    <div class="save-confirm" id="saveConfirm">
+      <div class="save-confirm-msg">✓ Gespeichert.</div>
+      <div class="save-confirm-row">
+        <button class="btn btn-primary" id="addAnotherSetBtn"></button>
+        <button class="btn btn-primary" id="addAnotherExerciseBtn">+ Weitere Übung</button>
+      </div>
+      <button class="btn btn-finish" id="finishDayBtn" style="width:100%; margin-top:8px;">Training fertig</button>
+    </div>
   </section>
 </div>
 
 <script>
-  // ---------- Auth guard ----------
-  const pb = new PocketBase('https://pb.ascensus.fit');
-  if (!pb.authStore.isValid) {
-    window.location.href = 'mitglieder-login.html';
-  }
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    pb.authStore.clear();
-    window.location.href = 'mitglieder-login.html';
-  });
 
-  // ---------- State ----------
-  let entries = [];
-  let selectedTendenz = 'okay';
-  let selectedDate = null;
-
-  const screens = {
-    overview: document.getElementById('overview-screen'),
-    day: document.getElementById('day-screen'),
-    stats: document.getElementById('stats-screen'),
-    new: document.getElementById('new-screen')
-  };
-  const loadingState = document.getElementById('loadingState');
-
-  function showScreen(name){
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[name].classList.add('active');
-  }
-
-  async function loadEntries(){
-    try{
-      entries = await pb.collection('trainingsbuch_entries').getFullList({ sort: '-date' });
-    }catch(e){
-      entries = [];
-      console.error('Laden fehlgeschlagen', e);
-    }
-    loadingState.style.display = 'none';
-    renderOverview();
-    updateExerciseList();
-  }
-
-  function escapeHtml(str){
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-  }
-
-  function formatLoad(weight){
-    return weight > 0 ? weight + ' kg × ' : 'Körpergewicht × ';
-  }
-
-  function formatEntryDetail(e){
-    const base = `${formatLoad(e.weight)}${e.reps} × ${e.sets}`;
-    if(e.weight > 0){
-      return `${base} · ${Math.round(e.weight * e.reps * e.sets)} kg Workload`;
-    }
-    return `${base} · ${e.reps * e.sets} Wdh. gesamt`;
-  }
-
-  function formatDateHeading(iso){
-    const d = new Date(iso.slice(0,10) + 'T00:00:00');
-    return d.toLocaleDateString('de-DE', {day:'numeric', month:'long', year:'numeric'});
-  }
-
-  // ---------- Übersicht ----------
-  function renderOverview(){
-    const container = document.getElementById('dayList');
-    if(entries.length === 0){
-      container.innerHTML = '<div class="empty">Noch keine Trainings erfasst. Starte oben Dein erstes Training.</div>';
-      return;
-    }
-    const dates = [...new Set(entries.map(e => e.date.slice(0,10)))].sort().reverse();
-    container.innerHTML = dates.map(date => {
-      const dayEntries = entries.filter(e => e.date.slice(0,10) === date);
-      return `
-        <button class="day-row" data-date="${date}">
-          <span>
-            <span class="day-date">${formatDateHeading(date)}</span>
-            <span class="day-meta">${dayEntries.length} Übung${dayEntries.length === 1 ? '' : 'en'}</span>
-          </span>
-          <span class="day-chevron">›</span>
-        </button>
-      `;
-    }).join('');
-
-    container.querySelectorAll('.day-row').forEach(row => {
-      row.addEventListener('click', () => openDay(row.dataset.date));
-    });
-  }
-
-  document.getElementById('newTrainingBtn').addEventListener('click', () => openNew(null));
-
-  // ---------- Tag-Detail ----------
-  function openDay(date){
-    selectedDate = date;
-    renderDayDetail();
-    showScreen('day');
-  }
-
-  function renderDayDetail(){
-    document.getElementById('dayHeading').textContent = formatDateHeading(selectedDate);
-    const container = document.getElementById('dayEntries');
-    const dayEntries = entries.filter(e => e.date.slice(0,10) === selectedDate);
-
-    if(dayEntries.length === 0){
-      container.innerHTML = '<div class="empty">Keine Übungen mehr an diesem Tag.</div>';
-      return;
-    }
-
-    container.innerHTML = dayEntries.map(e => `
-      <div class="entry">
-        <div class="entry-main">
-          <div class="entry-ex">${escapeHtml(e.exercise)}</div>
-          <div class="entry-detail">${formatEntryDetail(e)}</div>
-        </div>
-        <div class="entry-right">
-          <span class="tendenz-label ${e.tendenz}">
-            <span class="dot ${e.tendenz}"></span>
-            ${e.tendenz}
-          </span>
-          <button class="del" data-id="${e.id}" aria-label="Eintrag löschen">×</button>
-        </div>
-      </div>
-    `).join('');
-
-    container.querySelectorAll('.del').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        try{
-          await pb.collection('trainingsbuch_entries').delete(id);
-          entries = entries.filter(e => e.id !== id);
-          updateExerciseList();
-          const stillHasEntries = entries.some(e => e.date.slice(0,10) === selectedDate);
-          if(stillHasEntries){
-            renderDayDetail();
-          } else {
-            renderOverview();
-            showScreen('overview');
-          }
-        }catch(e){
-          console.error('Löschen fehlgeschlagen', e);
-        }
-      });
-    });
-  }
-
-  document.getElementById('dayBackBtn').addEventListener('click', () => {
-    renderOverview();
-    showScreen('overview');
-  });
-
-  document.getElementById('addToDayBtn').addEventListener('click', () => openNew(selectedDate));
-
-  // ---------- Auswertung ----------
-  document.getElementById('statsLink').addEventListener('click', openStats);
-  document.getElementById('statsBackBtn').addEventListener('click', () => {
-    renderOverview();
-    showScreen('overview');
-  });
-  document.getElementById('rangeFrom').addEventListener('change', renderStats);
-  document.getElementById('rangeTo').addEventListener('change', renderStats);
-
-  function openStats(){
-    if(entries.length > 0){
-      const dates = entries.map(e => e.date.slice(0,10)).sort();
-      document.getElementById('rangeFrom').value = dates[0];
-      document.getElementById('rangeTo').value = dates[dates.length - 1];
-    }
-    renderStats();
-    showScreen('stats');
-  }
-
-  function renderStats(){
-    const from = document.getElementById('rangeFrom').value;
-    const to = document.getElementById('rangeTo').value;
-    const summary = document.getElementById('statsSummary');
-    const chartScroll = document.getElementById('chartScroll');
-
-    const inRange = entries.filter(e => {
-      const d = e.date.slice(0,10);
-      return (!from || d >= from) && (!to || d <= to);
-    });
-
-    if(inRange.length === 0){
-      summary.innerHTML = 'Keine Trainings in diesem Zeitraum.';
-      chartScroll.innerHTML = '';
-      return;
-    }
-
-    // Volumen pro Tag: Gewicht × Wiederholungen × Sätze, summiert
-    const byDate = {};
-    inRange.forEach(e => {
-      const d = e.date.slice(0,10);
-      byDate[d] = (byDate[d] || 0) + (e.weight * e.reps * e.sets);
-    });
-    const dates = Object.keys(byDate).sort();
-    const volumes = dates.map(d => byDate[d]);
-    const totalVolume = volumes.reduce((a,b) => a+b, 0);
-
-    summary.innerHTML =
-      `<strong>${Math.round(totalVolume).toLocaleString('de-DE')} kg</strong> Gesamtvolumen · ` +
-      `${dates.length} Trainingstag${dates.length === 1 ? '' : 'e'} im Zeitraum`;
-
-    chartScroll.innerHTML = buildBarChart(dates, volumes);
-    document.getElementById('exerciseHistory').innerHTML = buildExerciseHistory(inRange);
-  }
-
-  function buildExerciseHistory(inRange){
-    const byExercise = {};
-    inRange.forEach(e => {
-      if(!byExercise[e.exercise]) byExercise[e.exercise] = [];
-      byExercise[e.exercise].push(e);
-    });
-
-    const names = Object.keys(byExercise).sort();
-    return names.map(name => {
-      const list = byExercise[name].slice().sort((a,b) => a.date.localeCompare(b.date));
-
-      const totalVolume = list.reduce((sum,e) => sum + (e.weight * e.reps * e.sets), 0);
-      const totalReps = list.reduce((sum,e) => sum + (e.reps * e.sets), 0);
-      const totalLabel = totalVolume > 0
-        ? `${Math.round(totalVolume).toLocaleString('de-DE')} kg gesamt`
-        : `${totalReps} Wdh. gesamt`;
-
-      const rows = list.map(e => `
-        <div class="exercise-entry">
-          <span class="exercise-entry-date">${formatShort(e.date)}</span>
-          <span class="exercise-entry-detail">${formatEntryDetail(e)}</span>
-          <span class="tendenz-label ${e.tendenz}">
-            <span class="dot ${e.tendenz}"></span>
-            ${e.tendenz}
-          </span>
-        </div>
-      `).join('');
-
-      return `
-        <details class="exercise-block">
-          <summary>
-            <span class="exercise-name">${escapeHtml(name)}</span>
-            <span class="exercise-total">${totalLabel} <span class="exercise-chevron">›</span></span>
-          </summary>
-          <div class="exercise-entries">${rows}</div>
-        </details>
-      `;
-    }).join('');
-  }
-
-  function buildBarChart(dates, volumes){
-    const barWidth = 34;
-    const gap = 14;
-    const chartHeight = 180;
-    const labelHeight = 34;
-    const maxVal = Math.max(...volumes, 1);
-    const width = Math.max(dates.length * (barWidth + gap) + gap, 280);
-    const height = chartHeight + labelHeight;
-
-    const bars = dates.map((d, i) => {
-      const v = volumes[i];
-      const barH = Math.max((v / maxVal) * (chartHeight - 24), 2);
-      const x = gap + i * (barWidth + gap);
-      const y = chartHeight - barH;
-      const shortDate = d.slice(8,10) + '.' + d.slice(5,7) + '.';
-      return `
-        <text x="${x + barWidth/2}" y="${y - 6}" text-anchor="middle" font-size="10" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${Math.round(v)}</text>
-        <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="3" fill="#e8c547"></rect>
-        <text x="${x + barWidth/2}" y="${chartHeight + 20}" text-anchor="middle" font-size="10" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${shortDate}</text>
-      `;
-    }).join('');
-
-    return `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
-  }
-
-  // ---------- Neues Training ----------
-  function openNew(date){
-    document.getElementById('fDate').value = date || new Date().toISOString().slice(0,10);
-    document.getElementById('formMsg').textContent = '';
-    showScreen('new');
-  }
-
-  document.getElementById('newBackBtn').addEventListener('click', () => {
-    renderOverview();
-    showScreen('overview');
-  });
-
-  function updateExerciseList(){
-    const names = [...new Set(entries.map(e => e.exercise))].sort();
-    document.getElementById('exerciseList').innerHTML =
-      names.map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
-  }
-
-  // ---------- Form: last-value hint ----------
-  const fExercise = document.getElementById('fExercise');
-  fExercise.addEventListener('input', () => {
-    const q = fExercise.value.trim().toLowerCase();
-    const hintEl = document.getElementById('lastHint');
-    if(!q){ hintEl.textContent = ''; return; }
-    const matches = entries.filter(e => e.exercise.toLowerCase() === q)
-                            .sort((a,b) => b.date.localeCompare(a.date));
-    if(matches.length){
-      const m = matches[0];
-      hintEl.textContent = `Letztes Mal (${formatShort(m.date)}): ${formatLoad(m.weight)}${m.reps} × ${m.sets} · ${m.tendenz}`;
-    } else {
-      hintEl.textContent = '';
-    }
-  });
-
-  function formatShort(iso){
-    const d = new Date(iso.slice(0,10) + 'T00:00:00');
-    return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
-  }
-
-  // ---------- Nur-Körpergewicht-Checkbox ----------
-  const fBodyweight = document.getElementById('fBodyweight');
-  const fWeight = document.getElementById('fWeight');
-  fBodyweight.addEventListener('change', () => {
-    if(fBodyweight.checked){
-      fWeight.value = '';
-      fWeight.disabled = true;
-    } else {
-      fWeight.disabled = false;
-      fWeight.focus();
-    }
-  });
-
-  // ---------- Tendenz picker ----------
-  document.getElementById('tendenzPicker').addEventListener('click', (e) => {
-    const btn = e.target.closest('.tendenz-btn');
-    if(!btn) return;
-    document.querySelectorAll('.tendenz-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedTendenz = btn.dataset.val;
-  });
-
-  // ---------- Save entry ----------
-  document.getElementById('saveEntry').addEventListener('click', async () => {
-    const formMsg = document.getElementById('formMsg');
-    formMsg.textContent = '';
-    formMsg.classList.remove('error');
-
-    const date = document.getElementById('fDate').value;
-    const exercise = fExercise.value.trim();
-    const weight = fBodyweight.checked ? 0 : (parseFloat(document.getElementById('fWeight').value) || 0);
-    const reps = parseInt(document.getElementById('fReps').value) || 0;
-    const sets = parseInt(document.getElementById('fSets').value) || 1;
-
-    if(!date || !exercise || !reps){
-      formMsg.textContent = 'Bitte Datum, Übung und Wiederholungen ausfüllen.';
-      formMsg.classList.add('error');
-      return;
-    }
-
-    const saveBtn = document.getElementById('saveEntry');
-    saveBtn.disabled = true;
-
-    try{
-      await pb.collection('trainingsbuch_entries').create({
-        member: pb.authStore.model.id,
-        date, exercise, weight, reps, sets,
-        tendenz: selectedTendenz
-      });
-      await loadEntries();
-
-      fExercise.value = '';
-      document.getElementById('fWeight').value = '';
-      fWeight.disabled = false;
-      fBodyweight.checked = false;
-      document.getElementById('fReps').value = '';
-      document.getElementById('fSets').value = '1';
-      document.getElementById('lastHint').textContent = '';
-
-      openDay(date);
-    }catch(e){
-      formMsg.textContent = 'Eintrag konnte nicht gespeichert werden.';
-      formMsg.classList.add('error');
-      console.error(e);
-    }finally{
-      saveBtn.disabled = false;
-    }
-  });
-
-  // ---------- Timer ----------
-  let totalSecs = 90;
-  let remaining = 90;
-  let timerInterval = null;
-  let isRunning = false;
-  let audioCtx = null;
-
-  const timerDisplay = document.getElementById('timerDisplay');
-  const startPauseBtn = document.getElementById('startPause');
-
-  function renderTimer(){
-    const m = Math.floor(remaining / 60).toString().padStart(2,'0');
-    const s = (remaining % 60).toString().padStart(2,'0');
-    timerDisplay.textContent = `${m}:${s}`;
-  }
-  renderTimer();
-
-  document.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      stopTimer();
-      totalSecs = Number(chip.dataset.secs);
-      remaining = totalSecs;
-      renderTimer();
-    });
-  });
-
-  document.getElementById('setCustom').addEventListener('click', () => {
-    const val = parseInt(document.getElementById('customSecs').value);
-    if(!val || val <= 0) return;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    stopTimer();
-    totalSecs = val;
-    remaining = val;
-    renderTimer();
-  });
-
-  function playBeep(){
-    try{
-      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if(audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.value = 880;
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
-    }catch(e){ /* Audio nicht verfügbar */ }
-  }
-
-  function tick(){
-    remaining -= 1;
-    renderTimer();
-    if(remaining <= 0){
-      stopTimer();
-      timerDisplay.classList.add('done');
-      playBeep();
-      try{ navigator.vibrate && navigator.vibrate([200,100,200]); }catch(e){}
-      setTimeout(() => timerDisplay.classList.remove('done'), 2800);
-    }
-  }
-
-  function startTimer(){
-    if(remaining <= 0) remaining = totalSecs;
-    isRunning = true;
-    startPauseBtn.textContent = 'Pause';
-    timerInterval = setInterval(tick, 1000);
-  }
-
-  function stopTimer(){
-    isRunning = false;
-    startPauseBtn.textContent = 'Start';
-    clearInterval(timerInterval);
-  }
-
-  startPauseBtn.addEventListener('click', () => {
-    if(isRunning) stopTimer();
-    else startTimer();
-  });
-
-  document.getElementById('resetTimer').addEventListener('click', () => {
-    stopTimer();
-    remaining = totalSecs;
-    renderTimer();
-  });
-
-  // ---------- Init ----------
-  showScreen('overview');
-  loadEntries();
-</script>
-
-</body>
-</html>
+  // ---------------------------------------------------------------------
+  // Körpergrafik-Vektordaten (männlich/weiblich, vorne/hinten) basierend auf
+  // "react-muscle-highlighter" von soroojshehryar, MIT-lizenziert:
+  // https://github.com/soroojshehryar/react-muscle-highlighter
+  //
+  // MIT License
+  // Permission is hereby granted, free of charge, to any person obtaining a copy
+  // of this software and associated documentation files (the "Software"), to deal
+  // in the Software without restriction, including without limitation the rights
+  // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  // copies of the Software, and to permit persons to whom the Software is
+  // furnished to do so, subject to the following conditions:
+  // The above copyright notice and this permission notice shall be included in
+  // all copies or substantial portions of the Software.
+ 
