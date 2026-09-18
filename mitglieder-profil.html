@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mein Profil – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+<style>
+  :root{
+    --olive: #556B4E;
+    --sand: #B59A5D;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+    --error: #A9432F;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--offwhite); color: var(--anthrazit);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  header{ padding: 20px; border-bottom: 1px solid rgba(35,35,35,0.1); }
+  .navbar{ display:flex; align-items:center; justify-content:space-between; max-width: 720px; margin:0 auto; }
+  .navbar img{ height: 34px; }
+  .nav-right{ display:flex; align-items:center; gap:16px; }
+  .nav-right a, .nav-right button{
+    color: var(--anthrazit); opacity:0.7; font-size:0.85rem; text-decoration:none;
+    background:none; border:none; cursor:pointer; font-family:inherit;
+  }
+
+  main{ max-width: 560px; margin: 0 auto; padding: 30px 20px 60px; }
+  h1{
+    font-size: 1.5rem; font-weight: 700; color: var(--olive);
+    text-transform: uppercase; letter-spacing: 2px; margin: 0 0 24px;
+  }
+
+  .card{
+    background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 4px;
+    padding: 22px 22px 24px; margin-bottom: 18px;
+  }
+  .card h2{
+    font-family:'Space Grotesk', system-ui, sans-serif; font-size:1rem; font-weight:600;
+    margin: 0 0 16px; color: var(--anthrazit);
+  }
+  .info-row{ display:flex; justify-content:space-between; padding: 8px 0; font-size:0.92rem; border-top: 1px solid rgba(35,35,35,0.07); }
+  .info-row:first-of-type{ border-top:none; }
+  .info-label{ color: var(--text-dim,#7a7a75); opacity:0.7; }
+
+  label{ display:block; font-size:0.85rem; margin-bottom:6px; }
+  select, input{
+    width:100%; padding: 11px 12px; margin-bottom:14px;
+    border: 1px solid rgba(35,35,35,0.25); border-radius: 4px;
+    font-family: inherit; font-size:0.95rem; background: var(--offwhite);
+  }
+  input:focus-visible, select:focus-visible{ outline: 2px solid var(--olive); outline-offset:1px; }
+  button.action{
+    padding: 12px 20px; border:none; border-radius: 4px;
+    background: var(--olive); color:#fff; font-family: inherit;
+    font-size:0.9rem; font-weight:600; cursor:pointer;
+  }
+  button.action:disabled{ opacity:0.6; cursor:default; }
+  .msg{ font-size:0.85rem; margin-top:10px; min-height: 1.2em; }
+  .msg.error{ color: var(--error); }
+  .msg.success{ color: var(--olive); }
+  .hint{ font-size:0.8rem; opacity:0.65; line-height:1.5; margin: -8px 0 14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <a href="mitglieder-dashboard.html" aria-label="Zum Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <div class="nav-right">
+      <a href="mitglieder-dashboard.html">← Mitgliederbereich</a>
+      <button id="logoutBtn">Ausloggen</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <h1>Mein Profil</h1>
+
+  <div class="card">
+    <h2>Konto</h2>
+    <div class="info-row"><span class="info-label">E-Mail</span><span id="infoEmail"></span></div>
+    <div class="info-row"><span class="info-label">Mitglied seit</span><span id="infoCreated"></span></div>
+  </div>
+
+  <div class="card">
+    <h2>Geschlecht</h2>
+    <p style="font-size:0.82rem; opacity:0.65; margin:0 0 14px;">Bestimmt, welche Körpergrafik im Trainingsbuch angezeigt wird.</p>
+    <select id="genderSelect">
+      <option value="Männlich">Männlich</option>
+      <option value="Weiblich">Weiblich</option>
+    </select>
+    <button class="action" id="saveGenderBtn">Speichern</button>
+    <div class="msg" id="genderMsg"></div>
+  </div>
+
+  <div class="card">
+    <h2>E-Mail ändern</h2>
+    <label for="newEmail">Neue E-Mail-Adresse</label>
+    <input type="email" id="newEmail" autocomplete="email">
+    <button class="action" id="changeEmailBtn">E-Mail ändern</button>
+    <div class="msg" id="emailMsg"></div>
+    <p class="hint">Du bekommst an die neue Adresse eine Bestätigungsmail. Erst nach dem Bestätigen wird die Änderung wirksam.</p>
+  </div>
+
+  <div class="card">
+    <h2>Passwort ändern</h2>
+    <label for="oldPw">Aktuelles Passwort</label>
+    <input type="password" id="oldPw" autocomplete="current-password">
+    <label for="newPw">Neues Passwort</label>
+    <input type="password" id="newPw" minlength="8" autocomplete="new-password">
+    <label for="newPw2">Neues Passwort wiederholen</label>
+    <input type="password" id="newPw2" minlength="8" autocomplete="new-password">
+    <button class="action" id="changePwBtn">Passwort ändern</button>
+    <div class="msg" id="pwMsg"></div>
+  </div>
+</main>
+
+<script>
+  const pb = new PocketBase('https://pb.ascensus.fit');
+  if (!pb.authStore.isValid) {
+    window.location.href = 'mitglieder-login.html';
+  }
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    pb.authStore.clear();
+    window.location.href = 'mitglieder-login.html';
+  });
+
+  function fillInfo(){
+    const m = pb.authStore.model;
+    document.getElementById('infoEmail').textContent = m.email;
+    document.getElementById('genderSelect').value = m.Geschlecht || 'Männlich';
+    const created = new Date(m.created);
+    document.getElementById('infoCreated').textContent = created.toLocaleDateString('de-DE', { day:'numeric', month:'long', year:'numeric' });
+  }
+  fillInfo();
+
+  // ---------- Geschlecht ----------
+  document.getElementById('saveGenderBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveGenderBtn');
+    const msg = document.getElementById('genderMsg');
+    msg.textContent = ''; msg.className = 'msg';
+    btn.disabled = true;
+    try {
+      await pb.collection('members').update(pb.authStore.model.id, {
+        Geschlecht: document.getElementById('genderSelect').value
+      });
+      await pb.collection('members').authRefresh();
+      fillInfo();
+      msg.textContent = 'Gespeichert.';
+      msg.classList.add('success');
+    } catch (err) {
+      msg.textContent = 'Konnte nicht gespeichert werden.';
+      msg.classList.add('error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ---------- E-Mail ändern ----------
+  document.getElementById('changeEmailBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('changeEmailBtn');
+    const msg = document.getElementById('emailMsg');
+    const newEmail = document.getElementById('newEmail').value.trim();
+    msg.textContent = ''; msg.className = 'msg';
+
+    if (!newEmail) {
+      msg.textContent = 'Bitte eine E-Mail-Adresse eingeben.';
+      msg.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      await pb.collection('members').requestEmailChange(newEmail);
+      msg.textContent = 'Bestätigungsmail an ' + newEmail + ' gesendet.';
+      msg.classList.add('success');
+      document.getElementById('newEmail').value = '';
+    } catch (err) {
+      msg.textContent = 'Änderung fehlgeschlagen. Ist die Adresse bereits vergeben?';
+      msg.classList.add('error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ---------- Passwort ändern ----------
+  document.getElementById('changePwBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('changePwBtn');
+    const msg = document.getElementById('pwMsg');
+    const oldPw = document.getElementById('oldPw').value;
+    const newPw = document.getElementById('newPw').value;
+    const newPw2 = document.getElementById('newPw2').value;
+    msg.textContent = ''; msg.className = 'msg';
+
+    if (!oldPw || !newPw) {
+      msg.textContent = 'Bitte alle Felder ausfüllen.';
+      msg.classList.add('error');
+      return;
+    }
+    if (newPw !== newPw2) {
+      msg.textContent = 'Die neuen Passwörter stimmen nicht überein.';
+      msg.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      await pb.collection('members').update(pb.authStore.model.id, {
+        oldPassword: oldPw,
+        password: newPw,
+        passwordConfirm: newPw2
+      });
+      pb.authStore.clear();
+      window.location.href = 'mitglieder-login.html?reset=success';
+    } catch (err) {
+      msg.textContent = 'Passwort konnte nicht geändert werden. Stimmt das aktuelle Passwort?';
+      msg.classList.add('error');
+      btn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
