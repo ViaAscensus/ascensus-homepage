@@ -38,15 +38,27 @@
 
   .card{
     background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 4px;
-    padding: 22px 22px 24px; margin-bottom: 18px;
+    padding: 18px 22px; margin-bottom: 18px;
   }
-  .card h2{
-    font-family:'Space Grotesk', system-ui, sans-serif; font-size:1rem; font-weight:600;
-    margin: 0 0 16px; color: var(--anthrazit);
+  .info-row{ display:flex; justify-content:space-between; padding: 4px 0; font-size:0.92rem; }
+  .info-label{ opacity:0.6; }
+
+  .profile-item{
+    background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 4px;
+    margin-bottom: 10px; overflow:hidden;
   }
-  .info-row{ display:flex; justify-content:space-between; padding: 8px 0; font-size:0.92rem; border-top: 1px solid rgba(35,35,35,0.07); }
-  .info-row:first-of-type{ border-top:none; }
-  .info-label{ color: var(--text-dim,#7a7a75); opacity:0.7; }
+  .profile-item summary{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 16px 22px; cursor:pointer; list-style:none;
+  }
+  .profile-item summary::-webkit-details-marker{ display:none; }
+  .profile-item summary::marker{ content:''; }
+  .item-label{ font-weight:600; font-size:0.95rem; }
+  .item-value{ display:flex; align-items:center; gap:8px; font-size:0.88rem; opacity:0.65; }
+  .item-chevron{ opacity:0.5; font-size:1rem; transition: transform 0.15s; }
+  .profile-item[open] .item-chevron{ transform: rotate(90deg); }
+  .item-body{ padding: 0 22px 22px; border-top: 1px solid rgba(35,35,35,0.08); padding-top:16px; }
+  .badge{ color: var(--olive); font-weight:600; }
 
   label{ display:block; font-size:0.85rem; margin-bottom:6px; }
   select, input{
@@ -83,56 +95,74 @@
   <h1>Mein Profil</h1>
 
   <div class="card">
-    <h2>Konto</h2>
-    <div class="info-row"><span class="info-label">E-Mail</span><span id="infoEmail"></span></div>
     <div class="info-row"><span class="info-label">Mitglied seit</span><span id="infoCreated"></span></div>
   </div>
 
-  <div class="card">
-    <h2>Geschlecht</h2>
-    <p style="font-size:0.82rem; opacity:0.65; margin:0 0 14px;">Bestimmt, welche Körpergrafik im Trainingsbuch angezeigt wird.</p>
-    <select id="genderSelect">
-      <option value="Männlich">Männlich</option>
-      <option value="Weiblich">Weiblich</option>
-    </select>
-    <button class="action" id="saveGenderBtn">Speichern</button>
-    <div class="msg" id="genderMsg"></div>
-  </div>
-
-  <div class="card">
-    <h2>Körpergewicht</h2>
-    <p style="font-size:0.82rem; opacity:0.65; margin:0 0 14px;">Wird genutzt, um die Last bei Körpergewichtsübungen im Trainingsbuch realistisch einzurechnen.</p>
-    <div id="nutrilizeSuggestion" style="display:none; background:var(--offwhite); border:1px solid rgba(85,107,78,0.3); border-radius:4px; padding:12px 14px; margin-bottom:14px; font-size:0.85rem;">
-      <div id="nutrilizeSuggestionText"></div>
-      <button class="action" id="useNutrilizeBtn" style="margin-top:10px; padding:8px 16px; font-size:0.82rem;">Übernehmen</button>
+  <details class="profile-item" id="itemEmail">
+    <summary>
+      <span class="item-label">E-Mail-Adresse</span>
+      <span class="item-value"><span id="summaryEmail"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <label for="newEmail">Neue E-Mail-Adresse</label>
+      <input type="email" id="newEmail" autocomplete="email">
+      <button class="action" id="changeEmailBtn">E-Mail ändern</button>
+      <div class="msg" id="emailMsg"></div>
+      <p class="hint">Du bekommst an die neue Adresse eine Bestätigungsmail. Erst nach dem Bestätigen wird die Änderung wirksam.</p>
     </div>
-    <div id="nutrilizeStatus" style="font-size:0.78rem; opacity:0.6; margin-bottom:10px;"></div>
-    <label for="weightInput">Gewicht (kg)</label>
-    <input type="number" id="weightInput" step="0.5" min="0">
-    <button class="action" id="saveWeightBtn">Speichern</button>
-    <div class="msg" id="weightMsg"></div>
-  </div>
+  </details>
 
-  <div class="card">
-    <h2>E-Mail ändern</h2>
-    <label for="newEmail">Neue E-Mail-Adresse</label>
-    <input type="email" id="newEmail" autocomplete="email">
-    <button class="action" id="changeEmailBtn">E-Mail ändern</button>
-    <div class="msg" id="emailMsg"></div>
-    <p class="hint">Du bekommst an die neue Adresse eine Bestätigungsmail. Erst nach dem Bestätigen wird die Änderung wirksam.</p>
-  </div>
+  <details class="profile-item" id="itemGender">
+    <summary>
+      <span class="item-label">Geschlecht</span>
+      <span class="item-value"><span id="summaryGender"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <p class="hint" style="margin-top:0;">Bestimmt, welche Körpergrafik im Trainingsbuch angezeigt wird.</p>
+      <select id="genderSelect">
+        <option value="Männlich">Männlich</option>
+        <option value="Weiblich">Weiblich</option>
+      </select>
+      <button class="action" id="saveGenderBtn">Speichern</button>
+      <div class="msg" id="genderMsg"></div>
+    </div>
+  </details>
 
-  <div class="card">
-    <h2>Passwort ändern</h2>
-    <label for="oldPw">Aktuelles Passwort</label>
-    <input type="password" id="oldPw" autocomplete="current-password">
-    <label for="newPw">Neues Passwort</label>
-    <input type="password" id="newPw" minlength="8" autocomplete="new-password">
-    <label for="newPw2">Neues Passwort wiederholen</label>
-    <input type="password" id="newPw2" minlength="8" autocomplete="new-password">
-    <button class="action" id="changePwBtn">Passwort ändern</button>
-    <div class="msg" id="pwMsg"></div>
-  </div>
+  <details class="profile-item" id="itemWeight">
+    <summary>
+      <span class="item-label">Gewicht</span>
+      <span class="item-value"><span id="summaryWeight"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <p class="hint" style="margin-top:0;">Wird genutzt, um die Last bei Körpergewichtsübungen im Trainingsbuch realistisch einzurechnen.</p>
+      <div id="nutrilizeSuggestion" style="display:none; background:var(--offwhite); border:1px solid rgba(85,107,78,0.3); border-radius:4px; padding:12px 14px; margin-bottom:14px; font-size:0.85rem;">
+        <div id="nutrilizeSuggestionText"></div>
+        <button class="action" id="useNutrilizeBtn" style="margin-top:10px; padding:8px 16px; font-size:0.82rem;">Übernehmen</button>
+      </div>
+      <div id="nutrilizeStatus" style="font-size:0.78rem; opacity:0.6; margin-bottom:10px;"></div>
+      <label for="weightInput">Gewicht (kg)</label>
+      <input type="number" id="weightInput" step="0.5" min="0">
+      <button class="action" id="saveWeightBtn">Speichern</button>
+      <div class="msg" id="weightMsg"></div>
+    </div>
+  </details>
+
+  <details class="profile-item" id="itemPassword">
+    <summary>
+      <span class="item-label">Passwort ändern</span>
+      <span class="item-value"><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <label for="oldPw">Aktuelles Passwort</label>
+      <input type="password" id="oldPw" autocomplete="current-password">
+      <label for="newPw">Neues Passwort</label>
+      <input type="password" id="newPw" minlength="8" autocomplete="new-password">
+      <label for="newPw2">Neues Passwort wiederholen</label>
+      <input type="password" id="newPw2" minlength="8" autocomplete="new-password">
+      <button class="action" id="changePwBtn">Passwort ändern</button>
+      <div class="msg" id="pwMsg"></div>
+    </div>
+  </details>
 </main>
 
 <script>
@@ -147,9 +177,11 @@
 
   function fillInfo(){
     const m = pb.authStore.model;
-    document.getElementById('infoEmail').textContent = m.email;
+    document.getElementById('summaryEmail').textContent = m.email;
     document.getElementById('genderSelect').value = m.Geschlecht || 'Männlich';
+    document.getElementById('summaryGender').textContent = m.Geschlecht || 'Nicht angegeben';
     document.getElementById('weightInput').value = m.Gewicht || '';
+    document.getElementById('summaryWeight').textContent = m.Gewicht ? m.Gewicht + ' kg' : 'Nicht angegeben';
     const created = new Date(m.created);
     document.getElementById('infoCreated').textContent = created.toLocaleDateString('de-DE', { day:'numeric', month:'long', year:'numeric' });
   }
@@ -172,8 +204,10 @@
     try {
       await pb.collection('members').update(pb.authStore.model.id, { Gewicht: val });
       await pb.collection('members').authRefresh();
+      fillInfo();
       msg.textContent = 'Gespeichert.';
       msg.classList.add('success');
+      setTimeout(() => { document.getElementById('itemWeight').open = false; }, 900);
     } catch (err) {
       msg.textContent = 'Konnte nicht gespeichert werden.';
       msg.classList.add('error');
@@ -221,6 +255,8 @@
       }
 
       suggestBox.style.display = 'block';
+      document.getElementById('summaryWeight').innerHTML =
+        (currentWeight ? currentWeight + ' kg' : 'Nicht angegeben') + ' <span class="badge">· Vorschlag verfügbar</span>';
       document.getElementById('useNutrilizeBtn').onclick = () => {
         document.getElementById('weightInput').value = data.gewicht;
         suggestBox.style.display = 'none';
@@ -246,6 +282,7 @@
       fillInfo();
       msg.textContent = 'Gespeichert.';
       msg.classList.add('success');
+      setTimeout(() => { document.getElementById('itemGender').open = false; }, 900);
     } catch (err) {
       msg.textContent = 'Konnte nicht gespeichert werden.';
       msg.classList.add('error');
