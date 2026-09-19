@@ -100,6 +100,20 @@
   </div>
 
   <div class="card">
+    <h2>Körpergewicht</h2>
+    <p style="font-size:0.82rem; opacity:0.65; margin:0 0 14px;">Wird genutzt, um die Last bei Körpergewichtsübungen im Trainingsbuch realistisch einzurechnen.</p>
+    <div id="nutrilizeSuggestion" style="display:none; background:var(--offwhite); border:1px solid rgba(85,107,78,0.3); border-radius:4px; padding:12px 14px; margin-bottom:14px; font-size:0.85rem;">
+      <div id="nutrilizeSuggestionText"></div>
+      <button class="action" id="useNutrilizeBtn" style="margin-top:10px; padding:8px 16px; font-size:0.82rem;">Übernehmen</button>
+    </div>
+    <div id="nutrilizeStatus" style="font-size:0.78rem; opacity:0.6; margin-bottom:10px;"></div>
+    <label for="weightInput">Gewicht (kg)</label>
+    <input type="number" id="weightInput" step="0.5" min="0">
+    <button class="action" id="saveWeightBtn">Speichern</button>
+    <div class="msg" id="weightMsg"></div>
+  </div>
+
+  <div class="card">
     <h2>E-Mail ändern</h2>
     <label for="newEmail">Neue E-Mail-Adresse</label>
     <input type="email" id="newEmail" autocomplete="email">
@@ -135,10 +149,88 @@
     const m = pb.authStore.model;
     document.getElementById('infoEmail').textContent = m.email;
     document.getElementById('genderSelect').value = m.Geschlecht || 'Männlich';
+    document.getElementById('weightInput').value = m.Gewicht || '';
     const created = new Date(m.created);
     document.getElementById('infoCreated').textContent = created.toLocaleDateString('de-DE', { day:'numeric', month:'long', year:'numeric' });
   }
   fillInfo();
+
+  // ---------- Körpergewicht ----------
+  document.getElementById('saveWeightBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveWeightBtn');
+    const msg = document.getElementById('weightMsg');
+    const val = parseFloat(document.getElementById('weightInput').value);
+    msg.textContent = ''; msg.className = 'msg';
+
+    if (!val || val <= 0) {
+      msg.textContent = 'Bitte ein gültiges Gewicht eingeben.';
+      msg.classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      await pb.collection('members').update(pb.authStore.model.id, { Gewicht: val });
+      await pb.collection('members').authRefresh();
+      msg.textContent = 'Gespeichert.';
+      msg.classList.add('success');
+    } catch (err) {
+      msg.textContent = 'Konnte nicht gespeichert werden.';
+      msg.classList.add('error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ---------- nutrilize-Abgleich ----------
+  // WICHTIG: Webhook-URL nach dem Aktivieren des n8n-Workflows hier eintragen.
+  const NUTRILIZE_WEBHOOK_URL = 'https://n8n.ascensus.fit/webhook/nutrilize-gewicht';
+
+  async function checkNutrilize(){
+    const statusEl = document.getElementById('nutrilizeStatus');
+    const suggestBox = document.getElementById('nutrilizeSuggestion');
+    const suggestText = document.getElementById('nutrilizeSuggestionText');
+    statusEl.textContent = 'Gleiche mit nutrilize ab …';
+
+    try {
+      const res = await fetch(NUTRILIZE_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: pb.authStore.model.email })
+      });
+      const data = await res.json();
+
+      if (!data.gefunden || !data.gewicht) {
+        statusEl.textContent = 'Keine Verknüpfung zu nutrilize gefunden.';
+        return;
+      }
+
+      const currentWeight = pb.authStore.model.Gewicht;
+      statusEl.textContent = '';
+
+      const displayDate = data.datum
+        ? new Date(data.datum + 'T00:00:00').toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' })
+        : 'zuletzt erfasst';
+
+      if (currentWeight && Math.abs(currentWeight - data.gewicht) > 0.1) {
+        suggestText.innerHTML = `Unterschiedliche Werte gefunden:<br>Hier eingetragen: <strong>${currentWeight} kg</strong><br>Aus nutrilize (${displayDate}): <strong>${data.gewicht} kg</strong>`;
+      } else if (!currentWeight) {
+        suggestText.innerHTML = `Aus nutrilize übernehmen: <strong>${data.gewicht} kg</strong> (${displayDate})`;
+      } else {
+        return; // Werte stimmen überein, nichts zu tun
+      }
+
+      suggestBox.style.display = 'block';
+      document.getElementById('useNutrilizeBtn').onclick = () => {
+        document.getElementById('weightInput').value = data.gewicht;
+        suggestBox.style.display = 'none';
+      };
+    } catch (err) {
+      statusEl.textContent = '';
+      console.error('nutrilize-Abgleich fehlgeschlagen', err);
+    }
+  }
+  checkNutrilize();
 
   // ---------- Geschlecht ----------
   document.getElementById('saveGenderBtn').addEventListener('click', async () => {
