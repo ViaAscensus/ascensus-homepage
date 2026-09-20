@@ -1,0 +1,44 @@
+<!-- ============================================================
+     Diesen kompletten Block in den <head> JEDER Seite einfügen
+     (index.html, pakete.html, alle weiteren .html-Dateien),
+     am besten direkt vor dem schließenden </head>-Tag.
+     ============================================================ -->
+
+<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
+        BEVOR irgendetwas von Google geladen wird -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent-Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) – lädt immer, sendet aber wegen Consent Mode
+        so lange nichts, bis Klaro auf 'granted' umschaltet -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+
+  // Sobald ihr die Google-Ads-Conversion-ID habt (Format AW-XXXXXXXXX),
+  // hier einfach eine zweite Zeile ergänzen:
+  // gtag('config', 'AW-XXXXXXXXX');
+</script>
+
+<!-- ============================================================
+     Zusätzlich EINMAL irgendwo im Footer/Body platzieren, damit
+     Besucher ihre Auswahl nachträglich ändern können:
+
+     <a href="#" onclick="klaro.show(); return false;">Datenschutzeinstellungen</a>
+     ============================================================ -->

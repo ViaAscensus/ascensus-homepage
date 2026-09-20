@@ -1,0 +1,44 @@
+/**
+ * ASCENSUS Corporate-Design-Override für Klaro
+ * Nach klaro.css einbinden, damit diese Regeln die Standardfarben überschreiben.
+ */
+
+.klaro .cookie-notice,
+.klaro .cookie-modal .cm-modal {
+  background: #F5F3EE;
+  color: #232323;
+  font-family: 'Inter', sans-serif;
+  border-top: 1px solid #556B4E;
+}
+
+.klaro .cookie-modal .cm-modal h1,
+.klaro .cookie-modal .cm-modal h2 {
+  color: #556B4E;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.klaro .cm-btn.cm-btn-success {
+  background-color: #556B4E;
+  border-color: #556B4E;
+  color: #F5F3EE;
+}
+
+.klaro .cm-btn.cm-btn-success:hover {
+  background-color: #44573f;
+}
+
+.klaro .cm-btn.cm-btn-decline {
+  background-color: transparent;
+  border: 1px solid #556B4E;
+  color: #556B4E;
+}
+
+.klaro .cm-btn.cm-btn-info,
+.klaro .cm-link {
+  color: #B59A5D;
+}
+
+.klaro .slider .slider-toggle:checked + .slider-track {
+  background-color: #556B4E;
+}
