@@ -1,44 +1,88 @@
 /**
- * ASCENSUS Corporate-Design-Override für Klaro
- * Nach klaro.css einbinden, damit diese Regeln die Standardfarben überschreiben.
+ * ASCENSUS Corporate-Design-Override fuer Klaro
+ * Nach klaro.css einbinden, damit diese Regeln die Standardfarben ueberschreiben.
+ *
+ * Klaro steuert seine Farben groesstenteils ueber CSS-Variablen im .klaro-Scope
+ * -- deshalb setzen wir die Variablen direkt, statt jede einzelne Klasse
+ * zu ueberschreiben.
  */
 
-.klaro .cookie-notice,
-.klaro .cookie-modal .cm-modal {
-  background: #F5F3EE;
-  color: #232323;
-  font-family: 'Inter', sans-serif;
-  border-top: 1px solid #556B4E;
+.klaro {
+  --font-family: 'Inter', system-ui, sans-serif;
+  --title-font-family: 'Inter', system-ui, sans-serif;
+
+  /* Flaeche des Banners/Modals (Off-White statt Standard-Dunkelgrau) */
+  --dark1: #F5F3EE;
+  /* Textfarbe auf dieser Flaeche (Anthrazit statt Hellgrau) */
+  --light1: #232323;
+
+  /* Primaerfarbe: "Alle akzeptieren", Links, aktive Schalter */
+  --green1: #556B4E;
+  --green2: #44573f;
+  --green3: #B59A5D;
+
+  /* "Einstellungen"-Button (nur im Modal-Notice-Modus sichtbar) */
+  --blue1: #B59A5D;
+
+  /* Textfarbe auf farbigen Buttons */
+  --button-text-color: #F5F3EE;
+
+  /* Kantiger Look, passend zum restlichen Corporate Design (keine runden Ecken) */
+  --border-radius: 0;
+  --border-width: 1px;
+  --border-style: solid;
 }
 
-.klaro .cookie-modal .cm-modal h1,
-.klaro .cookie-modal .cm-modal h2 {
-  color: #556B4E;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+/* Dunkles, zum CD passendes Overlay hinter dem zentrierten Fenster */
+.klaro .cm-bg {
+  background: rgba(35, 35, 35, .6) !important;
 }
 
-.klaro .cm-btn.cm-btn-success {
-  background-color: #556B4E;
-  border-color: #556B4E;
-  color: #F5F3EE;
-}
-
-.klaro .cm-btn.cm-btn-success:hover {
-  background-color: #44573f;
-}
-
-.klaro .cm-btn.cm-btn-decline {
-  background-color: transparent;
+/* Fenster selbst: dezenter Rahmen statt Schatten-only, etwas mehr Luft */
+.klaro .cookie-notice.cookie-modal-notice,
+.klaro .cookie-modal .cm-modal.cm-klaro {
   border: 1px solid #556B4E;
+  box-shadow: 0 20px 60px -20px rgba(35, 35, 35, .45);
+  max-width: 460px;
+}
+
+/* Ueberschrift im Banner: Stil wie die h2 auf der restlichen Website */
+.klaro .cookie-notice h2,
+.klaro .cookie-modal .cm-modal h1 {
   color: #556B4E;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 1.05rem;
 }
 
-.klaro .cm-btn.cm-btn-info,
-.klaro .cm-link {
-  color: #B59A5D;
+/* "Alle akzeptieren" -- Hauptaktion, klar hervorgehoben */
+.klaro .cookie-notice .cm-btn.cm-btn-success {
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .85em 1.1em;
 }
 
-.klaro .slider .slider-toggle:checked + .slider-track {
-  background-color: #556B4E;
+/* "Ablehnen" -- bewusst zurueckhaltend: kein Fond, nur dezenter Text/Rand */
+.klaro .cookie-notice .cm-btn.cm-btn-danger,
+.klaro .cookie-modal .cm-btn.cm-btn-decline {
+  background-color: transparent !important;
+  color: #556B4E !important;
+  border: 1px solid rgba(85, 107, 78, .35);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* "Einstellungen" (Learn-more-Button im Modal-Notice-Modus) -- zurueckhaltend, Sand-Akzent */
+.klaro .cookie-notice .cm-btn.cm-btn-info {
+  background-color: transparent !important;
+  color: #B59A5D !important;
+  border: 1px solid rgba(181, 154, 93, .4);
+}
+
+/* Toggle-Schalter im Detail-Bereich */
+.klaro .slider {
+  background-color: #d8d3c7;
 }
