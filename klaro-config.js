@@ -1,6 +1,6 @@
 /**
  * Klaro-Konfiguration für ASCENSUS (ascensus.fit)
- * Steuert die Einwilligung für Google Analytics & Google Ads
+ * Steuert die Einwilligung für Google Analytics, Microsoft Clarity & Google Ads
  * und meldet die Entscheidung an Google Consent Mode v2 zurück.
  */
 var klaroConfig = {
@@ -37,7 +37,7 @@ var klaroConfig = {
       },
       consentNotice: {
         description:
-          'Wir nutzen Google Analytics und Google Ads, um zu verstehen, wie unsere Website genutzt wird und wie unsere Anzeigen wirken. Du entscheidest, ob Du das erlaubst.',
+          'Wir nutzen Google Analytics, Microsoft Clarity und Google Ads, um zu verstehen, wie unsere Website genutzt wird und wie unsere Anzeigen wirken. Du entscheidest, ob Du das erlaubst.',
         learnMore: 'Einstellungen',
       },
       acceptAll: 'Alle akzeptieren',
@@ -54,9 +54,9 @@ var klaroConfig = {
         services: 'Dienste',
       },
       'google-analytics': {
-        title: 'Google Analytics',
+        title: 'Google Analytics & Microsoft Clarity',
         description:
-          'Erfasst anonymisiert, wie Besucher:innen die Website nutzen, damit wir sie verbessern können.',
+          'Erfasst anonymisiert, wie Besucher:innen die Website nutzen (Statistik) und wie sie sich auf der Seite bewegen (Klick-/Scroll-Verhalten), damit wir sie verbessern können.',
       },
       'google-ads': {
         title: 'Google Ads',
@@ -69,11 +69,20 @@ var klaroConfig = {
   services: [
     {
       name: 'google-analytics',
-      title: 'Google Analytics',
+      title: 'Google Analytics & Microsoft Clarity',
       purposes: ['analytics'],
-      cookies: [/^_ga/, /^_gid/, /^_gat/],
+      cookies: [/^_ga/, /^_gid/, /^_gat/, /^_clck/, /^_clsk/],
       onAccept: `
         gtag('consent', 'update', { analytics_storage: 'granted' });
+
+        // Microsoft Clarity nur nach Zustimmung laden
+        if (!window.clarity) {
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window, document, "clarity", "script", "ylp87mc5i4");
+        }
       `,
       onDecline: `
         gtag('consent', 'update', { analytics_storage: 'denied' });
