@@ -13,8 +13,8 @@ var klaroConfig = {
   // Banner erscheint automatisch beim ersten Besuch
   noAutoLoad: false,
 
-  // Banner als zentriertes Fenster mit dunklem Overlay statt Balken unten
-  noticeAsModal: true,
+  // Kleines Banner unten rechts (nicht als zentriertes Modal)
+  noticeAsModal: false,
   htmlTexts: true,
 
   // Eigener Cookie-Name für die Einwilligungs-Entscheidung selbst
@@ -27,7 +27,6 @@ var klaroConfig = {
   acceptAll: true,
   hideDeclineAll: false,
   hideLearnMore: false,
-  noticeAsModal: false,
 
   translations: {
     de: {
@@ -45,7 +44,6 @@ var klaroConfig = {
       acceptSelected: 'Auswahl akzeptieren',
       decline: 'Ablehnen',
       close: 'Schließen',
-      poweredBy: '',
       purposes: {
         analytics: 'Statistik & Reichweitenmessung',
         marketing: 'Marketing & Werbe-Erfolgsmessung',
