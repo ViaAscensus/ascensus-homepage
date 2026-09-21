@@ -11,6 +11,102 @@
 <meta property="og:description" content="Nachhaltig leistungsfähig. Datenbasiertes Ernährungscoaching ohne Dogma.">
 <meta property="og:image" content="logo-wordmark-claim.png">
 <meta property="og:type" content="website">
+
+<!-- Schema.org: Unternehmensidentität für Google & KI-Suchmaschinen -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dietitian",
+  "name": "ASCENSUS",
+  "alternateName": "ASCENSUS Ernährungs- & Laufcoaching",
+  "description": "Ernährungscoaching ohne Crash-Diäten und Verbote – datenbasiert, individuell, deutschlandweit online.",
+  "url": "https://ascensus.fit",
+  "logo": "https://ascensus.fit/logo-wordmark.png",
+  "image": "https://ascensus.fit/patrick.jpg",
+  "telephone": "+4915679810556",
+  "email": "patrick@ascensus.fit",
+  "priceRange": "€€",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Frankfurt am Main",
+    "addressCountry": "DE"
+  },
+  "areaServed": {
+    "@type": "Country",
+    "name": "Deutschland"
+  },
+  "founder": {
+    "@type": "Person",
+    "name": "Patrick Spengler",
+    "jobTitle": "Ernährungs- & Laufcoach"
+  },
+  "sameAs": [
+    "https://www.instagram.com/via_ascensus/",
+    "https://www.facebook.com/ascensus.fit",
+    "https://www.linkedin.com/company/ascensus-fit",
+    "https://www.youtube.com/channel/UCIsGfHlZaTIh6n2waZQHkeQ"
+  ]
+}
+</script>
+
+<!-- Schema.org: FAQPage, deckungsgleich mit dem sichtbaren FAQ-Bereich weiter unten -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Muss ich für die Beratung nach Frankfurt kommen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nein. Die gesamte Zusammenarbeit läuft online – Strategiegespräch, Auswertung und Live-Calls per Video. Du kannst deutschlandweit mit mir arbeiten, unabhängig davon, wo Du wohnst."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Was genau ist das Blind-Tracking?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In der ersten Woche trackst Du Deine Ernährung ganz normal weiter, aber ohne dass Kalorien- oder Nährstoffwerte angezeigt werden. So entsteht ein unverfälschtes Bild Deiner echten Gewohnheiten, statt dass Du unbewusst danach isst, was gut aussieht. Erst danach werten wir gemeinsam aus und schalten die vollen Werte frei."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Was kostet eine Betreuung bei ASCENSUS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Die Pakete starten bei 149 € (Das Fundament, 3 Wochen) und reichen bis 357 € für 3 Monate durchgehende Begleitung (Die Nachhaltigkeit, auch als Ratenzahlung 3 × 119 € möglich). Alle Preise sind Endpreise ohne ausgewiesene Umsatzsteuer gemäß § 19 UStG."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Was passiert im kostenlosen Erstgespräch?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "30 Minuten, unverbindlich und ohne Verkaufsdruck. Wir klären, wo Du gerade stehst, was Dich beschäftigt und ob und wie ich Dich unterstützen kann – Du entscheidest danach in Ruhe, ob es passt."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Arbeitet ihr nach Verbotslisten oder strengen Diätplänen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nein, bewusst nicht. Es gibt keine Crash-Diäten, keine pauschalen Verbote und keine Dogmen. Wir schauen wertfrei auf Deinen Alltag und entwickeln Schritt für Schritt eine Ernährung, die Du wirklich durchhalten kannst."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Bietet ihr auch Laufcoaching an?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Laufcoaching und ein kombiniertes Hybrid-Paket aus Ernährung und Laufen sind in Vorbereitung und aktuell noch nicht buchbar."
+      }
+    }
+  ]
+}
+</script>
+
 <style>
 :root{
   --olive:#556B4E;
@@ -437,6 +533,24 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 }
 .contact-list a:hover{border-bottom-color:var(--sand)}
 
+/* ---------- FAQ ---------- */
+.faq-list{margin-top:2.6rem;max-width:74ch}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item:first-child{border-top:1px solid var(--line)}
+.faq-item summary{
+  list-style:none;cursor:pointer;padding:1.3rem 2.2rem 1.3rem 0;position:relative;
+  font-size:1.02rem;font-weight:600;color:var(--olive);
+}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{
+  content:"+";position:absolute;right:0;top:1.2rem;
+  font-size:1.3rem;font-weight:400;color:var(--sand);transition:transform .25s;
+}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-item p{
+  padding-bottom:1.5rem;color:var(--ink-60);font-size:.96rem;line-height:1.6;max-width:66ch;
+}
+
 /* ---------- Footer ---------- */
 footer{
   background:var(--ink);color:rgba(245,243,238,.7);
@@ -504,6 +618,7 @@ footer .fslogan{
       <a class="navlink" href="#ansatz">Ansatz</a>
       <a class="navlink" href="#ablauf">Ablauf</a>
       <a class="navlink" href="pakete.html">Pakete</a>
+      <a class="navlink" href="#faq">FAQ</a>
       <a class="navlink" href="#kontakt">Kontakt</a>
       <a class="btn btn-sm" href="#erstgespraech">Erstgespräch</a>
     </nav>
@@ -952,6 +1067,78 @@ footer .fslogan{
           Unverbindlich. Kein Verkaufsgespräch.
         </p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap reveal">
+    <p class="eyebrow">Bevor Du fragst</p>
+    <h2>Häufige Fragen</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Muss ich für die Beratung nach Frankfurt kommen?</summary>
+        <p>
+          Nein. Die gesamte Zusammenarbeit läuft online — Strategiegespräch,
+          Auswertung und Live-Calls per Video. Du kannst deutschlandweit mit mir
+          arbeiten, unabhängig davon, wo Du wohnst.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Was genau ist das Blind-Tracking?</summary>
+        <p>
+          In der ersten Woche trackst Du Deine Ernährung ganz normal weiter,
+          aber ohne dass Kalorien- oder Nährstoffwerte angezeigt werden. So
+          entsteht ein unverfälschtes Bild Deiner echten Gewohnheiten, statt
+          dass Du unbewusst danach isst, was gut aussieht. Erst danach werten
+          wir gemeinsam aus und schalten die vollen Werte frei.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Was kostet eine Betreuung bei ASCENSUS?</summary>
+        <p>
+          Die Pakete starten bei 149&nbsp;€ (Das Fundament, 3 Wochen) und
+          reichen bis 357&nbsp;€ für 3 Monate durchgehende Begleitung (Die
+          Nachhaltigkeit, auch als Ratenzahlung 3&nbsp;×&nbsp;119&nbsp;€
+          möglich). Alle Preise sind Endpreise ohne ausgewiesene
+          Umsatzsteuer gemäß §&nbsp;19&nbsp;UStG. Die genaue Aufstellung
+          findest Du auf der <a href="pakete-ernaehrung.html">Pakete-Seite</a>.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Was passiert im kostenlosen Erstgespräch?</summary>
+        <p>
+          30 Minuten, unverbindlich und ohne Verkaufsdruck. Wir klären, wo Du
+          gerade stehst, was Dich beschäftigt und ob und wie ich Dich
+          unterstützen kann — Du entscheidest danach in Ruhe, ob es passt.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Arbeitet ihr nach Verbotslisten oder strengen Diätplänen?</summary>
+        <p>
+          Nein, bewusst nicht. Es gibt keine Crash-Diäten, keine pauschalen
+          Verbote und keine Dogmen. Wir schauen wertfrei auf Deinen Alltag
+          und entwickeln Schritt für Schritt eine Ernährung, die Du wirklich
+          durchhalten kannst — die Dosis macht das Gift, nicht das einzelne
+          Lebensmittel.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Bietet ihr auch Laufcoaching an?</summary>
+        <p>
+          Laufcoaching und ein kombiniertes Hybrid-Paket aus Ernährung und
+          Laufen sind in Vorbereitung und aktuell noch nicht buchbar. Melde
+          Dich gern, wenn Du benachrichtigt werden möchtest, sobald es
+          verfügbar ist.
+        </p>
+      </details>
     </div>
   </div>
 </section>
