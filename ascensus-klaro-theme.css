@@ -73,22 +73,23 @@
 .klaro .cookie-notice .cn-ok {
   display: flex !important;
   flex-wrap: nowrap !important;
-  justify-content: space-between !important;
   align-items: center !important;
-  gap: .8em;
-  width: 100%;
+  gap: 1em;
 }
 
-/* Reihenfolge der drei Elemente */
+/* Reihenfolge: Ablehnen -- Einstellungen -- Okay (rechts, prominent).
+   Okay wird per margin-left:auto an den rechten Rand gedrueckt -- das
+   funktioniert unabhaengig davon, welche justify-content-Regel gewinnt. */
 .klaro .cookie-notice .cn-decline {
   order: 1;
 }
-.klaro .cookie-notice .cm-btn.cm-btn-success {
-  order: 2;
-}
 .klaro .cookie-notice .cn-learn-more {
-  order: 3;
+  order: 2;
   flex: none;
+}
+.klaro .cookie-notice .cm-btn.cm-btn-success {
+  order: 3;
+  margin-left: auto !important;
 }
 
 /* "Okay" -- Hauptaktion, klar hervorgehoben */
