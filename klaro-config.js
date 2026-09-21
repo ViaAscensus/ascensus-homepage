@@ -7,11 +7,14 @@ var klaroConfig = {
   version: 1,
   elementID: 'klaro',
   styling: {
-    theme: ['light', 'top', 'wide'],
+    theme: ['light'],
   },
 
   // Banner erscheint automatisch beim ersten Besuch
   noAutoLoad: false,
+
+  // Banner als zentriertes Fenster mit dunklem Overlay statt Balken unten
+  noticeAsModal: true,
   htmlTexts: true,
 
   // Eigener Cookie-Name für die Einwilligungs-Entscheidung selbst
