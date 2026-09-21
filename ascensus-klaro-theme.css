@@ -82,6 +82,28 @@
   border: 1px solid rgba(181, 154, 93, .4);
 }
 
+/* Grosses Einstellungen-Fenster (Detailauswahl): Button-Reihenfolge tauschen --
+   "Alle akzeptieren" bleibt die auffaellige Hauptaktion, "Auswahl akzeptieren"
+   rutscht auf die Position von "Ablehnen" und bekommt dessen dezenten Stil. */
+.klaro .cookie-modal .cm-modal .cm-footer-buttons {
+  flex-wrap: wrap;
+  gap: .6em;
+}
+.klaro .cookie-modal .cm-modal .cm-footer-buttons .cm-btn-danger {
+  order: 1;
+}
+.klaro .cookie-modal .cm-modal .cm-footer-buttons .cm-btn-accept-all {
+  order: 2;
+}
+.klaro .cookie-modal .cm-modal .cm-footer-buttons .cm-btn-accept {
+  order: 3;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #556B4E !important;
+  border: 1px solid rgba(85, 107, 78, .35);
+  font-weight: 500;
+}
+
 /* Toggle-Schalter im Detail-Bereich */
 .klaro .slider {
   background-color: #d8d3c7;
