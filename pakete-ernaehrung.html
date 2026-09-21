@@ -257,6 +257,33 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
   .reveal{opacity:1;transform:none}
 }
 </style>
+
+<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
+        BEVOR irgendetwas von Google geladen wird -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent-Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+</script>
 </head>
 <body>
 
@@ -280,7 +307,7 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
       <a class="navlink" href="index.html#ablauf">Ablauf</a>
       <a class="navlink is-active" href="pakete.html">Pakete</a>
       <a class="navlink" href="index.html#kontakt">Kontakt</a>
-      <a class="btn btn-sm" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Erstgespräch</a>
+      <a class="btn btn-sm" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event', 'erstgespraech_klick');">Erstgespräch</a>
     </nav>
   </div>
 </header>
@@ -503,7 +530,7 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
       <div class="call-box">
         <div class="dur">30</div>
         <div class="durlbl">Minuten · kostenlos</div>
-        <a class="btn btn-sand" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Termin buchen</a>
+        <a class="btn btn-sand" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event', 'erstgespraech_klick');">Termin buchen</a>
         <p style="margin-top:1rem;font-size:.8rem;color:rgba(245,243,238,.6)">
           Unverbindlich. Kein Verkaufsgespräch.
         </p>
@@ -531,6 +558,7 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
         <a href="datenschutz.html">Datenschutz</a>
         <a href="agb.html">AGB</a>
         <a href="widerruf.html">Widerruf</a>
+        <a href="#" onclick="klaro.show(); return false;">Datenschutzeinstellungen</a>
       </div>
     </div>
     <div class="copyright">© <span id="yr">2026</span> ASCENSUS · Patrick Spengler</div>
