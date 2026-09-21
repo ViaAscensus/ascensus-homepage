@@ -64,14 +64,19 @@
 
 /* cn-buttons hat keine eigene Optik mehr, seine Kinder (Ablehnen + Okay)
    werden direkte Flex-Kinder von .cn-ok -- dadurch koennen wir alle drei
-   Elemente (Einstellungen-Link, Ablehnen, Okay) frei anordnen. */
+   Elemente (Einstellungen-Link, Ablehnen, Okay) frei anordnen.
+   !important noetig, da Klaros eigene Basis-Regeln hier hoeher
+   spezifiziert sind (z. B. ".cookie-notice:not(.cookie-modal-notice) .cn-body .cn-buttons"). */
 .klaro .cookie-notice .cn-buttons {
-  display: contents;
+  display: contents !important;
 }
 .klaro .cookie-notice .cn-ok {
-  justify-content: space-between;
-  align-items: center;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: space-between !important;
+  align-items: center !important;
   gap: .8em;
+  width: 100%;
 }
 
 /* Reihenfolge der drei Elemente */
@@ -130,35 +135,30 @@
   letter-spacing: .06em;
 }
 
-/* Layout: Ablehnen + Auswahl akzeptieren nebeneinander oben,
-   Alle akzeptieren als eigene, wirklich zentrierte Zeile direkt
-   ueber "Realisiert mit Klaro!" */
+/* Eine Reihe: Ablehnen links, Alle akzeptieren mittig, Auswahl akzeptieren rechts */
 .klaro .cookie-modal .cm-modal .cm-footer-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex !important;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
   gap: .6em;
 }
 .klaro .cookie-modal .cm-modal .cm-footer-buttons .cm-btn-danger {
-  grid-column: 1;
-  grid-row: 1;
+  order: 1;
+}
+.klaro .cookie-modal .cm-modal .cm-footer-buttons .cm-btn-accept-all {
+  order: 2;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: .06em;
 }
 .klaro .cookie-modal .cm-modal .cm-footer-buttons .cm-btn-accept {
-  grid-column: 2;
-  grid-row: 1;
+  order: 3;
   background-color: transparent !important;
   background-image: none !important;
   color: #556B4E !important;
   border: 1px solid rgba(85, 107, 78, .35);
   font-weight: 500;
-}
-.klaro .cookie-modal .cm-modal .cm-footer-buttons .cm-btn-accept-all {
-  grid-column: 1 / -1;
-  grid-row: 2;
-  justify-self: center;
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: .06em;
-  padding: .85em 1.8em;
 }
 
 /* Toggle-Schalter im Detail-Bereich */
