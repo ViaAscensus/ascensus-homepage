@@ -9,6 +9,34 @@
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="legal.css">
+
+<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
+        BEVOR irgendetwas von Google geladen wird -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent-Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+  gtag('config', 'AW-18465350303');
+</script>
 </head>
 <body>
 
