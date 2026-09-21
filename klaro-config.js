@@ -43,6 +43,7 @@ var klaroConfig = {
       acceptAll: 'Alle akzeptieren',
       acceptSelected: 'Auswahl akzeptieren',
       decline: 'Ablehnen',
+      ok: 'Okay',
       close: 'Schließen',
       purposes: {
         analytics: 'Statistik & Reichweitenmessung',
