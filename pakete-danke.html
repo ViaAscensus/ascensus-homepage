@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Danke für Deine Buchung – ASCENSUS</title>
+<meta name="description" content="Deine Buchung bei ASCENSUS war erfolgreich. Ich melde mich in Kürze bei Dir.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{
+  --olive:#556B4E;
+  --olive-dark:#3E5039;
+  --sand:#B59A5D;
+  --offwhite:#F5F3EE;
+  --paper:#FFFFFF;
+  --ink:#232323;
+  --ink-60:rgba(35,35,35,.68);
+  --ink-40:rgba(35,35,35,.45);
+  --line:rgba(85,107,78,.18);
+  --maxw:1140px;
+  --gut:clamp(1.5rem,5vw,4rem);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--offwhite);
+  color:var(--ink);
+  font-family:'Inter','Inter var',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:17px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;flex-direction:column;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+
+header{padding:1.2rem 0}
+.navbar{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+.navbar img{height:38px;width:auto}
+
+.confirm{flex:1;display:flex;align-items:center;padding:3rem 0}
+.confirm-box{max-width:560px;margin:0 auto;text-align:center}
+.mark{
+  width:56px;height:56px;border-radius:50%;background:var(--olive);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 1.8rem;
+}
+.mark svg{width:26px;height:26px}
+.eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sand);margin-bottom:1rem;
+}
+h1{
+  font-size:clamp(1.7rem,4.5vw,2.4rem);
+  font-weight:200;letter-spacing:.03em;text-transform:uppercase;
+  line-height:1.15;color:var(--olive);margin-bottom:1.3rem;
+}
+.lead{font-size:1.05rem;line-height:1.65;color:var(--ink-60);margin:0 auto}
+.next{
+  margin-top:2.4rem;padding-top:2rem;border-top:1px solid var(--line);
+  text-align:left;
+}
+.next h2{
+  font-size:.8rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--olive);margin-bottom:1rem;
+}
+.next ol{padding-left:1.2rem;color:var(--ink-60);font-size:.95rem}
+.next li{margin-bottom:.6rem;line-height:1.5}
+.actions{margin-top:2.4rem;display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center}
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.92rem 1.7rem;border:1px solid var(--olive);
+  background:var(--olive);color:var(--offwhite);
+  font-size:.79rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;transition:background .25s,color .25s,transform .25s;
+}
+.btn:hover{background:var(--olive-dark);border-color:var(--olive-dark);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--olive)}
+.btn-ghost:hover{background:var(--olive);color:var(--offwhite)}
+
+footer{background:var(--ink);color:rgba(245,243,238,.7);padding:2rem 0;font-size:.82rem;margin-top:auto}
+.foot-links{display:flex;flex-wrap:wrap;gap:1.4rem;justify-content:center}
+.foot-links a{color:rgba(245,243,238,.7);text-decoration:none;transition:color .2s}
+.foot-links a:hover{color:var(--sand)}
+.copyright{margin-top:1.2rem;font-size:.76rem;color:rgba(245,243,238,.45);text-align:center}
+</style>
+
+<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
+        BEVOR irgendetwas von Google geladen wird -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent-Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+
+  // Diese Seite wird nur nach erfolgreicher Zahlung aufgerufen -> Conversion
+  gtag('event', 'kauf_abgeschlossen');
+</script>
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <a href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+  </div>
+</header>
+
+<section class="confirm">
+  <div class="wrap">
+    <div class="confirm-box">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#F5F3EE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <p class="eyebrow">Zahlung erfolgreich</p>
+      <h1>Danke Dir</h1>
+      <p class="lead">
+        Deine Buchung ist bei mir angekommen. Ich melde mich in Kürze bei Dir,
+        um alles Weitere zu besprechen.
+      </p>
+
+      <div class="next">
+        <h2>Wie es weitergeht</h2>
+        <ol>
+          <li>Du erhältst von Stripe eine Zahlungsbestätigung per E-Mail.</li>
+          <li>Ich melde mich werktags in der Regel innerhalb von 24 Stunden bei Dir.</li>
+          <li>Gemeinsam vereinbaren wir den nächsten Termin.</li>
+        </ol>
+      </div>
+
+      <div class="actions">
+        <a class="btn btn-ghost" href="index.html">Zur Startseite</a>
+        <a class="btn" href="https://wa.me/4915679810556" target="_blank" rel="noopener">Direkt schreiben</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html">Datenschutz</a>
+      <a href="agb.html">AGB</a>
+      <a href="widerruf.html">Widerruf</a>
+      <a href="#" onclick="klaro.show(); return false;">Datenschutzeinstellungen</a>
+    </div>
+    <div class="copyright">© <span id="yr">2026</span> ASCENSUS · Patrick Spengler</div>
+  </div>
+</footer>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>
