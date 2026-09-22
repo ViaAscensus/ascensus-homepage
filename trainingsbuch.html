@@ -7,6 +7,8 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
 <style>
   :root{
     --bg: #16171a;
@@ -36,18 +38,6 @@
   }
 
   h1,h2{ font-family:'Space Grotesk', system-ui, sans-serif; margin:0; }
-
-  .navbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 16px 18px; background: var(--offwhite); color: var(--anthrazit);
-  }
-  .navbar img{ height: 30px; }
-  .navbar .nav-right{ display:flex; align-items:center; gap:16px; }
-  .navbar a.back{ color: var(--anthrazit); text-decoration:none; font-size:0.85rem; opacity:0.7; font-family:'IBM Plex Sans', system-ui, sans-serif; }
-  .navbar button.logout{
-    background:none; border:none; color: var(--anthrazit); opacity:0.65;
-    font-size:0.85rem; cursor:pointer; font-family:'IBM Plex Sans', system-ui, sans-serif;
-  }
 
   section{ padding: 18px; border-bottom: 1px solid var(--border); }
   .screen{ display:none; }
@@ -427,14 +417,21 @@
 </head>
 <body>
 
-<div class="navbar">
-  <a href="mitglieder-dashboard.html" aria-label="Zum Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
-  <div class="nav-right">
-    <a class="back" href="mitglieder-dashboard.html">← Mitgliederbereich</a>
-    <button class="logout" id="logoutBtn">Ausloggen</button>
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="mitglieder-dashboard.html" aria-label="Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Mitgliederbereich">
+      <a class="asc-navlink" href="mitglieder-dashboard.html">Übersicht</a>
+      <a class="asc-navlink is-active" aria-current="page" href="trainingsbuch.html">Trainingsbuch</a>
+      <a class="asc-navlink" href="mitglieder-profil.html">Profil</a>
+      <button class="asc-btn asc-btn-secondary asc-nav-cta" type="button" data-asc-logout>Ausloggen</button>
+    </nav>
+    <div class="asc-header-actions">
+      <button class="asc-btn asc-btn-secondary asc-hide-mobile" type="button" id="logoutBtn">Ausloggen</button>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen"><span></span><span></span><span></span></button>
+    </div>
   </div>
-</div>
-
+</header>
 <div id="loadingState" class="loading">Lade Trainingsbuch …</div>
 
 <!-- ========== Übersicht ========== -->

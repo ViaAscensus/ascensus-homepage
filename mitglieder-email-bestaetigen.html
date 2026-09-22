@@ -8,6 +8,8 @@
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
 <style>
   :root{
     --olive: #556B4E;
@@ -21,10 +23,6 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     min-height: 100vh; display:flex; flex-direction:column;
   }
-  header{ padding: 24px 20px; }
-  .navbar{ display:flex; align-items:center; justify-content:space-between; max-width: 960px; margin:0 auto; }
-  .navbar img{ height: 34px; }
-  .navbar a.back{ color: var(--anthrazit); text-decoration:none; font-size:0.9rem; opacity:0.7; }
 
   main{ flex:1; display:flex; align-items:center; justify-content:center; padding: 20px; }
   .card{
@@ -59,10 +57,10 @@
 </head>
 <body>
 
-<header>
-  <div class="navbar">
-    <a href="index.html" aria-label="Zur Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
-    <a class="back" href="index.html">← Startseite</a>
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <div class="asc-header-actions"><a class="asc-back" href="index.html">← Startseite</a></div>
   </div>
 </header>
 
@@ -82,6 +80,44 @@
     </form>
   </div>
 </main>
+
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+          <li><a href="widerruf.html">Widerruf</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
+  </div>
+</footer>
+
 
 <script>
   const pb = new PocketBase('https://pb.ascensus.fit');

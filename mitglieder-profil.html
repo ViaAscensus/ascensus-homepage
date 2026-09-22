@@ -8,6 +8,8 @@
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
 <style>
   :root{
     --olive: #556B4E;
@@ -20,14 +22,6 @@
   body{
     margin:0; background: var(--offwhite); color: var(--anthrazit);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
-  header{ padding: 20px; border-bottom: 1px solid rgba(35,35,35,0.1); }
-  .navbar{ display:flex; align-items:center; justify-content:space-between; max-width: 720px; margin:0 auto; }
-  .navbar img{ height: 34px; }
-  .nav-right{ display:flex; align-items:center; gap:16px; }
-  .nav-right a, .nav-right button{
-    color: var(--anthrazit); opacity:0.7; font-size:0.85rem; text-decoration:none;
-    background:none; border:none; cursor:pointer; font-family:inherit;
   }
 
   main{ max-width: 560px; margin: 0 auto; padding: 30px 20px 60px; }
@@ -81,12 +75,18 @@
 </head>
 <body>
 
-<header>
-  <div class="navbar">
-    <a href="mitglieder-dashboard.html" aria-label="Zum Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
-    <div class="nav-right">
-      <a href="mitglieder-dashboard.html">← Mitgliederbereich</a>
-      <button id="logoutBtn">Ausloggen</button>
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="mitglieder-dashboard.html" aria-label="Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Mitgliederbereich">
+      <a class="asc-navlink" href="mitglieder-dashboard.html">Übersicht</a>
+      <a class="asc-navlink" href="trainingsbuch.html">Trainingsbuch</a>
+      <a class="asc-navlink is-active" aria-current="page" href="mitglieder-profil.html">Profil</a>
+      <button class="asc-btn asc-btn-secondary asc-nav-cta" type="button" data-asc-logout>Ausloggen</button>
+    </nav>
+    <div class="asc-header-actions">
+      <button class="asc-btn asc-btn-secondary asc-hide-mobile" type="button" id="logoutBtn">Ausloggen</button>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
@@ -164,6 +164,44 @@
     </div>
   </details>
 </main>
+
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+          <li><a href="widerruf.html">Widerruf</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
+  </div>
+</footer>
+
 
 <script>
   const pb = new PocketBase('https://pb.ascensus.fit');

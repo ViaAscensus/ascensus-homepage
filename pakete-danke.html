@@ -8,6 +8,8 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
 <style>
 :root{
   --olive:#556B4E;
@@ -34,10 +36,6 @@ body{
 img{max-width:100%;display:block}
 a{color:inherit}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
-
-header{padding:1.2rem 0}
-.navbar{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
-.navbar img{height:38px;width:auto}
 
 .confirm{flex:1;display:flex;align-items:center;padding:3rem 0}
 .confirm-box{max-width:560px;margin:0 auto;text-align:center}
@@ -77,12 +75,6 @@ h1{
 .btn:hover{background:var(--olive-dark);border-color:var(--olive-dark);transform:translateY(-2px)}
 .btn-ghost{background:transparent;color:var(--olive)}
 .btn-ghost:hover{background:var(--olive);color:var(--offwhite)}
-
-footer{background:var(--ink);color:rgba(245,243,238,.7);padding:2rem 0;font-size:.82rem;margin-top:auto}
-.foot-links{display:flex;flex-wrap:wrap;gap:1.4rem;justify-content:center}
-.foot-links a{color:rgba(245,243,238,.7);text-decoration:none;transition:color .2s}
-.foot-links a:hover{color:var(--sand)}
-.copyright{margin-top:1.2rem;font-size:.76rem;color:rgba(245,243,238,.45);text-align:center}
 </style>
 
 <!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
@@ -118,9 +110,10 @@ footer{background:var(--ink);color:rgba(245,243,238,.7);padding:2rem 0;font-size
 </head>
 <body>
 
-<header>
-  <div class="navbar">
-    <a href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <div class="asc-header-actions"><a class="asc-back" href="index.html">← Startseite</a></div>
   </div>
 </header>
 
@@ -156,16 +149,40 @@ footer{background:var(--ink);color:rgba(245,243,238,.7);padding:2rem 0;font-size
   </div>
 </section>
 
-<footer>
-  <div class="wrap">
-    <div class="foot-links">
-      <a href="impressum.html">Impressum</a>
-      <a href="datenschutz.html">Datenschutz</a>
-      <a href="agb.html">AGB</a>
-      <a href="widerruf.html">Widerruf</a>
-      <a href="#" onclick="klaro.show(); return false;">Datenschutzeinstellungen</a>
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+          <li><a href="widerruf.html">Widerruf</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="copyright">© <span id="yr">2026</span> ASCENSUS · Patrick Spengler</div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
   </div>
 </footer>
 
