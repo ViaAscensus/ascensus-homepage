@@ -38,7 +38,19 @@
   "founder": {
     "@type": "Person",
     "name": "Patrick Spengler",
-    "jobTitle": "Ernährungs- & Laufcoach"
+    "jobTitle": "Ernährungsberater (B-Lizenz) & Laufcoach",
+    "hasCredential": {
+      "@type": "EducationalOccupationalCredential",
+      "name": "Ernährungsberater B-Lizenz",
+      "credentialCategory": "Lizenz",
+      "educationalLevel": "Qualifikationslevel 3",
+      "dateCreated": "2026-06-14",
+      "url": "https://ascensus.fit/zertifikat-ernaehrungsberater.pdf",
+      "recognizedBy": {
+        "@type": "Organization",
+        "name": "Akademie für Sport und Gesundheit"
+      }
+    }
   },
   "sameAs": [
     "https://www.instagram.com/via_ascensus/",
@@ -267,6 +279,19 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .portrait figcaption small{display:block;margin-top:.35rem;letter-spacing:.02em;text-transform:none;
   font-weight:400;color:var(--ink-40);font-size:.8rem}
 .about p+p{margin-top:1.1rem}
+/* Qualifikation */
+.cred{
+  margin-top:2.2rem;padding:1.3rem 1.4rem;border:1px solid var(--line);background:var(--paper);
+  display:flex;gap:1.1rem;align-items:flex-start;
+}
+.cred-icon{flex-shrink:0;width:34px;height:34px;color:var(--sand)}
+.cred-title{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive)}
+.cred-meta{margin-top:.35rem !important;font-size:.88rem;color:var(--ink-60);line-height:1.5}
+.cred-link{display:inline-block;margin-top:.55rem;font-size:.82rem;color:var(--sand);font-weight:600;
+  text-decoration:none;border-bottom:1px solid rgba(181,154,93,.4)}
+.cred-link:hover{color:var(--olive);border-color:var(--olive)}
+.trust-line{display:inline-flex;align-items:center;gap:.45rem}
+.trust-line svg{width:14px;height:14px;color:var(--sand);flex-shrink:0}
 .pullquote{
   margin:2rem 0;padding:1.5rem 0 1.5rem 1.6rem;border-left:2px solid var(--olive);
   font-size:clamp(1.1rem,2.4vw,1.45rem);font-weight:300;line-height:1.4;color:var(--olive);
@@ -654,7 +679,8 @@ footer .fslogan{
       <a class="btn" href="#erstgespraech">Kostenloses Erstgespräch</a>
       <a class="btn btn-ghost" href="pakete.html">Pakete ansehen</a>
     </div>
-    <p class="hero-note">30 Minuten, unverbindlich, ohne Verkaufsgespräch.</p>
+    <p class="hero-note">30 Minuten, unverbindlich, ohne Verkaufsgespräch.<br>
+      <span class="trust-line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.4 7.5 10 4.3-1.6 7.5-5.4 7.5-10v-6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></svg>Mit zertifiziertem Ernährungsberater <span style="white-space:nowrap">(B-Lizenz)</span></span></p>
 
     <div class="slogan">
       <span>Echt</span><span>·</span><span>Fundiert</span><span>·</span><span>Nachhaltig</span>
@@ -692,7 +718,7 @@ footer .fslogan{
         <img src="patrick.jpg" alt="Patrick Spengler, Gründer von ASCENSUS" width="600" height="374">
         <figcaption>
           Patrick Spengler
-          <small>Gründer · Ernährungs- &amp; Laufcoach</small>
+          <small>Gründer · Zertifizierter Ernährungsberater (B-Lizenz) · Laufcoach</small>
         </figcaption>
       </figure>
 
@@ -727,6 +753,20 @@ footer .fslogan{
           Entscheidend ist am Ende nicht die Zahl auf der Waage. Entscheidend ist
           Dein Wohlbefinden und Deine Leistungsfähigkeit im Alltag.
         </p>
+
+        <div class="cred">
+          <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+            <circle cx="12" cy="9" r="6"/><path d="M8.5 13.9 7 22l5-2.6 5 2.6-1.5-8.1"/><path d="m9.5 9 1.7 1.7L14.8 7"/>
+          </svg>
+          <div>
+            <p class="cred-title">Ernährungsberater B-Lizenz</p>
+            <p class="cred-meta">
+              Akademie für Sport und Gesundheit · 128 Unterrichtseinheiten ·
+              Qualifikationslevel 3 · ZFU-zugelassener Lehrgang · 2026
+            </p>
+            <a class="cred-link" href="zertifikat-ernaehrungsberater.pdf" target="_blank" rel="noopener">Zertifikat ansehen →</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1064,7 +1104,8 @@ footer .fslogan{
           Termin buchen
         </a>
         <p style="margin-top:1rem;font-size:.8rem;color:rgba(245,243,238,.6)">
-          Unverbindlich. Kein Verkaufsgespräch.
+          Unverbindlich. Kein Verkaufsgespräch.<br>
+          Mit zertifiziertem Ernährungsberater (B-Lizenz).
         </p>
       </div>
     </div>
