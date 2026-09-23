@@ -98,6 +98,21 @@
     <div class="info-row"><span class="info-label">Mitglied seit</span><span id="infoCreated"></span></div>
   </div>
 
+  <details class="profile-item" id="itemName">
+    <summary>
+      <span class="item-label">Name</span>
+      <span class="item-value"><span id="summaryName"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <label for="vornameInput">Vorname</label>
+      <input type="text" id="vornameInput" autocomplete="given-name">
+      <label for="nachnameInput">Nachname</label>
+      <input type="text" id="nachnameInput" autocomplete="family-name">
+      <button class="action" id="saveNameBtn">Speichern</button>
+      <div class="msg" id="nameMsg"></div>
+    </div>
+  </details>
+
   <details class="profile-item" id="itemEmail">
     <summary>
       <span class="item-label">E-Mail-Adresse</span>
@@ -128,6 +143,33 @@
     </div>
   </details>
 
+  <details class="profile-item" id="itemBirth">
+    <summary>
+      <span class="item-label">Geburtsdatum</span>
+      <span class="item-value"><span id="summaryBirth"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <p class="hint" style="margin-top:0;">Dein Alter wird daraus automatisch berechnet – z. B. für Deinen Grundumsatz.</p>
+      <label for="birthInput">Geburtsdatum</label>
+      <input type="date" id="birthInput">
+      <button class="action" id="saveBirthBtn">Speichern</button>
+      <div class="msg" id="birthMsg"></div>
+    </div>
+  </details>
+
+  <details class="profile-item" id="itemHeight">
+    <summary>
+      <span class="item-label">Körpergröße</span>
+      <span class="item-value"><span id="summaryHeight"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <label for="heightInput">Körpergröße (cm)</label>
+      <input type="number" id="heightInput" step="1" min="100" max="230" inputmode="numeric">
+      <button class="action" id="saveHeightBtn">Speichern</button>
+      <div class="msg" id="heightMsg"></div>
+    </div>
+  </details>
+
   <details class="profile-item" id="itemWeight">
     <summary>
       <span class="item-label">Gewicht</span>
@@ -144,6 +186,44 @@
       <input type="number" id="weightInput" step="0.5" min="0">
       <button class="action" id="saveWeightBtn">Speichern</button>
       <div class="msg" id="weightMsg"></div>
+    </div>
+  </details>
+
+  <details class="profile-item" id="itemStartWeight">
+    <summary>
+      <span class="item-label">Startgewicht</span>
+      <span class="item-value"><span id="summaryStartWeight"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <p class="hint" style="margin-top:0;">Dein Gewicht zu Beginn des Coachings – damit Du siehst, wie weit Du schon gekommen bist.</p>
+      <label for="startWeightInput">Startgewicht (kg)</label>
+      <input type="number" id="startWeightInput" step="0.5" min="0" inputmode="decimal">
+      <button class="action" id="saveStartWeightBtn">Speichern</button>
+      <div class="msg" id="startWeightMsg"></div>
+    </div>
+  </details>
+
+  <details class="profile-item" id="itemWearable">
+    <summary>
+      <span class="item-label">Verbundenes Wearable</span>
+      <span class="item-value"><span id="summaryWearable"></span><span class="item-chevron">›</span></span>
+    </summary>
+    <div class="item-body">
+      <label for="wearableSelect">Welches Gerät bzw. welche App nutzt Du?</label>
+      <select id="wearableSelect">
+        <option value="">Bitte wählen</option>
+        <option>Apple Health</option>
+        <option>Garmin</option>
+        <option>Google Health Connect</option>
+        <option>Samsung Health</option>
+        <option>Fitbit</option>
+        <option>Polar</option>
+        <option>Suunto</option>
+        <option>Keins</option>
+        <option>Anderes</option>
+      </select>
+      <button class="action" id="saveWearableBtn">Speichern</button>
+      <div class="msg" id="wearableMsg"></div>
     </div>
   </details>
 
@@ -213,6 +293,40 @@
     window.location.href = 'mitglieder-login.html';
   });
 
+  // Alter immer aus dem Geburtsdatum berechnen – wird nicht gespeichert
+  function alterAus(iso){
+    const g = new Date(iso + 'T00:00:00'), h = new Date();
+    let a = h.getFullYear() - g.getFullYear();
+    if (h.getMonth() < g.getMonth() || (h.getMonth() === g.getMonth() && h.getDate() < g.getDate())) a--;
+    return a;
+  }
+
+  // Gemeinsame Speicher-Funktion für die neuen Profilfelder
+  function bindSave({ btnId, msgId, itemId, daten, pruefen }){
+    document.getElementById(btnId).addEventListener('click', async () => {
+      const btn = document.getElementById(btnId);
+      const msg = document.getElementById(msgId);
+      msg.textContent = ''; msg.className = 'msg';
+      const d = daten();
+      const fehler = pruefen ? pruefen(d) : '';
+      if (fehler) { msg.textContent = fehler; msg.classList.add('error'); return; }
+      btn.disabled = true;
+      try {
+        await pb.collection('members').update(pb.authStore.model.id, d);
+        await pb.collection('members').authRefresh();
+        fillInfo();
+        msg.textContent = 'Gespeichert.';
+        msg.classList.add('success');
+        setTimeout(() => { document.getElementById(itemId).open = false; }, 900);
+      } catch (err) {
+        msg.textContent = 'Konnte nicht gespeichert werden.';
+        msg.classList.add('error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
   function fillInfo(){
     const m = pb.authStore.model;
     document.getElementById('summaryEmail').textContent = m.email;
@@ -220,6 +334,21 @@
     document.getElementById('summaryGender').textContent = m.Geschlecht || 'Nicht angegeben';
     document.getElementById('weightInput').value = m.Gewicht || '';
     document.getElementById('summaryWeight').textContent = m.Gewicht ? m.Gewicht + ' kg' : 'Nicht angegeben';
+    const nameVoll = [m.vorname, m.nachname].filter(Boolean).join(' ');
+    document.getElementById('summaryName').textContent = nameVoll || 'Nicht angegeben';
+    document.getElementById('vornameInput').value = m.vorname || '';
+    document.getElementById('nachnameInput').value = m.nachname || '';
+    const geb = m.geburtsdatum || '';
+    document.getElementById('birthInput').value = geb;
+    document.getElementById('summaryBirth').textContent = geb
+      ? new Date(geb + 'T00:00:00').toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' · ' + alterAus(geb) + ' Jahre'
+      : 'Nicht angegeben';
+    document.getElementById('heightInput').value = m.groesse || '';
+    document.getElementById('summaryHeight').textContent = m.groesse ? m.groesse + ' cm' : 'Nicht angegeben';
+    document.getElementById('startWeightInput').value = m.startgewicht || '';
+    document.getElementById('summaryStartWeight').textContent = m.startgewicht ? m.startgewicht + ' kg' : 'Nicht angegeben';
+    document.getElementById('wearableSelect').value = m.wearable || '';
+    document.getElementById('summaryWearable').textContent = m.wearable || 'Nicht angegeben';
     const created = new Date(m.created);
     document.getElementById('infoCreated').textContent = created.toLocaleDateString('de-DE', { day:'numeric', month:'long', year:'numeric' });
   }
@@ -268,9 +397,14 @@
       const res = await fetch(NUTRILIZE_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: pb.authStore.model.email })
+        // Token mitschicken: n8n prüft damit, dass wirklich dieses Mitglied anfragt,
+        // und darf dann leere Profilfelder (Name, Größe, Geburtsdatum …) ergänzen.
+        body: JSON.stringify({ email: pb.authStore.model.email, token: pb.authStore.token })
       });
       const data = await res.json();
+
+      // Falls n8n leere Felder ergänzt hat: frische Daten laden und anzeigen
+      try { await pb.collection('members').authRefresh(); fillInfo(); } catch (e) {}
 
       if (!data.gefunden || !data.gewicht) {
         statusEl.textContent = 'Keine Verknüpfung zu nutrilize gefunden.';
@@ -305,6 +439,32 @@
     }
   }
   checkNutrilize();
+
+  // ---------- Neue Profilfelder ----------
+  bindSave({ btnId: 'saveNameBtn', msgId: 'nameMsg', itemId: 'itemName',
+    daten: () => ({ vorname: document.getElementById('vornameInput').value.trim(), nachname: document.getElementById('nachnameInput').value.trim() }),
+    pruefen: d => !d.vorname ? 'Bitte mindestens den Vornamen eingeben.' : '' });
+
+  document.getElementById('birthInput').max = new Date().toISOString().slice(0, 10);
+  bindSave({ btnId: 'saveBirthBtn', msgId: 'birthMsg', itemId: 'itemBirth',
+    daten: () => ({ geburtsdatum: document.getElementById('birthInput').value }),
+    pruefen: d => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d.geburtsdatum)) return 'Bitte ein gültiges Datum wählen.';
+      const a = alterAus(d.geburtsdatum);
+      return (a < 14 || a > 110) ? 'Bitte das Geburtsdatum prüfen.' : '';
+    } });
+
+  bindSave({ btnId: 'saveHeightBtn', msgId: 'heightMsg', itemId: 'itemHeight',
+    daten: () => ({ groesse: parseInt(document.getElementById('heightInput').value, 10) }),
+    pruefen: d => (!d.groesse || d.groesse < 100 || d.groesse > 230) ? 'Bitte eine Größe zwischen 100 und 230 cm eingeben.' : '' });
+
+  bindSave({ btnId: 'saveStartWeightBtn', msgId: 'startWeightMsg', itemId: 'itemStartWeight',
+    daten: () => ({ startgewicht: parseFloat(document.getElementById('startWeightInput').value) }),
+    pruefen: d => (!d.startgewicht || d.startgewicht <= 0) ? 'Bitte ein gültiges Gewicht eingeben.' : '' });
+
+  bindSave({ btnId: 'saveWearableBtn', msgId: 'wearableMsg', itemId: 'itemWearable',
+    daten: () => ({ wearable: document.getElementById('wearableSelect').value }),
+    pruefen: d => !d.wearable ? 'Bitte eine Auswahl treffen.' : '' });
 
   // ---------- Geschlecht ----------
   document.getElementById('saveGenderBtn').addEventListener('click', async () => {
