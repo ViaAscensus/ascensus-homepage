@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wochen-Quiz – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="pocketbase.umd.js"></script>
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
+<style>
+  :root{
+    --olive: #556B4E;
+    --sand: #B59A5D;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+    --error: #A9432F;
+    --gruen: #4C7A4C;
+    --rot: #A9432F;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--offwhite); color: var(--anthrazit);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  main{ max-width: 560px; margin: 0 auto; padding: 30px 20px 60px; }
+  h1{
+    font-size: 1.5rem; font-weight: 700; color: var(--olive);
+    text-transform: uppercase; letter-spacing: 2px; margin: 0 0 24px;
+  }
+  .card{
+    background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 4px;
+    padding: 20px 22px; margin-bottom: 18px;
+  }
+  button.action{
+    padding: 12px 20px; border:none; border-radius: 4px;
+    background: var(--olive); color:#fff; font-family: inherit;
+    font-size:0.9rem; font-weight:600; cursor:pointer;
+  }
+  button.action:disabled{ opacity:0.5; cursor:default; }
+  .hint{ font-size:0.85rem; opacity:0.7; line-height:1.5; }
+
+  /* Intro */
+  .quiz-thema{ font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--sand); font-weight:700; margin-bottom:10px; }
+  .hinweise-box{ background: var(--offwhite); border:1px solid rgba(85,107,78,0.25); border-radius:4px; padding:12px 14px; margin: 10px 0 18px; font-size:0.85rem; line-height:1.5; }
+  .hinweise-box p{ margin: 0 0 6px; }
+  .hinweise-box p:last-child{ margin-bottom:0; }
+
+  /* Quiz Ablauf */
+  .quiz-progress{ font-size:0.78rem; opacity:0.6; margin-bottom:10px; }
+  .progress-bar{ height:4px; background:rgba(35,35,35,0.08); border-radius:2px; margin-bottom:16px; overflow:hidden; }
+  .progress-bar-fill{ height:100%; background: var(--olive); transition: width 0.25s; }
+  .quiz-question{ font-size:1.1rem; font-weight:600; margin-bottom:18px; line-height:1.4; }
+  .quiz-options{ display:flex; flex-direction:column; gap:10px; }
+  .opt-btn{
+    text-align:left; padding: 13px 16px; border-radius:4px; cursor:pointer;
+    border: 1px solid rgba(35,35,35,0.2); background:#fff; font-family:inherit;
+    font-size:0.92rem; color: var(--anthrazit); transition: all 0.15s;
+  }
+  .opt-btn:hover:not(:disabled){ border-color: var(--olive); }
+  .opt-btn:disabled{ cursor:default; }
+  .opt-btn.richtig{ border-color: var(--gruen); background: rgba(76,122,76,0.1); font-weight:600; }
+  .opt-btn.falsch{ border-color: var(--rot); background: rgba(169,67,47,0.08); }
+  .quiz-feedback{ margin-top:16px; padding:14px 16px; border-radius:4px; font-size:0.88rem; line-height:1.5; }
+  .quiz-feedback.ok{ background: rgba(76,122,76,0.1); border:1px solid rgba(76,122,76,0.3); }
+  .quiz-feedback.nok{ background: rgba(169,67,47,0.08); border:1px solid rgba(169,67,47,0.25); }
+  .quiz-feedback .tipp{ margin-top:8px; opacity:0.8; font-style:italic; }
+  #nextBtn{ margin-top:16px; }
+
+  /* Ergebnis */
+  .result-score{ font-size:2rem; font-weight:700; color: var(--olive); text-align:center; }
+  .result-score-label{ text-align:center; font-size:0.8rem; opacity:0.6; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .stat-row{ display:flex; justify-content:space-around; text-align:center; margin-top:16px; padding-top:16px; border-top:1px solid rgba(35,35,35,0.08); }
+  .stat-val{ font-size:1.3rem; font-weight:700; color: var(--olive); }
+  .stat-label{ font-size:0.75rem; opacity:0.6; text-transform:uppercase; letter-spacing:0.5px; }
+  .badges-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; justify-content:center; }
+  .badge-pill{ background: var(--offwhite); border:1px solid rgba(181,154,93,0.4); border-radius:20px; padding:6px 14px; font-size:0.8rem; }
+  .badge-pill.neu{ background: var(--sand); color:#fff; border-color: var(--sand); font-weight:600; }
+  .neu-badges-hinweis{ text-align:center; font-size:0.85rem; color: var(--sand); font-weight:600; margin-top:14px; }
+  .review-item{ padding:14px 0; border-top:1px solid rgba(35,35,35,0.08); }
+  .review-item:first-child{ border-top:none; padding-top:0; }
+  .review-frage{ font-weight:600; font-size:0.92rem; margin-bottom:6px; }
+  .review-antwort{ font-size:0.85rem; opacity:0.8; }
+  .review-icon{ font-weight:700; }
+  .review-icon.ok{ color: var(--gruen); }
+  .review-icon.nok{ color: var(--rot); }
+</style>
+</head>
+<body>
+
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="mitglieder-dashboard.html" aria-label="Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Mitgliederbereich">
+      <a class="asc-navlink" href="mitglieder-dashboard.html">Übersicht</a>
+      <a class="asc-navlink" href="trainingsbuch.html">Trainingsbuch</a>
+      <a class="asc-navlink is-active" aria-current="page" href="mitglieder-quiz.html">Quiz</a>
+      <a class="asc-navlink" href="mitglieder-profil.html">Profil</a>
+      <button class="asc-btn asc-btn-secondary asc-nav-cta" type="button" data-asc-logout>Ausloggen</button>
+    </nav>
+    <div class="asc-header-actions">
+      <button class="asc-btn asc-btn-secondary asc-hide-mobile" type="button" id="logoutBtn">Ausloggen</button>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <h1>Wochen-Quiz</h1>
+
+  <div id="loadingState" class="card"><p class="hint" style="margin:0;">Lade Dein Quiz …</p></div>
+
+  <div id="emptyState" class="card" style="display:none;">
+    <p class="hint" style="margin:0;">Für diese Woche ist noch kein Quiz für Dich da. Es wird sonntagvormittags aus Deinen Trackingdaten erstellt – schau danach nochmal vorbei.</p>
+  </div>
+
+  <div id="introState" style="display:none;">
+    <div class="card">
+      <div class="quiz-thema" id="quizThemaLabel"></div>
+      <div class="hinweise-box" id="hinweiseBox"></div>
+      <button class="action" id="startBtn">Quiz starten</button>
+    </div>
+  </div>
+
+  <div id="quizState" style="display:none;">
+    <div class="card">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="quiz-question" id="quizFrage"></div>
+      <div class="quiz-options" id="quizOptionen"></div>
+      <div class="quiz-feedback" id="quizFeedback" style="display:none;"></div>
+      <button class="action" id="nextBtn" style="display:none;">Weiter</button>
+    </div>
+  </div>
+
+  <div id="resultState" style="display:none;">
+    <div class="card">
+      <div class="result-score-label">Diese Woche</div>
+      <div class="result-score" id="resultScore"></div>
+      <div id="neueBadgesHinweis"></div>
+      <div class="stat-row">
+        <div><div class="stat-val" id="statStreak"></div><div class="stat-label">Streak</div></div>
+        <div><div class="stat-val" id="statPunkte"></div><div class="stat-label">Punkte gesamt</div></div>
+      </div>
+      <div class="badges-row" id="badgesRow"></div>
+    </div>
+    <div class="card" id="reviewCard"></div>
+  </div>
+</main>
+
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+          <li><a href="widerruf.html">Widerruf</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const pb = new PocketBase('https://pb.ascensus.fit');
+  if (!pb.authStore.isValid) {
+    window.location.href = 'mitglieder-login.html';
+  }
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    pb.authStore.clear();
+    window.location.href = 'mitglieder-login.html';
+  });
+
+  const BADGE_LABEL = {
+    erste_woche: '🎯 Erste Woche',
+    dreier_streak: '🔥 3er-Streak',
+    drei_monats_streak: '🏆 3-Monats-Streak',
+    volltreffer: '💯 Volltreffer'
+  };
+
+  function zeigen(id){
+    ['loadingState','emptyState','introState','quizState','resultState'].forEach(s => {
+      document.getElementById(s).style.display = (s === id) ? '' : 'none';
+    });
+  }
+
+  // Montag (Europe/Berlin) der laufenden Woche – identische Logik wie im n8n-Workflow "Woche bestimmen"
+  function montagDerWoche(){
+    const heuteStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' });
+    const heute = new Date(heuteStr + 'T12:00:00Z');
+    const versatz = (heute.getUTCDay() + 6) % 7; // Mo=0 … So=6
+    const montag = new Date(heute.getTime() - versatz * 86400000);
+    return montag;
+  }
+  function iso(d){ return d.toISOString().slice(0, 10); }
+  const montag = montagDerWoche();
+  const wocheStart = iso(montag);
+  const vorwoche = iso(new Date(montag.getTime() - 7 * 86400000));
+
+  function istKorrekt(frage, antwortIdx){
+    if (typeof frage.richtig === 'number') return antwortIdx === frage.richtig;
+    return frage.optionen[antwortIdx] === frage.richtig;
+  }
+  function korrekterIndex(frage){
+    if (typeof frage.richtig === 'number') return frage.richtig;
+    return frage.optionen.indexOf(frage.richtig);
+  }
+
+  let record = null;      // aktueller quiz_wochen-Datensatz
+  let fragenListe = [];
+  let idx = 0;
+  let antworten = [];
+
+  async function init(){
+    try {
+      record = await pb.collection('quiz_wochen').getFirstListItem(
+        `member="${pb.authStore.model.id}" && woche_start="${wocheStart}"`
+      );
+    } catch (err) {
+      zeigen('emptyState');
+      return;
+    }
+    fragenListe = record.fragen || [];
+    if (record.beantwortet_am) {
+      await zeigeErgebnis(false);
+    } else {
+      zeigeIntro();
+    }
+  }
+
+  function zeigeIntro(){
+    document.getElementById('quizThemaLabel').textContent = 'Thema: ' + (record.thema || 'Ernährung');
+    const box = document.getElementById('hinweiseBox');
+    const hinweise = record.hinweise || [];
+    box.innerHTML = hinweise.length
+      ? hinweise.map(h => `<p>${h}</p>`).join('')
+      : '<p>5 Fragen aus Deinen eigenen Trackingdaten dieser Woche.</p>';
+    zeigen('introState');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    idx = 0; antworten = [];
+    zeigen('quizState');
+    renderFrage();
+  });
+
+  function renderFrage(){
+    const f = fragenListe[idx];
+    document.getElementById('quizProgress').textContent = `Frage ${idx + 1} von ${fragenListe.length}`;
+    document.getElementById('progressFill').style.width = Math.round((idx / fragenListe.length) * 100) + '%';
+    document.getElementById('quizFrage').textContent = f.frage;
+    document.getElementById('quizFeedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+
+    const optWrap = document.getElementById('quizOptionen');
+    optWrap.innerHTML = '';
+    f.optionen.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => beantworten(i));
+      optWrap.appendChild(btn);
+    });
+  }
+
+  function beantworten(gewaehlt){
+    const f = fragenListe[idx];
+    const richtigIdx = korrekterIndex(f);
+    const ok = istKorrekt(f, gewaehlt);
+    antworten[idx] = gewaehlt;
+
+    const buttons = document.getElementById('quizOptionen').querySelectorAll('.opt-btn');
+    buttons.forEach((b, i) => {
+      b.disabled = true;
+      if (i === richtigIdx) b.classList.add('richtig');
+      else if (i === gewaehlt) b.classList.add('falsch');
+    });
+
+    const fb = document.getElementById('quizFeedback');
+    fb.className = 'quiz-feedback ' + (ok ? 'ok' : 'nok');
+    fb.innerHTML = (ok ? '✅ Richtig! ' : '❌ Leider nicht. ')
+      + (f.aufloesung || '')
+      + (f.tipp ? `<div class="tipp">${f.tipp}</div>` : '');
+    fb.style.display = '';
+
+    document.getElementById('nextBtn').style.display = '';
+    document.getElementById('nextBtn').textContent = (idx < fragenListe.length - 1) ? 'Weiter' : 'Auswertung ansehen';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', async () => {
+    if (idx < fragenListe.length - 1) {
+      idx++;
+      renderFrage();
+    } else {
+      await abschliessen();
+    }
+  });
+
+  async function abschliessen(){
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = true;
+    const punkteWoche = antworten.filter((a, i) => istKorrekt(fragenListe[i], a)).length;
+
+    try {
+      record = await pb.collection('quiz_wochen').update(record.id, {
+        antworten,
+        punkte_woche: punkteWoche,
+        beantwortet_am: iso(new Date()),
+        status: 'beantwortet'
+      });
+    } catch (err) {
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Konnte nicht gespeichert werden – nochmal versuchen';
+      return;
+    }
+
+    const neueBadges = await fortschrittAktualisieren(punkteWoche);
+    await zeigeErgebnis(true, neueBadges);
+  }
+
+  async function fortschrittAktualisieren(punkteWoche){
+    let fort = null;
+    try {
+      fort = await pb.collection('quiz_fortschritt').getFirstListItem(`member="${pb.authStore.model.id}"`);
+    } catch (err) { /* noch kein Datensatz */ }
+
+    const warBereits = !!fort;
+    // PocketBase liefert Date-Felder als vollen Zeitstempel zurück (z.B. "2026-09-14 00:00:00.000Z") -> nur die ersten 10 Zeichen (Datum) vergleichen
+    const letzteWoche = fort && fort.letzte_woche_beantwortet ? String(fort.letzte_woche_beantwortet).slice(0, 10) : '';
+    const streak_aktuell = (letzteWoche === vorwoche) ? fort.streak_aktuell + 1 : 1;
+    const streak_bester = Math.max(fort ? fort.streak_bester : 0, streak_aktuell);
+    const punkte_gesamt = (fort ? fort.punkte_gesamt : 0) + punkteWoche;
+    const badges = fort ? [...(fort.badges || [])] : [];
+    const neueBadges = [];
+
+    function vergeben(schluessel){
+      if (!badges.includes(schluessel)) { badges.push(schluessel); neueBadges.push(schluessel); }
+    }
+    if (!warBereits) vergeben('erste_woche');
+    if (streak_aktuell === 3) vergeben('dreier_streak');
+    if (streak_aktuell === 12) vergeben('drei_monats_streak');
+    if (fragenListe.length > 0 && punkteWoche === fragenListe.length) vergeben('volltreffer');
+
+    const payload = { punkte_gesamt, streak_aktuell, streak_bester, badges, letzte_woche_beantwortet: wocheStart };
+    try {
+      if (fort) await pb.collection('quiz_fortschritt').update(fort.id, payload);
+      else await pb.collection('quiz_fortschritt').create({ member: pb.authStore.model.id, ...payload });
+    } catch (err) { /* Fortschritt konnte nicht gespeichert werden – Quiz-Ergebnis bleibt trotzdem erhalten */ }
+
+    return neueBadges;
+  }
+
+  async function zeigeErgebnis(geradeFertig, neueBadges){
+    neueBadges = neueBadges || [];
+    let fort = null;
+    try {
+      fort = await pb.collection('quiz_fortschritt').getFirstListItem(`member="${pb.authStore.model.id}"`);
+    } catch (err) { /* kein Fortschritt vorhanden */ }
+
+    document.getElementById('resultScore').textContent = `${record.punkte_woche} / ${fragenListe.length}`;
+    document.getElementById('statStreak').textContent = fort ? fort.streak_aktuell : '–';
+    document.getElementById('statPunkte').textContent = fort ? fort.punkte_gesamt : '–';
+
+    const badgesRow = document.getElementById('badgesRow');
+    badgesRow.innerHTML = (fort && fort.badges || []).map(b =>
+      `<span class="badge-pill${neueBadges.includes(b) ? ' neu' : ''}">${BADGE_LABEL[b] || b}</span>`
+    ).join('');
+
+    document.getElementById('neueBadgesHinweis').innerHTML = neueBadges.length
+      ? `<div class="neu-badges-hinweis">Neues Badge freigeschaltet! 🎉</div>` : '';
+
+    const review = document.getElementById('reviewCard');
+    review.innerHTML = fragenListe.map((f, i) => {
+      const gewaehlt = (record.antworten || [])[i];
+      const ok = istKorrekt(f, gewaehlt);
+      const richtigTxt = f.optionen[korrekterIndex(f)];
+      return `<div class="review-item">
+        <div class="review-frage"><span class="review-icon ${ok ? 'ok' : 'nok'}">${ok ? '✔' : '✘'}</span> ${f.frage}</div>
+        <div class="review-antwort">Richtige Antwort: <strong>${richtigTxt}</strong></div>
+      </div>`;
+    }).join('');
+
+    zeigen('resultState');
+  }
+
+  init();
+</script>
+
+</body>
+</html>
