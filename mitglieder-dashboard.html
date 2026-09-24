@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mitgliederbereich – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="pocketbase.umd.js"></script>
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
+<style>
+  :root{
+    --olive: #556B4E;
+    --sand: #B59A5D;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--offwhite); color: var(--anthrazit);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+
+  main{ max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+  h1{
+    font-size: 1.6rem; font-weight: 600; color: var(--olive);
+    text-transform: uppercase; letter-spacing: 2px; margin: 0 0 6px;
+  }
+  .welcome{ font-size:0.95rem; opacity:0.7; margin: 0 0 20px; }
+
+  .badges-preview{ margin: 0 0 32px; }
+  .badges-preview-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+  .badge-preview-tile{
+    background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 8px;
+    padding: 14px 10px; text-align:center; width: 84px;
+  }
+  .badge-preview-icon{
+    width:48px; height:48px; margin: 0 auto 6px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+    background: var(--offwhite); border: 2px solid var(--sand);
+  }
+  .badge-preview-titel{ font-size:0.7rem; font-weight:600; line-height:1.3; }
+  .badges-preview-link{ font-size:0.82rem; color: var(--olive); text-decoration:none; font-weight:600; }
+
+  .modules{ display:flex; flex-direction:column; gap:12px; }
+  .module{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 20px 22px; background:#fff; border: 1px solid rgba(35,35,35,0.1);
+    border-radius: 4px; text-decoration:none; color: var(--anthrazit);
+  }
+  .module.disabled{ opacity:0.55; pointer-events:none; }
+  .module-name{ font-weight:600; font-size:1rem; }
+  .module-status{ font-size:0.8rem; color: var(--sand); text-transform:uppercase; letter-spacing:1px; }
+</style>
+</head>
+<body>
+
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="mitglieder-dashboard.html" aria-label="Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Mitgliederbereich">
+      <a class="asc-navlink is-active" aria-current="page" href="mitglieder-dashboard.html">Übersicht</a>
+      <a class="asc-navlink" href="trainingsbuch.html">Trainingsbuch</a>
+      <a class="asc-navlink" href="mitglieder-quiz.html">Quiz</a>
+      <a class="asc-navlink" href="mitglieder-profil.html">Profil</a>
+      <button class="asc-btn asc-btn-secondary asc-nav-cta" type="button" data-asc-logout>Ausloggen</button>
+    </nav>
+    <div class="asc-header-actions">
+      <button class="asc-btn asc-btn-secondary asc-hide-mobile" type="button" id="logoutBtn">Ausloggen</button>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <h1>Mitgliederbereich</h1>
+  <p class="welcome" id="welcome">Willkommen, claude@ascensus.fit</p>
+
+  <div class="badges-preview" id="badgesPreview" style="display:none;">
+    <div class="badges-preview-row" id="badgesPreviewRow"></div>
+    <a class="badges-preview-link" href="mitglieder-badges.html">Alle Auszeichnungen ansehen →</a>
+  </div>
+
+  <div class="modules">
+    <a href="trainingsbuch.html" class="module">
+      <span class="module-name">Trainingsbuch</span>
+      <span class="module-status">Öffnen</span>
+    </a>
+    <a href="mitglieder-quiz.html" class="module">
+      <span class="module-name">Wochen-Quiz</span>
+      <span class="module-status">Öffnen</span>
+    </a>
+    <a href="mitglieder-badges.html" class="module">
+      <span class="module-name">Auszeichnungen</span>
+      <span class="module-status">Öffnen</span>
+    </a>
+    <a href="mitglieder-profil.html" class="module">
+      <span class="module-name">Mein Profil</span>
+      <span class="module-status">Öffnen</span>
+    </a>
+  </div>
+</main>
+
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+          <li><a href="widerruf.html">Widerruf</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  const pb = new PocketBase('https://pb.ascensus.fit');
+
+  if (!pb.authStore.isValid) {
+    window.location.href = 'mitglieder-login.html';
+  } else {
+    document.getElementById('welcome').textContent =
+      'Willkommen, ' + (pb.authStore.model?.email || '');
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    pb.authStore.clear();
+    window.location.href = 'mitglieder-login.html';
+  });
+
+  // ---------- Quiz-Fortschritt: Vorschau der zuletzt erhaltenen Auszeichnungen ----------
+  // Gleiche Badge-Definitionen wie auf mitglieder-badges.html – bei neuen Badge-Typen dort UND hier ergänzen.
+  const BADGE_DEFS = {
+    erste_woche: { icon: '🎯', titel: 'Erste Woche' },
+    dreier_streak: { icon: '🔥', titel: '3er-Streak' },
+    drei_monats_streak: { icon: '🏆', titel: '3-Monats-Streak' },
+    volltreffer: { icon: '💯', titel: 'Volltreffer' }
+  };
+
+  async function ladeFortschritt(){
+    try {
+      const fort = await pb.collection('quiz_fortschritt').getFirstListItem(`member="${pb.authStore.model.id}"`);
+      const letzte4 = (fort.badges || []).slice(-4).reverse();
+      if (letzte4.length === 0) return;
+
+      const row = document.getElementById('badgesPreviewRow');
+      row.innerHTML = letzte4.map(k => {
+        const def = BADGE_DEFS[k] || { icon: '🏅', titel: k };
+        return `<div class="badge-preview-tile">
+          <div class="badge-preview-icon">${def.icon}</div>
+          <div class="badge-preview-titel">${def.titel}</div>
+        </div>`;
+      }).join('');
+      document.getElementById('badgesPreview').style.display = '';
+    } catch (err) {
+      // Noch kein Quiz-Fortschritt vorhanden – Vorschau bleibt versteckt
+    }
+  }
+  if (pb.authStore.isValid) ladeFortschritt();
+</script>
+
+</body>
+</html>

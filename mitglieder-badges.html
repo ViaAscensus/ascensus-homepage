@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auszeichnungen – ASCENSUS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="pocketbase.umd.js"></script>
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
+<style>
+  :root{
+    --olive: #556B4E;
+    --sand: #B59A5D;
+    --offwhite: #F5F3EE;
+    --anthrazit: #232323;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--offwhite); color: var(--anthrazit);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  main{ max-width: 640px; margin: 0 auto; padding: 30px 20px 60px; }
+  h1{
+    font-size: 1.5rem; font-weight: 700; color: var(--olive);
+    text-transform: uppercase; letter-spacing: 2px; margin: 0 0 6px;
+  }
+  .sub{ font-size:0.88rem; opacity:0.65; margin: 0 0 24px; }
+
+  .tabs{ display:flex; gap:4px; border-bottom: 1px solid rgba(35,35,35,0.12); margin-bottom: 24px; }
+  .tab-btn{
+    flex:1; padding: 12px 8px; border:none; background:none; cursor:pointer;
+    font-family:inherit; font-size:0.9rem; font-weight:600; color: var(--anthrazit);
+    opacity:0.5; border-bottom: 2px solid transparent; margin-bottom:-1px;
+  }
+  .tab-btn.aktiv{ opacity:1; color: var(--olive); border-bottom-color: var(--olive); }
+
+  .badge-grid{
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px;
+  }
+  .badge-tile{
+    background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 8px;
+    padding: 20px 14px; text-align:center;
+  }
+  .badge-tile.gesperrt{ opacity:0.5; }
+  .badge-icon{
+    width:64px; height:64px; margin: 0 auto 12px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:2rem;
+    background: var(--offwhite); border: 2px solid var(--sand);
+  }
+  .badge-tile.gesperrt .badge-icon{ border-color: rgba(35,35,35,0.2); filter: grayscale(1); }
+  .badge-titel{ font-weight:700; font-size:0.92rem; margin-bottom:4px; }
+  .badge-beschreibung{ font-size:0.78rem; opacity:0.65; line-height:1.4; }
+
+  .leer-hinweis{ text-align:center; padding: 40px 20px; opacity:0.6; font-size:0.9rem; }
+</style>
+</head>
+<body>
+
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="mitglieder-dashboard.html" aria-label="Mitgliederbereich"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Mitgliederbereich">
+      <a class="asc-navlink" href="mitglieder-dashboard.html">Übersicht</a>
+      <a class="asc-navlink" href="trainingsbuch.html">Trainingsbuch</a>
+      <a class="asc-navlink" href="mitglieder-quiz.html">Quiz</a>
+      <a class="asc-navlink" href="mitglieder-profil.html">Profil</a>
+      <button class="asc-btn asc-btn-secondary asc-nav-cta" type="button" data-asc-logout>Ausloggen</button>
+    </nav>
+    <div class="asc-header-actions">
+      <button class="asc-btn asc-btn-secondary asc-hide-mobile" type="button" id="logoutBtn">Ausloggen</button>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <h1>Auszeichnungen</h1>
+  <p class="sub" id="fortschrittSub"></p>
+
+  <div class="tabs">
+    <button class="tab-btn aktiv" id="tabErhalten" type="button">Erhalten</button>
+    <button class="tab-btn" id="tabVerfuegbar" type="button">Verfügbar</button>
+  </div>
+
+  <div class="badge-grid" id="grid"></div>
+  <div class="leer-hinweis" id="leerHinweis" style="display:none;"></div>
+</main>
+
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+          <li><a href="widerruf.html">Widerruf</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const pb = new PocketBase('https://pb.ascensus.fit');
+  if (!pb.authStore.isValid) {
+    window.location.href = 'mitglieder-login.html';
+  }
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    pb.authStore.clear();
+    window.location.href = 'mitglieder-login.html';
+  });
+
+  // Alle bekannten Badge-Typen – hier erweitern, sobald neue dazukommen (Training, Ziele, Challenges …)
+  const BADGE_DEFS = [
+    { key: 'erste_woche', icon: '🎯', titel: 'Erste Woche', beschreibung: 'Das erste Wochen-Quiz abgeschlossen.' },
+    { key: 'dreier_streak', icon: '🔥', titel: '3er-Streak', beschreibung: '3 Wochen in Folge das Quiz gemacht.' },
+    { key: 'drei_monats_streak', icon: '🏆', titel: '3-Monats-Streak', beschreibung: '12 Wochen in Folge das Quiz gemacht.' },
+    { key: 'volltreffer', icon: '💯', titel: 'Volltreffer', beschreibung: 'Alle Fragen einer Woche richtig beantwortet.' }
+  ];
+
+  let erhalteneSchluessel = [];
+  let aktiverTab = 'erhalten';
+
+  function renderTile(def, gesperrt){
+    return `<div class="badge-tile ${gesperrt ? 'gesperrt' : ''}">
+      <div class="badge-icon">${def.icon}</div>
+      <div class="badge-titel">${def.titel}</div>
+      <div class="badge-beschreibung">${def.beschreibung}</div>
+    </div>`;
+  }
+
+  function render(){
+    const grid = document.getElementById('grid');
+    const hinweis = document.getElementById('leerHinweis');
+    let liste;
+    if (aktiverTab === 'erhalten') {
+      // In der Reihenfolge, in der sie erreicht wurden (neueste zuerst)
+      liste = erhalteneSchluessel.slice().reverse()
+        .map(k => BADGE_DEFS.find(d => d.key === k)).filter(Boolean);
+    } else {
+      liste = BADGE_DEFS.filter(d => !erhalteneSchluessel.includes(d.key));
+    }
+
+    if (liste.length === 0) {
+      grid.style.display = 'none';
+      hinweis.style.display = '';
+      hinweis.textContent = aktiverTab === 'erhalten'
+        ? 'Noch keine Auszeichnung erhalten – mach Dein erstes Wochen-Quiz!'
+        : 'Alle Auszeichnungen erreicht – stark!';
+    } else {
+      grid.style.display = '';
+      hinweis.style.display = 'none';
+      grid.innerHTML = liste.map(d => renderTile(d, aktiverTab === 'verfuegbar')).join('');
+    }
+  }
+
+  document.getElementById('tabErhalten').addEventListener('click', () => {
+    aktiverTab = 'erhalten';
+    document.getElementById('tabErhalten').classList.add('aktiv');
+    document.getElementById('tabVerfuegbar').classList.remove('aktiv');
+    render();
+  });
+  document.getElementById('tabVerfuegbar').addEventListener('click', () => {
+    aktiverTab = 'verfuegbar';
+    document.getElementById('tabVerfuegbar').classList.add('aktiv');
+    document.getElementById('tabErhalten').classList.remove('aktiv');
+    render();
+  });
+
+  async function init(){
+    try {
+      const fort = await pb.collection('quiz_fortschritt').getFirstListItem(`member="${pb.authStore.model.id}"`);
+      erhalteneSchluessel = fort.badges || [];
+      document.getElementById('fortschrittSub').textContent =
+        `Streak: ${fort.streak_aktuell} Woche${fort.streak_aktuell === 1 ? '' : 'n'} · ${fort.punkte_gesamt} Punkte gesamt`;
+    } catch (err) {
+      document.getElementById('fortschrittSub').textContent = 'Noch kein Quiz-Fortschritt vorhanden.';
+    }
+    render();
+  }
+  init();
+</script>
+
+</body>
+</html>
