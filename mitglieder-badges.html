@@ -45,6 +45,7 @@
     padding: 20px 14px; text-align:center;
   }
   .badge-tile.gesperrt{ opacity:0.5; }
+  .badge-tile.hervorgehoben{ border-color: var(--olive); box-shadow: 0 0 0 2px var(--olive); transition: box-shadow 0.3s; }
   .badge-icon{
     width:64px; height:64px; margin: 0 auto 12px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; font-size:2rem;
@@ -148,11 +149,31 @@
   let aktiverTab = 'erhalten';
 
   function renderTile(def, gesperrt){
-    return `<div class="badge-tile ${gesperrt ? 'gesperrt' : ''}">
+    return `<div class="badge-tile ${gesperrt ? 'gesperrt' : ''}" id="badge-${def.key}">
       <div class="badge-icon">${def.icon}</div>
       <div class="badge-titel">${def.titel}</div>
       <div class="badge-beschreibung">${def.beschreibung}</div>
     </div>`;
+  }
+
+  // Wenn über einen Link mit #badge-schluessel angekommen (z.B. von der Übersichtsseite):
+  // richtigen Tab zeigen, zur Auszeichnung scrollen und kurz hervorheben.
+  function zuHashSpringen(){
+    const schluessel = location.hash.replace('#', '');
+    if (!schluessel) return;
+    const zielTab = erhalteneSchluessel.includes(schluessel) ? 'erhalten' : 'verfuegbar';
+    if (zielTab !== aktiverTab) {
+      aktiverTab = zielTab;
+      document.getElementById('tabErhalten').classList.toggle('aktiv', zielTab === 'erhalten');
+      document.getElementById('tabVerfuegbar').classList.toggle('aktiv', zielTab === 'verfuegbar');
+      render();
+    }
+    const el = document.getElementById('badge-' + schluessel);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('hervorgehoben');
+      setTimeout(() => el.classList.remove('hervorgehoben'), 2000);
+    }
   }
 
   function render(){
@@ -203,6 +224,7 @@
       document.getElementById('fortschrittSub').textContent = 'Noch kein Quiz-Fortschritt vorhanden.';
     }
     render();
+    zuHashSpringen();
   }
   init();
 </script>

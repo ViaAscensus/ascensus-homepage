@@ -36,6 +36,7 @@
   .badge-preview-tile{
     background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 8px;
     padding: 14px 10px; text-align:center; width: 84px;
+    display:block; text-decoration:none; color: var(--anthrazit);
   }
   .badge-preview-icon{
     width:48px; height:48px; margin: 0 auto 6px; border-radius:50%;
@@ -175,10 +176,10 @@
       const row = document.getElementById('badgesPreviewRow');
       row.innerHTML = letzte4.map(k => {
         const def = BADGE_DEFS[k] || { icon: '🏅', titel: k };
-        return `<div class="badge-preview-tile">
+        return `<a class="badge-preview-tile" href="mitglieder-badges.html#${k}">
           <div class="badge-preview-icon">${def.icon}</div>
           <div class="badge-preview-titel">${def.titel}</div>
-        </div>`;
+        </a>`;
       }).join('');
       document.getElementById('badgesPreview').style.display = '';
     } catch (err) {
