@@ -560,6 +560,33 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
   padding-bottom:1.5rem;color:var(--ink-60);font-size:.96rem;line-height:1.6;max-width:66ch;
 }
 
+/* ---------- Wissen-Teaser (identisch in wissen.html) ---------- */
+.wissen-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.2rem}
+.wissen-all{
+  font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.78rem;
+  color:var(--olive);text-decoration:none;white-space:nowrap;
+}
+.wissen-all:hover{text-decoration:underline;text-underline-offset:4px}
+.post-grid{display:grid;gap:1.5rem;margin-top:2.4rem}
+@media(min-width:720px){.post-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.post-grid{grid-template-columns:repeat(3,1fr)}}
+.post{
+  background:var(--paper);border:1px solid var(--line);
+  padding:1.8rem 1.7rem 1.6rem;display:flex;flex-direction:column;
+  text-decoration:none;color:var(--ink);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.post:hover{transform:translateY(-4px);box-shadow:0 14px 40px -22px rgba(35,35,35,.35);border-color:rgba(85,107,78,.35)}
+.post-cat{font-size:.66rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--sand)}
+.post h3{margin:.8rem 0 .8rem;font-size:1.06rem;line-height:1.35;letter-spacing:.06em}
+.post p{font-size:.93rem;line-height:1.55;color:var(--ink-60);flex-grow:1}
+.post-foot{
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--line);
+  font-size:.78rem;color:var(--ink-40);
+}
+.post-more{font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:.7rem;color:var(--olive)}
+
 /* ---------- Footer ---------- */
 
 /* ---------- Reveal ---------- */
@@ -610,6 +637,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
       <a class="asc-navlink" href="#ansatz">Ansatz</a>
       <a class="asc-navlink" href="#ablauf">Ablauf</a>
       <a class="asc-navlink" href="pakete.html">Pakete</a>
+      <a class="asc-navlink" href="wissen.html">Wissen</a>
       <a class="asc-navlink" href="#faq">FAQ</a>
       <a class="asc-navlink" href="#kontakt">Kontakt</a>
       <a class="asc-btn asc-btn-primary asc-nav-cta" href="#erstgespraech">Kostenloses Erstgespräch</a>
@@ -1047,6 +1075,43 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
       Interesse? Sag mir im Erstgespräch Bescheid — dann melde ich mich, sobald
       es losgeht.
     </p>
+  </div>
+</section>
+
+<!-- ============ WISSEN ============
+     Zeigt die neuesten Beiträge (gleiche Kacheln wie auf wissen.html).
+     -->
+<section id="wissen">
+  <div class="wrap reveal">
+    <div class="wissen-head">
+      <div>
+        <p class="eyebrow">Wissen für Deinen Alltag</p>
+        <h2>Fundiert statt Hype</h2>
+      </div>
+      <a class="wissen-all" href="wissen.html">Alle Beiträge →</a>
+    </div>
+    <div class="post-grid">
+<!-- WISSEN-START · genau die neuesten Kacheln, identisch zu wissen.html -->
+<a class="post" href="wissen-dosis-macht-das-gift.html">
+  <span class="post-cat">Haltung</span>
+  <h3>Die Dosis macht das Gift</h3>
+  <p>Warum strikte Verbote so oft scheitern – und was stattdessen wirklich hilft.</p>
+  <div class="post-foot">
+    <span>25.09.2026</span>
+    <span class="post-more">Weiterlesen →</span>
+  </div>
+</a>
+<a class="post" href="wissen-eiweiss.html">
+  <span class="post-cat">Ernährung</span>
+  <h3>Eiweiß: Wie viel Du wirklich brauchst</h3>
+  <p>Wie viel Eiweiß ein gesunder Erwachsener wirklich braucht, warum es beim Sattwerden hilft – und ob viel Eiweiß den Nieren schadet.</p>
+  <div class="post-foot">
+    <span>24.09.2026</span>
+    <span class="post-more">Weiterlesen →</span>
+  </div>
+</a>
+<!-- WISSEN-ENDE -->
+    </div>
   </div>
 </section>
 
