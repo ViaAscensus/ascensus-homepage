@@ -110,6 +110,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
   transition:transform .3s,box-shadow .3s,border-color .3s;
 }
 .post:hover{transform:translateY(-4px);box-shadow:0 14px 40px -22px rgba(35,35,35,.35);border-color:rgba(85,107,78,.35)}
+.post[hidden]{display:none}
 .post-cat{font-size:.66rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--sand)}
 .post h3{margin:.8rem 0 .8rem;font-size:1.06rem;line-height:1.35;letter-spacing:.06em}
 .post p{font-size:.93rem;line-height:1.55;color:var(--ink-60);flex-grow:1}
@@ -220,6 +221,15 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
   <div class="wrap reveal">
     <div class="post-grid">
 <!-- BEITRAEGE:START  · neuester Beitrag immer oben einfügen -->
+<a class="post" href="wissen-kohlenhydrate.html" hidden data-visible-from="2026-09-30T00:00:00+02:00">
+  <span class="post-cat">Ernährung</span>
+  <h3>Kohlenhydrate: Machen sie wirklich dick?</h3>
+  <p>Wie viele Kohlenhydrate ein gesunder Erwachsener braucht, ob sie wirklich dick machen und was der Unterschied zwischen Zucker und komplexen Kohlenhydraten ist.</p>
+  <div class="post-foot">
+    <span>30.09.2026</span>
+    <span class="post-more">Weiterlesen →</span>
+  </div>
+</a>
 <a class="post" href="wissen-dosis-macht-das-gift.html">
   <span class="post-cat">Haltung</span>
   <h3>Die Dosis macht das Gift</h3>
@@ -275,6 +285,11 @@ footer .fslogan{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;c
 </footer>
 
 <script>
+/* Zeitgesteuerte Beiträge: Elemente mit hidden + data-visible-from werden
+   automatisch sichtbar, sobald der angegebene Zeitpunkt erreicht ist. */
+document.querySelectorAll('[data-visible-from]').forEach(function(el){
+  if (new Date(el.dataset.visibleFrom) <= new Date()) el.removeAttribute('hidden');
+});
 document.getElementById('yr').textContent = new Date().getFullYear();
 const hdr = document.getElementById('hdr');
 function onScroll(){ hdr.classList.toggle('scrolled', window.scrollY > 10); }
