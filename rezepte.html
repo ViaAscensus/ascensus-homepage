@@ -26,7 +26,7 @@
   --maxw:1140px;
   --gut:clamp(1.5rem,5vw,4rem);
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0}.asc-bottombar{display:none}@media (max-width:900px){.asc-bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--offwhite);border-top:1px solid var(--sand);padding-bottom:env(safe-area-inset-bottom,0)}.asc-bottombar a{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px 4px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--ink);text-decoration:none;border-right:1px solid rgba(35,35,35,.08)}.asc-bottombar a:last-child{border-right:none}.asc-bottombar a.asc-bottombar-cta{background:var(--olive);color:var(--offwhite)}body{padding-bottom:58px}}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   background:var(--offwhite);
@@ -609,5 +609,5 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   });
 })();
 </script>
-</body>
+<nav class="asc-bottombar" aria-label="Schnellzugriff"><a href="pakete.html">Pakete</a><a class="is-active" href="rezepte.html">Rezepte</a><a href="wissen.html">Wissen</a><a class="asc-bottombar-cta" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event','erstgespraech_klick');">Erstgespräch</a></nav></body>
 </html>
