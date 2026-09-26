@@ -154,4 +154,4 @@
 .asc-footer ul li { color: inherit; margin: 0; padding: 0; font-size: 14px; line-height: 1.5; list-style: none; }
 .asc-footer ul li::before, .asc-footer ul li::marker { content: none; display: none; }
 .asc-footer h4 { line-height: 1.3; }
-.asc-footer p { margin: 0; }
+.asc-footer p { margin: 0; }.asc-bottombar{display:none}@media (max-width:900px){.asc-bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--off-white);border-top:1px solid var(--sand);padding-bottom:env(safe-area-inset-bottom,0)}.asc-bottombar a{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px 4px;font-family:var(--font-sans);font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--anthrazit);text-decoration:none;border-right:1px solid rgba(35,35,35,.08)}.asc-bottombar a:last-child{border-right:none}.asc-bottombar a.asc-bottombar-cta{background:var(--olive);color:var(--off-white)}body{padding-bottom:58px}}
