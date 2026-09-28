@@ -200,7 +200,7 @@ SCHWELLE = {
   "Low-Carb":       "Kohlenhydrate <= 20 % der kcal",
   "High-Carb":      "Kohlenhydrate >= 55 % der kcal",
   "Kalorienarm":    "<= 400 kcal pro Portion",
-  "Ballaststoffreich": "Ballaststoffe >= 3 g / 100 kcal (EU-Claim 'hoher Ballaststoffgehalt')",
+  "Ballaststoffreich": "Ballaststoffe >= 5 g je Portion",
   "Schnell und einfach": "zeit_gesamt <= 30 Min.",
 }
 
@@ -319,8 +319,13 @@ for r in UNP:
     if "Ballaststoffreich" in tn:
         if not r["ballaststoffe"]:
             befund["ballast_unpruefbar"].append((name, rid, "ballaststoffe = 0, nicht pruefbar"))
-        elif kcal and r["ballaststoffe"]/kcal*100 < 3:
-            befund["ballast_falsch"].append((name, rid, f'{r["ballaststoffe"]:g} g / {kcal:g} kcal'))
+        # Frueher galt der EU-Claim von 3 g je 100 kcal. Der zielt auf einzelne
+        # Lebensmittel und schlaegt bei Mahlzeiten falsch an: Ofengemuese mit
+        # Creme fraiche traegt 14,1 g je Portion, knapp die halbe Tagesempfehlung,
+        # und galt mit 2,7 g je 100 kcal trotzdem als nicht ballaststoffreich.
+        elif r["ballaststoffe"] < 5:
+            befund["ballast_falsch"].append(
+                (name, rid, f'{r["ballaststoffe"]:g} g je Portion'))
     if "Schnell und einfach" in tn and r["zeit_gesamt"] and r["zeit_gesamt"] > 30:
         befund["schnell_falsch"].append((name, rid, f'{r["zeit_gesamt"]:g} Min.'))
 

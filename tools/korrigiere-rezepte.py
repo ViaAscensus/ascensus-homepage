@@ -14,6 +14,10 @@ inhaltliche Entscheidung und bleibt offen.
   python3 tools/korrigiere-rezepte.py              # Probelauf, schreibt nichts
   python3 tools/korrigiere-rezepte.py --schreiben  # aendert PocketBase
   python3 tools/korrigiere-rezepte.py --schreiben --log aenderungen.md
+  python3 tools/korrigiere-rezepte.py --veroeffentlicht   # die Seiten online
+
+Nach einem Lauf mit --veroeffentlicht muss tools/build-rezepte.py laufen, sonst
+steht die Korrektur nur in der Datenbank und nicht auf der Seite.
 
 Die Befunde stammen aus tools/pruefe-rezepte.py, damit beide Werkzeuge
 dieselbe Zutatenerkennung benutzen.
@@ -59,8 +63,10 @@ def alle(coll):
 
 
 def befunde():
-    r = subprocess.run([sys.executable, str(ROOT / 'tools' / 'pruefe-rezepte.py'), '--json'],
-                       capture_output=True, text=True, cwd=ROOT)
+    ruf = [sys.executable, str(ROOT / 'tools' / 'pruefe-rezepte.py'), '--json']
+    if '--veroeffentlicht' in sys.argv:
+        ruf.append('--veroeffentlicht')     # dann die Seiten, die online stehen
+    r = subprocess.run(ruf, capture_output=True, text=True, cwd=ROOT)
     if r.returncode:
         sys.exit(f'pruefe-rezepte.py fehlgeschlagen:\n{r.stderr}')
     return json.loads(r.stdout)
