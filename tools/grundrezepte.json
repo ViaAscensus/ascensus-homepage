@@ -1,0 +1,53 @@
+[
+ {
+  "slug": "rezept-bechamelsauce",
+  "name": "Cremige Béchamelsauce",
+  "kategorie": "Grundrezept",
+  "portionen": 6, "zeit_zubereitung": 10, "zeit_gesamt": 20,
+  "kcal": 112, "eiweiss": 3.5, "kohlenhydrate": 8.8, "fett": 6.8, "ballaststoffe": 0.2,
+  "allergene": "Milch, Weizen",
+  "tags": ["Vegetarisch"],
+  "zutaten": [
+   {"zutat": "Butter", "menge": 40, "einheit": "g"},
+   {"zutat": "Weizen- oder Dinkelmehl (Type 405 / 630)", "menge": 40, "einheit": "g"},
+   {"zutat": "Milch (1,5 % oder 3,5 % Fett, zimmerwarm)", "menge": 500, "einheit": "ml"},
+   {"zutat": "Salz und weißer Pfeffer", "menge": 0, "einheit": ""},
+   {"zutat": "Muskatnuss (frisch gerieben)", "menge": 0, "einheit": ""}
+  ],
+  "schritte": [
+   {"nummer": 1, "anweisung": "Mehlschwitze ansetzen: Die Butter in einem kleinen Topf bei mittlerer Hitze schmelzen lassen (Achtung: sie sollte nicht braun werden). Das Mehl mit einem Schneebesen auf einmal in die flüssige Butter einrühren, bis eine glatte Paste entsteht. Diese für ca. 1–2 Minuten unter Rühren hell anschwitzen."},
+   {"nummer": 2, "anweisung": "Milch zugeben: Zuerst etwa ein Drittel der Milch unter kräftigem Rühren mit dem Schneebesen dazugießen, um Klümpchen zu vermeiden. Sobald die Masse andickt, die restliche Milch nach und nach zügig unterrühren."},
+   {"nummer": 3, "anweisung": "Eindicken lassen: Die Sauce unter ständigem Rühren einmal aufkochen lassen. Danach die Hitze stark reduzieren und für ca. 5–10 Minuten sanft weiterköcheln lassen. Das ist wichtig, damit der mehlige Geschmack verschwindet. Dabei wirklich oft umrühren, da Béchamelsauce sehr leicht am Topfboden anbrennt."},
+   {"nummer": 4, "anweisung": "Abschmecken: Die Sauce vom Herd nehmen und großzügig mit Salz, Pfeffer und einer guten Prise frisch geriebener Muskatnuss abschmecken."}
+  ]
+ },
+ {
+  "slug": "rezept-tomaten-gemuese-sauce",
+  "name": "Tomaten-Gemüse-Sauce",
+  "kategorie": "Grundrezept",
+  "portionen": 6, "zeit_zubereitung": 15, "zeit_gesamt": 45,
+  "kcal": 47, "eiweiss": 1.4, "kohlenhydrate": 5.5, "fett": 1.8, "ballaststoffe": 1.0,
+  "allergene": "Sellerie",
+  "tags": ["Vegan"],
+  "zutaten": [
+   {"zutat": "Zwiebel (mittelgroß)", "menge": 1, "einheit": "Stk"},
+   {"zutat": "Karotte", "menge": 1, "einheit": "Stk"},
+   {"zutat": "Stange Sellerie (oder Knollensellerie)", "menge": 1, "einheit": "Stk"},
+   {"zutat": "Knoblauchzehe", "menge": 1, "einheit": "Stk"},
+   {"zutat": "Olivenöl", "menge": 1, "einheit": "EL"},
+   {"zutat": "Tomatenmark", "menge": 2, "einheit": "EL"},
+   {"zutat": "Passierte oder stückige Tomaten", "menge": 400, "einheit": "g"},
+   {"zutat": "Gemüsebrühe", "menge": 150, "einheit": "ml"},
+   {"zutat": "Oregano (getrocknet)", "menge": 1, "einheit": "TL"},
+   {"zutat": "Thymian (getrocknet)", "menge": 1, "einheit": "TL"},
+   {"zutat": "Salz und Pfeffer", "menge": 0, "einheit": ""}
+  ],
+  "schritte": [
+   {"nummer": 1, "anweisung": "Gemüse vorbereiten: Zwiebel, Knoblauch, Karotte und Sellerie schälen bzw. putzen und in sehr feine Würfel schneiden."},
+   {"nummer": 2, "anweisung": "Anbraten: Das Olivenöl in einer großen Pfanne oder einem weiten Topf erhitzen. Die Gemüsewürfel darin für ca. 8 Minuten goldgelb anbraten – je mehr Röstaromen, desto kräftiger wird die Sauce."},
+   {"nummer": 3, "anweisung": "Tomatisieren: Das Tomatenmark einrühren und 1–2 Minuten mitrösten. Das sorgt für einen intensiveren, leicht süßlichen Geschmack."},
+   {"nummer": 4, "anweisung": "Ablöschen: Mit der Gemüsebrühe ablöschen. Die Tomaten sowie die getrockneten Kräuter (Oregano, Thymian) hinzufügen."},
+   {"nummer": 5, "anweisung": "Zeit geben: Die Sauce bei niedriger Hitze mit leicht geöffnetem Deckel für mindestens 30 Minuten sanft köcheln lassen, damit sie schön sämig wird. Zum Schluss kräftig mit Salz und Pfeffer abschmecken."}
+  ]
+ }
+]
