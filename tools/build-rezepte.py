@@ -107,8 +107,13 @@ def baue(r, zutaten, schritte, tagname, slug):
     allerg = (f'<p class="allergene"><strong>Allergene:</strong> {esc(r["allergene"])}</p>'
               if (r["allergene"] or "").strip() else "")
 
+    # Ohne eigenes Foto bleibt das Logo als Vorschaubild - sonst laeuft og:image ins Leere
+    hat_og = (ROOT / f"{slug}-og.png").exists()
+    og = f"{SITE}/{slug}-og.png" if hat_og else f"{SITE}/logo-wordmark-claim.png"
+
     ld = {"@context":"https://schema.org","@type":"Recipe","name":r["name"],
-          "description":lead,"image":f"{SITE}/{slug}-og.png",
+          "description":lead,
+          **({"image": f"{SITE}/{slug}-og.png"} if hat_og else {}),
           "recipeYield":f'{r["portionen"]} Portionen',
           "recipeCategory":KATEGORIE.get(r["kategorie"], r["kategorie"]),
           "keywords":", ".join(sorted(TAG_ANZEIGE.get(t, t) for t in tagname)),
@@ -129,15 +134,12 @@ def baue(r, zutaten, schritte, tagname, slug):
     bild = (f'<div class="rezept-bild">\n      <img src="{SITE}/{slug}.jpg" alt="{titel}" '
             f'width="1200" height="900" loading="lazy">\n    </div>'
             if (ROOT / f"{slug}.jpg").exists() else "")
-    if not bild:
-        ld.pop("image", None)
-
     t = (ROOT / "tools" / "rezept-template.html").read_text(encoding="utf-8")
     for k, v in {"TITLE":titel, "DESC":esc(lead), "LEAD":esc(lead), "SLUG":slug,
                  "KATEGORIE":esc(KATEGORIE.get(r["kategorie"], r["kategorie"])),
                  "BADGES":badges_html, "KURZINFO":"\n      ".join(kurz),
                  "PORTIONEN":str(r["portionen"]), "ZUTATEN":zut_html,
-                 "SCHRITTE":sch_html, "ALLERGENE":allerg, "BILD":bild,
+                 "SCHRITTE":sch_html, "ALLERGENE":allerg, "BILD":bild, "OGIMAGE":og,
                  "JSONLD":json.dumps(ld, ensure_ascii=False, indent=2)}.items():
         t = t.replace("{{%s}}" % k, v)
     return t
