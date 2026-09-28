@@ -30,13 +30,13 @@ GRUNDREZEPTE = {"Béchamelsauce": "rezept-bechamelsauce",
 # Tag-Namen, die in der DB ohne Umlaute gespeichert sind
 TAG_ANZEIGE = {"Fruehstueck": "Frühstück", "Suess": "Süß"}
 # Rubrik-Anzeige: die DB speichert Slugs ohne Umlaute.
-# kategorie ist in PocketBase ein Select mit genau diesen fuenf Optionen -
-# Nachtisch und Grundrezept standen hier frueher, sind dort aber ungueltig.
-# Mittag und Abendessen werden nicht unterschieden und zeigen beide
-# "Hauptgericht"; kaeme die Unterscheidung zurueck, ist das hier eine Zeile.
-KATEGORIE = {"Fruehstueck":"Frühstück","Mittag":"Hauptgericht",
-             "Abendessen":"Hauptgericht","Snack":"Snack",
-             "Vor dem Training":"Vor dem Training"}
+# Mittag und Abendessen werden nicht mehr unterschieden und zeigen beide
+# "Hauptgericht"; kaeme die Unterscheidung zurueck, sind das hier zwei Zeilen.
+KATEGORIE = {"Fruehstueck":"Frühstück","Hauptgericht":"Hauptgericht",
+             "Mittag":"Hauptgericht","Abendessen":"Hauptgericht",
+             "Snack":"Snack","Nachtisch":"Nachtisch","Grundrezept":"Grundrezept",
+             "Vor dem Training":"Vor dem Training",
+             "Nach dem Training":"Nach dem Training"}
 
 def api(path):
     r = urllib.request.Request(f"{PB}/{path}")
@@ -149,9 +149,19 @@ def baue(r, zutaten, schritte, tagname, slug):
     return t
 
 # Rubrik der DB -> Filterwert und Anzeigename auf rezepte.html
-FILTER = {"Fruehstueck":("fruehstueck","Frühstück"), "Mittag":("hauptgericht","Hauptgericht"),
-          "Abendessen":("hauptgericht","Hauptgericht"), "Snack":("snack","Snack & Süßes"),
-          "Vor dem Training":("vor-dem-training","Vor dem Training")}
+# Die Filterwerte muessen zu den data-filter-Knoepfen in rezepte.html passen:
+# alle, fruehstueck, hauptgericht, snack, vor-dem-training. Eine Rubrik auf
+# einen Wert ohne Knopf abzubilden versteckt die Kachel unter jedem Filter
+# ausser "Alle" - "Nach dem Training" braucht also erst einen Knopf.
+FILTER = {"Fruehstueck":("fruehstueck","Frühstück"),
+          "Hauptgericht":("hauptgericht","Hauptgericht"),
+          "Mittag":("hauptgericht","Hauptgericht"),
+          "Abendessen":("hauptgericht","Hauptgericht"),
+          "Snack":("snack","Snack & Süßes"),
+          "Nachtisch":("snack","Snack & Süßes"),
+          "Grundrezept":("hauptgericht","Grundrezept"),
+          "Vor dem Training":("vor-dem-training","Vor dem Training"),
+          "Nach dem Training":("nach-dem-training","Nach dem Training")}
 
 def karte(r, tagname, slug, nr):
     """Eine Kachel fuer das Grid auf rezepte.html."""
