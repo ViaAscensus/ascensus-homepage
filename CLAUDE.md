@@ -1,0 +1,88 @@
+# ascensus.fit
+
+Statische Homepage von ASCENSUS (Ernährungs- und Laufcoaching, Patrick Spengler,
+Frankfurt am Main). Reines HTML, CSS und Vanilla-JavaScript im Wurzelverzeichnis —
+kein Framework, kein Build-Schritt, kein Paketmanager.
+
+## Deployment
+
+Coolify auf einem Hetzner-Server, Build strategy *Static*, `nginx:alpine`,
+Publish directory `/`. Die Quelle ist eine GitHub App, Auto-Deploy ist aktiv:
+
+```
+Merge auf main  →  GitHub sendet push  →  Coolify deployt  →  live
+```
+
+Es wird nichts gebaut — Coolify liefert die Dateien aus dem Repo direkt aus.
+Deshalb müssen **erzeugte HTML-Dateien mit eingecheckt werden**.
+
+## Rezeptseiten werden generiert
+
+`rezept-*.html`, das Kachel-Grid in `rezepte.html` und der Rezept-Abschnitt der
+`sitemap.xml` stammen aus PocketBase und werden von `tools/build-rezepte.py`
+erzeugt.
+
+**Diese Dateien nie von Hand bearbeiten.** Änderungen gehören in PocketBase,
+danach:
+
+```bash
+python3 tools/build-rezepte.py --check   # zeigt, was sich ändern würde
+python3 tools/build-rezepte.py           # schreibt die Seiten
+```
+
+Der Lauf ist idempotent. Details und wie ein neues Rezept veröffentlicht wird:
+`tools/README.md`.
+
+Von Hand gepflegt werden dagegen: `index.html`, `pakete*.html`, `wissen*.html`,
+die Rechtstexte, `anamnese*.html`, `trainingsbuch.html` und die `mitglieder-*.html`.
+
+## PocketBase
+
+`https://pb.ascensus.fit`. Der Zugang läuft über die API-Anmeldedaten der
+Umgebung — der Proxy setzt den `Authorization`-Header selbst, es ist kein Login
+nötig. PocketBase erwartet den Token **pur**, ohne `Bearer`-Präfix.
+
+Rezeptdaten (Konto `api_clients`, darf lesen, anlegen und ändern):
+
+| Collection | Felder |
+|---|---|
+| `rezepte` | `name`, `kategorie`, `portionen`, `zeit_zubereitung`, `zeit_gesamt`, `kcal`, `eiweiss`, `kohlenhydrate`, `fett`, `ballaststoffe`, `allergene`, `tags`, `status`, `naehrwerte_quelle` |
+| `zutaten` | `rezept`, `zutat`, `menge`, `einheit`, `gruppe`, `naehrwerte_pro_100g` (Format `"90g K / 16g E / 2g F / 454 kcal"`) |
+| `schritte` | `rezept`, `nummer`, `anweisung` |
+| `tags` | `name`, `typ` (`aus_zutaten` \| `berechnet` \| `bestaetigung`), `aktiv` |
+
+Der Mitgliederbereich nutzt daneben `members`, `invitations`, `quiz_wochen`,
+`quiz_fortschritt` und `trainingsbuch_entries` über `pocketbase.umd.js`.
+
+Bilder zu den Rezepten erzeugt ein n8n-Webhook aus denselben PocketBase-Daten.
+
+## Vor dem Veröffentlichen eines Rezepts prüfen
+
+Im September 2026 wurden acht ungeprüfte Datensätze veröffentlicht, deren Fehler
+anschließend im HTML landeten. Diese drei Prüfungen fangen das ab:
+
+1. `status` steht auf `geprueft` (505 von 515 stehen auf `neu`)
+2. `zeit_gesamt` ist größer als 0
+3. Tags passen zur Zutatenliste — besonders `Vegan`, `Vegetarisch` und `Glutenfrei`
+
+## Konventionen
+
+- Deutsche Seite: Dezimalkomma, Umlaute ausschreiben. Die DB speichert Rubriken
+  und Tags teils ohne Umlaute (`Fruehstueck`), der Generator bildet das ab.
+- Jede Seite bindet den Block aus `head-snippet.html` ein: Google Consent Mode,
+  Klaro und gtag. Ohne ihn erscheint kein Cookie-Banner.
+- Keine Ressourcen von Drittservern einbinden — alles liegt lokal im Repo
+  (Inter als woff2, Klaro selbst gehostet).
+- Dateinamen der Rezeptseiten stehen in `tools/slug-map.json` und bleiben stabil,
+  damit URLs nicht brechen.
+
+## Offene Punkte
+
+- **497 Rezepte sind inhaltlich ungeprüft.** Bei ihnen sind die Zutaten-Nährwerte
+  vollständig hinterlegt, eine Gegenrechnung ist also möglich. Bei den 18
+  veröffentlichten fehlen sie — deren Werte wurden geschätzt und wurden korrigiert.
+- 13 Rezepte haben `zeit_gesamt = 0`.
+- 8 Rezepte tragen `Vegan`, enthalten aber tierische Zutaten.
+- Bircher-Müsli trägt `High-Protein` bei 13 g Eiweiß auf 401 kcal — trägt nicht.
+- Alle sechs `wissen-*.html` verlinken auf `wissen-xxx.html`, eine Datei, die es
+  nicht gibt: sechs tote Links.
