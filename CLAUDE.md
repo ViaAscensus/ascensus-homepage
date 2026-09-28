@@ -61,7 +61,8 @@ Bilder zu den Rezepten erzeugt ein n8n-Webhook aus denselben PocketBase-Daten.
 Im September 2026 wurden acht ungeprüfte Datensätze veröffentlicht, deren Fehler
 anschließend im HTML landeten. Diese drei Prüfungen fangen das ab:
 
-1. `status` steht auf `geprueft` (505 von 515 stehen auf `neu`)
+1. `status` steht auf `geprueft` (Stand 28.09.2026: 495 von 515 stehen auf `neu`,
+   20 auf `geprueft`)
 2. `zeit_gesamt` ist größer als 0
 3. Tags passen zur Zutatenliste — besonders `Vegan`, `Vegetarisch` und `Glutenfrei`
 
@@ -78,11 +79,25 @@ anschließend im HTML landeten. Diese drei Prüfungen fangen das ab:
 
 ## Offene Punkte
 
-- **497 Rezepte sind inhaltlich ungeprüft.** Bei ihnen sind die Zutaten-Nährwerte
-  vollständig hinterlegt, eine Gegenrechnung ist also möglich. Bei den 18
-  veröffentlichten fehlen sie — deren Werte wurden geschätzt und wurden korrigiert.
-- 13 Rezepte haben `zeit_gesamt = 0`.
+Die Zahlen unten stammen aus einer direkten Abfrage vom 28.09.2026. Sie veralten,
+sobald geprüft wird — nachzählen statt glauben:
+
+```bash
+pb=https://pb.ascensus.fit/api/collections/rezepte/records
+for f in "status='neu'" "status='geprueft'" "zeit_gesamt=0"; do
+  printf '%-22s ' "$f"
+  curl -sS --get "$pb" --data-urlencode "filter=$f" --data-urlencode perPage=1 \
+    --data-urlencode fields=id | python3 -c 'import sys,json;print(json.load(sys.stdin)["totalItems"])'
+done
+ls rezept-*.html | wc -l   # veroeffentlichte Seiten
+```
+
+- **495 Rezepte sind inhaltlich ungeprüft** (`status: neu`). Bei ihnen sind die
+  Zutaten-Nährwerte vollständig hinterlegt, eine Gegenrechnung ist also möglich.
+  Bei den 20 veröffentlichten fehlen sie — deren Werte wurden geschätzt und
+  wurden korrigiert. Die 20 auf `geprueft` sind genau die 20 mit Rezeptseite.
+- 11 Rezepte haben `zeit_gesamt = 0`.
 - 8 Rezepte tragen `Vegan`, enthalten aber tierische Zutaten.
 - Bircher-Müsli trägt `High-Protein` bei 13 g Eiweiß auf 401 kcal — trägt nicht.
 - Alle sechs `wissen-*.html` verlinken auf `wissen-xxx.html`, eine Datei, die es
-  nicht gibt: sechs tote Links.
+  nicht gibt — je drei Verweise pro Seite, also 18 tote Links.
