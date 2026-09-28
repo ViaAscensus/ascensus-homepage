@@ -65,19 +65,51 @@ Bilder zu den Rezepten erzeugt ein n8n-Webhook aus denselben PocketBase-Daten.
 Im September 2026 wurden acht ungeprüfte Datensätze veröffentlicht, deren Fehler
 anschließend im HTML landeten. Diese drei Prüfungen fangen das ab:
 
-1. `status` steht auf `geprueft`
+1. **Der Prüferlauf meldet für dieses Rezept nichts** — und `status` steht auf
+   `geprueft`. Der Status allein genügt nicht: zwei Seiten mit fehlender
+   Gluten-Angabe trugen ihn bereits. Er sagt aus, dass jemand einen Haken
+   gesetzt hat, nicht dass geprüft wurde.
 2. `zeit_gesamt` ist größer als 0
 3. Tags passen zur Zutatenliste — besonders `Vegan`, `Vegetarisch` und `Glutenfrei`
 
-Alle drei prüft `tools/pruefe-rezepte.py` für die unveröffentlichten Rezepte,
-dazu Nährwerte gegen die Zutatensumme, Vollständigkeit und Dubletten:
+Alle drei prüft `tools/pruefe-rezepte.py`, dazu Nährwerte gegen die
+Zutatensumme, Allergene, Vollständigkeit und Dubletten:
 
 ```bash
-python3 tools/pruefe-rezepte.py            # Zusammenfassung
-python3 tools/pruefe-rezepte.py --json     # vollständiger Befund
+python3 tools/pruefe-rezepte.py                   # die unveröffentlichten
+python3 tools/pruefe-rezepte.py --veroeffentlicht # die Seiten, die online stehen
+python3 tools/pruefe-rezepte.py --json            # vollständiger Befund
 ```
 
 Der letzte Befund liegt in `tools/PRUEFBERICHT-REZEPTE.md`.
+
+Gefundenes korrigiert `tools/korrigiere-rezepte.py` (falsche Diät-Tags, fehlende
+Allergene), beide Werkzeuge ohne `--schreiben` nur als Probelauf.
+
+## Berechnete Tags werden gerechnet, nicht gepflegt
+
+Fünf Tags mit `typ: berechnet` folgen aus den Zahlen und werden von
+`tools/berechne-tags.py` gesetzt — von Hand gepflegt lagen sie gegen jede
+denkbare Schwelle nur zu 26 bis 63 % richtig:
+
+| Tag | Schwelle |
+|---|---|
+| High-Protein | Eiweiß ≥ 20 % der kcal (VO (EG) 1924/2006) |
+| High-Carb | Kohlenhydrate ≥ 50 % der kcal |
+| Low-Carb | Kohlenhydrate ≤ 20 % der kcal |
+| Kalorienarm | ≤ 400 kcal je Portion |
+| Schnell und einfach | `zeit_gesamt` zwischen 1 und 30 Minuten |
+
+Die Zahlen stehen als `GRENZE` **nur** in `tools/berechne-tags.py`; der Prüfer
+liest sie von dort, damit Rechnen und Prüfen nicht auseinanderlaufen.
+
+`Ballaststoffreich` wird **nicht** gerechnet: `ballaststoffe` ist bei den
+unveröffentlichten Rezepten durchweg 0 und die Zutatenzeilen führen keine
+Ballaststoffe. Solange es keine Datenquelle gibt, bleibt das Tag ungeprüft
+stehen und sollte bei neuen Rezepten nicht vergeben werden.
+
+Nach einem Lauf `tools/build-rezepte.py` ausführen — die Tags stehen als Badges
+auf den Seiten und im Kachel-Grid.
 
 ## Konventionen
 
@@ -111,9 +143,14 @@ ls rezept-*.html | wc -l   # veroeffentlichte Seiten
   sind die Zutaten-Nährwerte vollständig hinterlegt, eine Gegenrechnung ist also
   möglich. Bei den veröffentlichten fehlen sie — deren Werte wurden geschätzt und
   wurden korrigiert.
-- Einige Rezepte haben `zeit_gesamt = 0`.
-- Einige tragen `Vegan`, enthalten aber tierische Zutaten.
-- Bircher-Müsli trägt `High-Protein` bei 13 g Eiweiß auf 401 kcal — trägt nicht.
+- Einige Rezepte haben `zeit_gesamt = 0`, einige keine Schritte, einige
+  `menge = 0` bei kalorienrelevanten Zutaten. Der Prüfer nennt sie; sie sind
+  bis zum Nachtragen nicht veröffentlichbar.
+- **Nicht löschbar:** das API-Konto darf lesen, anlegen und ändern, aber nicht
+  löschen (`DELETE` gibt 403). Eine echte Dublette — *Apfel-Buchweizen-Pancakes*,
+  `r5ywxnobwwz1n6k`, identisch mit der veröffentlichten `9gh4ubu03pv4st8` — muss
+  deshalb von Hand in PocketBase weg. Solange sie steht, meldet der Prüfer sie.
+- `Ballaststoffreich` ist mangels `ballaststoffe`-Werten nicht prüfbar, siehe oben.
 - **Geklärt:** es gibt mehr Rezeptseiten als Datensätze auf `status: geprueft`,
   weil die acht im September veröffentlichten Rezepte den Status nie bekommen
   haben. Regel 1 gilt also unverändert, sie wurde einmal verletzt und die

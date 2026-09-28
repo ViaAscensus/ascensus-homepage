@@ -195,13 +195,21 @@ ALLERGEN_SYNONYM = {
 }
 
 # ------------------------------------------------------------------ Schwellen
+# Die Zahlen fuer die berechneten Tags stehen in tools/berechne-tags.py, damit
+# Pruefer und Rechner nicht auseinanderlaufen koennen - genau das war schon
+# einmal der Fall, als High-Carb dort auf 50 und hier auf 55 stand.
+import importlib.util as _ilu
+_spec = _ilu.spec_from_file_location("berechne_tags", ROOT / "tools" / "berechne-tags.py")
+_bt = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_bt)
+GRENZE = _bt.GRENZE
+
 SCHWELLE = {
-  "High-Protein":   "Eiweiss >= 20 % der kcal (EU-Claim 'hoher Proteingehalt')",
-  "Low-Carb":       "Kohlenhydrate <= 20 % der kcal",
-  "High-Carb":      "Kohlenhydrate >= 55 % der kcal",
-  "Kalorienarm":    "<= 400 kcal pro Portion",
-  "Ballaststoffreich": "Ballaststoffe >= 5 g je Portion",
-  "Schnell und einfach": "zeit_gesamt <= 30 Min.",
+  "High-Protein":   f"Eiweiss >= {GRENZE['High-Protein']} % der kcal (EU-Claim 'hoher Proteingehalt')",
+  "Low-Carb":       f"Kohlenhydrate <= {GRENZE['Low-Carb']} % der kcal",
+  "High-Carb":      f"Kohlenhydrate >= {GRENZE['High-Carb']} % der kcal",
+  "Kalorienarm":    f"<= {GRENZE['Kalorienarm']} kcal pro Portion",
+  "Ballaststoffreich": f"Ballaststoffe >= {GRENZE['Ballaststoffreich']} g je Portion",
+  "Schnell und einfach": f"zeit_gesamt <= {GRENZE['Schnell und einfach']} Min.",
 }
 
 befund = collections.defaultdict(list)
@@ -308,13 +316,13 @@ for r in UNP:
     kcal, ew, kh, fe = r["kcal"], r["eiweiss"], r["kohlenhydrate"], r["fett"]
     if kcal:
         ewp, khp = 4*ew/kcal*100, 4*kh/kcal*100
-        if "High-Protein" in tn and ewp < 20:
+        if "High-Protein" in tn and ewp < GRENZE["High-Protein"]:
             befund["highprotein_falsch"].append((name, rid, f'{ew:g} g EW bei {kcal:g} kcal = {ewp:.0f} E%'))
-        if "Low-Carb" in tn and khp > 20:
+        if "Low-Carb" in tn and khp > GRENZE["Low-Carb"]:
             befund["lowcarb_falsch"].append((name, rid, f'{kh:g} g KH bei {kcal:g} kcal = {khp:.0f} E%'))
-        if "High-Carb" in tn and khp < 55:
+        if "High-Carb" in tn and khp < GRENZE["High-Carb"]:
             befund["highcarb_falsch"].append((name, rid, f'{kh:g} g KH bei {kcal:g} kcal = {khp:.0f} E%'))
-        if "Kalorienarm" in tn and kcal > 400:
+        if "Kalorienarm" in tn and kcal > GRENZE["Kalorienarm"]:
             befund["kalorienarm_falsch"].append((name, rid, f'{kcal:g} kcal / Portion'))
     if "Ballaststoffreich" in tn:
         if not r["ballaststoffe"]:
@@ -323,10 +331,10 @@ for r in UNP:
         # Lebensmittel und schlaegt bei Mahlzeiten falsch an: Ofengemuese mit
         # Creme fraiche traegt 14,1 g je Portion, knapp die halbe Tagesempfehlung,
         # und galt mit 2,7 g je 100 kcal trotzdem als nicht ballaststoffreich.
-        elif r["ballaststoffe"] < 5:
+        elif r["ballaststoffe"] < GRENZE["Ballaststoffreich"]:
             befund["ballast_falsch"].append(
                 (name, rid, f'{r["ballaststoffe"]:g} g je Portion'))
-    if "Schnell und einfach" in tn and r["zeit_gesamt"] and r["zeit_gesamt"] > 30:
+    if "Schnell und einfach" in tn and r["zeit_gesamt"] and r["zeit_gesamt"] > GRENZE["Schnell und einfach"]:
         befund["schnell_falsch"].append((name, rid, f'{r["zeit_gesamt"]:g} Min.'))
 
 # --- 4. Dubletten
