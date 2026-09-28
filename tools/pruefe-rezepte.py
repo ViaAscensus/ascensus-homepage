@@ -10,8 +10,9 @@ eingetragenen, und zwar auf:
   3. Vollstaendigkeit Schritte, Zutaten, Zeiten, Mengen, Allergene, Rubrik
   4. Dubletten        gleiche Rezeptnamen
 
-  python3 tools/pruefe-rezepte.py            # Zusammenfassung
-  python3 tools/pruefe-rezepte.py --json     # vollstaendiger Befund als JSON
+  python3 tools/pruefe-rezepte.py                   # Zusammenfassung
+  python3 tools/pruefe-rezepte.py --json            # vollstaendiger Befund als JSON
+  python3 tools/pruefe-rezepte.py --veroeffentlicht # die Seiten, die online stehen
 
 Authentifizierung wie beim Generator: PB_TOKEN als Umgebungsvariable, oder ein
 Proxy, der den Authorization-Header selbst setzt.
@@ -48,7 +49,17 @@ TAG = {t["id"]: t for t in tags}
 Z = collections.defaultdict(list); S = collections.defaultdict(list)
 for x in zut: Z[x["rezept"]].append(x)
 for x in sch: S[x["rezept"]].append(x)
-UNP = [r for r in rez if r["id"] not in SLUG]
+# Standardmaessig die unveroeffentlichten. --veroeffentlicht dreht das um und
+# prueft stattdessen die Seiten, die schon online stehen: bei ihnen fehlen die
+# Zutaten-Naehrwerte, die Gegenrechnung faellt dort also weg (sie meldet sich
+# als "nw_fehlt"), Tags, Allergene und Vollstaendigkeit lassen sich aber pruefen.
+NUR_VEROEFFENTLICHT = "--veroeffentlicht" in sys.argv
+if NUR_VEROEFFENTLICHT:
+    UNP = [r for r in rez if r["id"] in SLUG]
+    GEPRUEFT = "veroeffentlichte"
+else:
+    UNP = [r for r in rez if r["id"] not in SLUG]
+    GEPRUEFT = "unveroeffentlichte"
 
 # ---------------------------------------------------------------- Naehrwerte
 NW = re.compile(r"([\d.,]+)\s*g\s*K\s*/\s*([\d.,]+)\s*g\s*E\s*/\s*([\d.,]+)\s*g\s*F\s*/\s*([\d.,]+)\s*kcal", re.I)
@@ -164,13 +175,32 @@ def klassifiziere(zs):
             if t: f[key].setdefault(q["zutat"], t[0])
     return f
 
+# Wie ein Allergen im Feld geschrieben sein darf. Die aelteren Seiten wurden von
+# Hand gepflegt und benutzen teils praezisere Begriffe als die Sammelnamen der
+# LMIV: "Weizen" statt Gluten, "Schalenfruechte (Mandeln)" statt Nuesse, "Ei"
+# statt Eier. Ohne diese Tabelle meldet der Pruefer sie faelschlich als fehlend.
+ALLERGEN_SYNONYM = {
+    "Milch":      [r"milch", r"laktose", r"molke"],
+    "Eier":       [r"\bei\b", r"eier", r"huehnerei", r"eiklar"],
+    "Nuesse":     [r"nuess", r"nuss", r"schalenfruecht", r"mandel", r"haselnuss",
+                   r"walnuss", r"cashew", r"pistazie", r"macadamia", r"paranuss"],
+    "Erdnuesse":  [r"erdnuss", r"erdnuess", r"peanut"],
+    "Fisch":      [r"fisch", r"lachs", r"thunfisch"],
+    "Gluten":     [r"gluten", r"weizen", r"dinkel", r"roggen", r"gerste", r"hafer",
+                   r"getreide"],
+    "Sesam":      [r"sesam"],
+    "Sojabohnen": [r"soja"],
+    "Krebstiere": [r"krebstier", r"krebs", r"garnele", r"krabbe", r"meeresfruecht"],
+    "Weichtiere": [r"weichtier", r"muschel", r"tintenfisch", r"meeresfruecht"],
+}
+
 # ------------------------------------------------------------------ Schwellen
 SCHWELLE = {
   "High-Protein":   "Eiweiss >= 20 % der kcal (EU-Claim 'hoher Proteingehalt')",
   "Low-Carb":       "Kohlenhydrate <= 20 % der kcal",
   "High-Carb":      "Kohlenhydrate >= 55 % der kcal",
   "Kalorienarm":    "<= 400 kcal pro Portion",
-  "Ballaststoffreich": "Ballaststoffe >= 3 g / 100 kcal (EU-Claim 'hoher Ballaststoffgehalt')",
+  "Ballaststoffreich": "Ballaststoffe >= 5 g je Portion",
   "Schnell und einfach": "zeit_gesamt <= 30 Min.",
 }
 
@@ -202,7 +232,7 @@ for r in UNP:
                             ("gluten","Gluten","gluten"), ("sesam","Sesam","sesam"),
                             ("soja","Sojabohnen","soja"), ("krebstier","Krebstiere","krebstier"),
                             ("weichtier","Weichtiere","weichtier")):
-        if kl[key] and norm(wort)[:5] not in allerg:
+        if kl[key] and not any(re.search(m, allerg) for m in ALLERGEN_SYNONYM[wort]):
             fehlt.append(f'{wort} ({list(kl[key])[0]})')
     if fehlt:
         befund["allergen_fehlt"].append((name, rid, "; ".join(fehlt)))
@@ -289,8 +319,13 @@ for r in UNP:
     if "Ballaststoffreich" in tn:
         if not r["ballaststoffe"]:
             befund["ballast_unpruefbar"].append((name, rid, "ballaststoffe = 0, nicht pruefbar"))
-        elif kcal and r["ballaststoffe"]/kcal*100 < 3:
-            befund["ballast_falsch"].append((name, rid, f'{r["ballaststoffe"]:g} g / {kcal:g} kcal'))
+        # Frueher galt der EU-Claim von 3 g je 100 kcal. Der zielt auf einzelne
+        # Lebensmittel und schlaegt bei Mahlzeiten falsch an: Ofengemuese mit
+        # Creme fraiche traegt 14,1 g je Portion, knapp die halbe Tagesempfehlung,
+        # und galt mit 2,7 g je 100 kcal trotzdem als nicht ballaststoffreich.
+        elif r["ballaststoffe"] < 5:
+            befund["ballast_falsch"].append(
+                (name, rid, f'{r["ballaststoffe"]:g} g je Portion'))
     if "Schnell und einfach" in tn and r["zeit_gesamt"] and r["zeit_gesamt"] > 30:
         befund["schnell_falsch"].append((name, rid, f'{r["zeit_gesamt"]:g} Min.'))
 
@@ -301,14 +336,14 @@ for r in rez: dub[key(r["name"])].append(r)
 DUB = {k: v for k, v in dub.items() if len(v) > 1}
 
 if "--json" in sys.argv:
-    json.dump({"n_unveroeffentlicht": len(UNP), "befund": dict(befund),
+    json.dump({"geprueft": GEPRUEFT, "anzahl": len(UNP), "befund": dict(befund),
                "dubletten": {k: [(x["name"], x["id"], x["id"] in SLUG) for x in v]
                              for k, v in DUB.items()},
                "schwellen": SCHWELLE},
               sys.stdout, ensure_ascii=False, indent=1)
     sys.exit(0)
 
-print(f"{len(UNP)} unveroeffentlichte Rezepte geprueft\n")
+print(f"{len(UNP)} {GEPRUEFT} Rezepte geprueft\n")
 for k in sorted(befund, key=lambda k: -len(befund[k])):
     print(f"{len(befund[k]):4d}  {k}")
 print(f"{sum(len(v) for v in DUB.values()):4d}  dubletten ({len(DUB)} Namensgruppen)")

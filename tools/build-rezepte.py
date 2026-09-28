@@ -29,10 +29,14 @@ GRUNDREZEPTE = {"Béchamelsauce": "rezept-bechamelsauce",
 
 # Tag-Namen, die in der DB ohne Umlaute gespeichert sind
 TAG_ANZEIGE = {"Fruehstueck": "Frühstück", "Suess": "Süß"}
-# Rubrik-Anzeige: die DB speichert Slugs ohne Umlaute
-KATEGORIE = {"Fruehstueck":"Frühstück","Mittag":"Mittag","Abendessen":"Abendessen",
-             "Snack":"Snack","Vor dem Training":"Vor dem Training","Nachtisch":"Nachtisch",
-             "Grundrezept":"Grundrezept"}
+# Rubrik-Anzeige: die DB speichert Slugs ohne Umlaute.
+# Mittag und Abendessen werden nicht mehr unterschieden und zeigen beide
+# "Hauptgericht"; kaeme die Unterscheidung zurueck, sind das hier zwei Zeilen.
+KATEGORIE = {"Fruehstueck":"Frühstück","Hauptgericht":"Hauptgericht",
+             "Mittag":"Hauptgericht","Abendessen":"Hauptgericht",
+             "Snack":"Snack","Nachtisch":"Nachtisch","Grundrezept":"Grundrezept",
+             "Vor dem Training":"Vor dem Training",
+             "Nach dem Training":"Nach dem Training"}
 
 def api(path):
     r = urllib.request.Request(f"{PB}/{path}")
@@ -145,13 +149,29 @@ def baue(r, zutaten, schritte, tagname, slug):
     return t
 
 # Rubrik der DB -> Filterwert und Anzeigename auf rezepte.html
-FILTER = {"Fruehstueck":("fruehstueck","Frühstück"), "Mittag":("hauptgericht","Hauptgericht"),
-          "Abendessen":("hauptgericht","Hauptgericht"), "Snack":("snack","Snack & Süßes"),
-          "Vor dem Training":("vor-dem-training","Vor dem Training")}
+# Die Filterwerte muessen zu den data-filter-Knoepfen in rezepte.html passen:
+# alle, fruehstueck, hauptgericht, snack, vor-dem-training. Eine Rubrik auf
+# einen Wert ohne Knopf abzubilden versteckt die Kachel unter jedem Filter
+# ausser "Alle" - "Nach dem Training" braucht also erst einen Knopf.
+FILTER = {"Fruehstueck":("fruehstueck","Frühstück"),
+          "Hauptgericht":("hauptgericht","Hauptgericht"),
+          "Mittag":("hauptgericht","Hauptgericht"),
+          "Abendessen":("hauptgericht","Hauptgericht"),
+          "Snack":("snack","Snack & Süßes"),
+          "Nachtisch":("snack","Snack & Süßes"),
+          "Grundrezept":("hauptgericht","Grundrezept"),
+          "Vor dem Training":("vor-dem-training","Vor dem Training"),
+          "Nach dem Training":("nach-dem-training","Nach dem Training")}
 
 def karte(r, tagname, slug, nr):
     """Eine Kachel fuer das Grid auf rezepte.html."""
-    filt, label = FILTER.get(r["kategorie"], ("hauptgericht", "Hauptgericht"))
+    # Frueher fiel eine fehlende Rubrik still auf Hauptgericht zurueck. Da sie
+    # bei 487 Datensaetzen leer ist, waere so reihenweise falsch einsortiert
+    # worden, ohne dass es auffaellt.
+    if r["kategorie"] not in FILTER:
+        raise SystemExit(f'{slug}: kategorie ist {r["kategorie"]!r}, erwartet '
+                         f'wird eine von {sorted(FILTER)}')
+    filt, label = FILTER[r["kategorie"]]
     badges = ([f'{int(r["zeit_gesamt"])} Min.'] if r["zeit_gesamt"] else [])
     sichtbar = set(tagname)
     if "Vegan" in sichtbar: sichtbar.discard("Vegetarisch")

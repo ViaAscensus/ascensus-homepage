@@ -114,9 +114,23 @@ ls rezept-*.html | wc -l   # veroeffentlichte Seiten
 - Einige Rezepte haben `zeit_gesamt = 0`.
 - Einige tragen `Vegan`, enthalten aber tierische Zutaten.
 - Bircher-Müsli trägt `High-Protein` bei 13 g Eiweiß auf 401 kcal — trägt nicht.
-- **Zu klären:** es gibt mehr Rezeptseiten als Datensätze auf `status: geprueft`.
-  Entweder wurden Rezepte veröffentlicht, ohne den Status zu setzen — dann
-  verletzt das Regel 1 oben —, oder `pruefe-rezepte.py` hat den Status als
-  Kriterium ersetzt und Regel 1 muss umformuliert werden.
-- Alle sechs `wissen-*.html` verlinken auf `wissen-xxx.html`, eine Datei, die es
-  nicht gibt — je drei Verweise pro Seite, also 18 tote Links.
+- **Geklärt:** es gibt mehr Rezeptseiten als Datensätze auf `status: geprueft`,
+  weil die acht im September veröffentlichten Rezepte den Status nie bekommen
+  haben. Regel 1 gilt also unverändert, sie wurde einmal verletzt und die
+  Betroffenen stehen noch so da. `pruefe-rezepte.py` ersetzt den Status nicht —
+  es prüft nur die *unveröffentlichten* Rezepte und sieht diese acht gar nicht.
+  Die Differenz findet sich mit:
+
+  ```bash
+  python3 -c "import json;print(len(json.load(open('tools/slug-map.json'))))"
+  # dagegen die Anzahl auf status=geprueft, siehe Schnipsel oben
+  ```
+
+  Offen bleibt damit: **diese acht Seiten sind nie geprüft worden.** Ihre
+  Zutaten-Nährwerte fehlen, eine Gegenrechnung ist bei ihnen nicht möglich —
+  Tags, Allergene und Vollständigkeit ließen sich aber prüfen.
+- **Kein Fehler:** die Verweise auf `wissen-xxx.html` in den sechs
+  `wissen-*.html` stehen sämtlich in einem HTML-Kommentar — ein nie gefüllter
+  Vorlagenblock „Das könnte Dich auch interessieren" mit den Platzhaltern
+  `Kategorie` und `Titel`. Kein Browser rendert sie, es sind keine toten Links.
+  Zu tun wäre höchstens, den Block zu füllen oder zu entfernen.
