@@ -158,11 +158,14 @@ def karte(r, tagname, slug, nr):
     badges += [t for t in TAG_PRIO if t in sichtbar][:2]
     bh = "\n".join(f'              <span class="post-badge">{esc(TAG_ANZEIGE.get(b, b))}</span>'
                    for b in badges)
+    # Ohne Foto bleibt die Flaeche leer - .post-bild hat ein eigenes aspect-ratio
+    # und eine Hintergrundfarbe, ein fehlendes <img> gaebe sonst ein kaputtes Bild.
+    img = (f'\n            <img src="{SITE}/{slug}.jpg" alt="{esc(r["name"])}" '
+           f'loading="lazy" width="600" height="450">\n          '
+           if (ROOT / f"{slug}.jpg").exists() else "")
     return f"""        <!-- {nr}. {r['name']} -->
         <a class="post" data-kategorie="{filt}" href="{SITE}/{slug}.html">
-          <div class="post-bild">
-            <img src="{SITE}/{slug}.jpg" alt="{esc(r['name'])}" loading="lazy" width="600" height="450">
-          </div>
+          <div class="post-bild">{img}</div>
           <div class="post-body">
             <p class="post-cat">{esc(label)}</p>
             <h3>{esc(r['name'])}</h3>
@@ -195,7 +198,8 @@ def uebersicht(karten):
         block = re.search(r'<!-- Consent & Analytics -->.*?(?=<script type="application/ld\+json">)',
                           tpl, re.S).group(0)
         h2 = h2.replace("</head>", block + "</head>")
-    h2 = h2.replace("mit allen 18 Rezepten", f"mit allen {len(karten)} Rezepten")
+    # Muster statt Literal: sonst greift der Austausch nur solange dort 18 steht
+    h2 = re.sub(r"mit allen \d+ Rezepten", f"mit allen {len(karten)} Rezepten", h2)
     if h2 != h:
         f.write_text(h2, encoding="utf-8"); return True
     return False
