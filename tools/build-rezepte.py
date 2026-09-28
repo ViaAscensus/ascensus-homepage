@@ -29,10 +29,14 @@ GRUNDREZEPTE = {"Béchamelsauce": "rezept-bechamelsauce",
 
 # Tag-Namen, die in der DB ohne Umlaute gespeichert sind
 TAG_ANZEIGE = {"Fruehstueck": "Frühstück", "Suess": "Süß"}
-# Rubrik-Anzeige: die DB speichert Slugs ohne Umlaute
-KATEGORIE = {"Fruehstueck":"Frühstück","Mittag":"Mittag","Abendessen":"Abendessen",
-             "Snack":"Snack","Vor dem Training":"Vor dem Training","Nachtisch":"Nachtisch",
-             "Grundrezept":"Grundrezept"}
+# Rubrik-Anzeige: die DB speichert Slugs ohne Umlaute.
+# kategorie ist in PocketBase ein Select mit genau diesen fuenf Optionen -
+# Nachtisch und Grundrezept standen hier frueher, sind dort aber ungueltig.
+# Mittag und Abendessen werden nicht unterschieden und zeigen beide
+# "Hauptgericht"; kaeme die Unterscheidung zurueck, ist das hier eine Zeile.
+KATEGORIE = {"Fruehstueck":"Frühstück","Mittag":"Hauptgericht",
+             "Abendessen":"Hauptgericht","Snack":"Snack",
+             "Vor dem Training":"Vor dem Training"}
 
 def api(path):
     r = urllib.request.Request(f"{PB}/{path}")
@@ -151,7 +155,13 @@ FILTER = {"Fruehstueck":("fruehstueck","Frühstück"), "Mittag":("hauptgericht",
 
 def karte(r, tagname, slug, nr):
     """Eine Kachel fuer das Grid auf rezepte.html."""
-    filt, label = FILTER.get(r["kategorie"], ("hauptgericht", "Hauptgericht"))
+    # Frueher fiel eine fehlende Rubrik still auf Hauptgericht zurueck. Da sie
+    # bei 487 Datensaetzen leer ist, waere so reihenweise falsch einsortiert
+    # worden, ohne dass es auffaellt.
+    if r["kategorie"] not in FILTER:
+        raise SystemExit(f'{slug}: kategorie ist {r["kategorie"]!r}, erwartet '
+                         f'wird eine von {sorted(FILTER)}')
+    filt, label = FILTER[r["kategorie"]]
     badges = ([f'{int(r["zeit_gesamt"])} Min.'] if r["zeit_gesamt"] else [])
     sichtbar = set(tagname)
     if "Vegan" in sichtbar: sichtbar.discard("Vegetarisch")
