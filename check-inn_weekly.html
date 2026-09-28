@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wöchentlicher Check-in – ASCENSUS</title>
+<meta name="description" content="Dein wöchentlicher Check-in für Dein Coaching bei ASCENSUS.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- ============================================================
+     Diesen kompletten Block in den <head> JEDER Seite einfügen
+     (index.html, pakete.html, alle weiteren .html-Dateien),
+     am besten direkt vor dem schließenden </head>-Tag.
+     ============================================================ -->
+
+<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
+        BEVOR irgendetwas von Google geladen wird -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent-Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) – lädt immer, sendet aber wegen Consent Mode
+        so lange nichts, bis Klaro auf 'granted' umschaltet -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+
+  // Sobald ihr die Google-Ads-Conversion-ID habt (Format AW-XXXXXXXXX),
+  // hier einfach eine zweite Zeile ergänzen:
+  // gtag('config', 'AW-XXXXXXXXX');
+</script>
+
+<style>
+:root{
+  --olive:#556B4E;
+  --olive-dark:#3E5039;
+  --sand:#B59A5D;
+  --offwhite:#F5F3EE;
+  --paper:#FFFFFF;
+  --ink:#232323;
+  --ink-60:rgba(35,35,35,.68);
+  --ink-40:rgba(35,35,35,.45);
+  --line:rgba(85,107,78,.18);
+  --alert:#A94438;
+  --maxw:720px;
+  --gut:clamp(1.25rem,5vw,2.5rem);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--offwhite);
+  color:var(--ink);
+  font-family:'Inter','Inter var',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:17px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:var(--olive)}
+:focus-visible{outline:2px solid var(--olive);outline-offset:3px;border-radius:2px}
+
+/* ---------- Kopf ---------- */
+.topbar{
+  border-bottom:1px solid var(--line);
+  background:var(--offwhite);
+}
+.topbar .inner{
+  max-width:var(--maxw);margin:0 auto;padding:1.1rem var(--gut);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.topbar img{height:30px;width:auto}
+.backlink{
+  font-size:.85rem;letter-spacing:.06em;text-decoration:none;
+  color:var(--ink-60);white-space:nowrap;
+}
+.backlink:hover{color:var(--olive)}
+.topnav{display:flex;align-items:center;gap:1.1rem}
+
+.shell{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut) 5rem}
+
+/* ---------- Fortschritt ---------- */
+.climb{
+  position:sticky;top:0;z-index:10;
+  background:var(--offwhite);
+  padding:1.25rem 0 1rem;
+  border-bottom:1px solid var(--line);
+}
+.climb-meta{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:1rem;margin-bottom:.7rem;
+}
+.climb-step{
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sand);font-weight:600;
+}
+.climb-count{font-size:.7rem;letter-spacing:.14em;color:var(--ink-40)}
+.climb-track{
+  height:2px;background:var(--line);position:relative;overflow:hidden;
+}
+.climb-fill{
+  position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(90deg,var(--olive),var(--sand));
+  transition:width .45s cubic-bezier(.22,.61,.36,1);
+}
+
+/* ---------- Schritte ---------- */
+.step{display:none;padding-top:2.5rem}
+.step.active{display:block;animation:rise .4s cubic-bezier(.22,.61,.36,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.step h2{
+  font-size:clamp(1.35rem,4.5vw,1.7rem);
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--olive);font-weight:600;line-height:1.25;
+}
+.step .sub{
+  margin-top:.65rem;font-size:.95rem;color:var(--ink-60);max-width:46ch;
+}
+
+.field{margin-top:1.9rem}
+.field > label,
+.group > legend{
+  display:block;font-size:.88rem;font-weight:600;
+  letter-spacing:.01em;margin-bottom:.55rem;line-height:1.4;
+}
+.optional{font-weight:400;color:var(--ink-40);font-size:.8rem}
+.req{color:var(--sand);font-weight:700;margin-left:.2em}
+.legend-req{
+  font-size:.78rem;color:var(--ink-40);margin-top:1.5rem;
+  padding-top:.9rem;border-top:1px solid var(--line);
+}
+.legend-req .req{margin:0 .15em 0 0}
+.hint{font-size:.78rem;color:var(--ink-40);margin-top:.45rem;line-height:1.5}
+
+input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{
+  width:100%;padding:.8rem .9rem;font-size:1rem;font-family:inherit;
+  color:var(--ink);background:var(--paper);
+  border:1px solid var(--line);border-radius:4px;
+  transition:border-color .15s,box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--olive);
+  box-shadow:0 0 0 3px rgba(85,107,78,.11);
+}
+textarea{min-height:6rem;resize:vertical;line-height:1.55}
+::placeholder{color:rgba(35,35,35,.3);font-style:italic}
+select{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23556B4E' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:540px){.row{grid-template-columns:1fr}}
+
+/* Auswahl-Chips */
+.group{border:0;margin-top:1.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:.55rem}
+.chips label{
+  display:flex;align-items:center;gap:.5rem;
+  font-size:.92rem;font-weight:400;
+  padding:.6rem 1rem;background:var(--paper);
+  border:1px solid var(--line);border-radius:100px;
+  cursor:pointer;transition:border-color .15s,background .15s;
+  margin:0;
+}
+.chips input{accent-color:var(--olive);margin:0}
+.chips label:hover{border-color:rgba(85,107,78,.4)}
+.chips label:has(input:checked){
+  border-color:var(--olive);background:rgba(85,107,78,.07);font-weight:600;
+}
+
+/* Einwilligung */
+.consent{
+  background:var(--paper);border-left:3px solid var(--sand);
+  border-radius:0 4px 4px 0;padding:1.4rem 1.5rem;margin-top:1.9rem;
+}
+.consent p{font-size:.88rem;color:var(--ink-60);line-height:1.65}
+.consent p + p{margin-top:.8rem}
+.consent .check{
+  display:flex;align-items:flex-start;gap:.7rem;
+  margin-top:1.2rem;cursor:pointer;
+}
+.consent .check input{
+  accent-color:var(--olive);width:1.15rem;height:1.15rem;
+  margin-top:.15rem;flex-shrink:0;
+}
+.consent .check span{font-size:.95rem;color:var(--ink);font-weight:500}
+
+/* Fehler */
+.invalid input,.invalid select,.invalid textarea{border-color:var(--alert)}
+.err{
+  display:none;font-size:.8rem;color:var(--alert);margin-top:.4rem;font-weight:500;
+}
+.invalid .err{display:block}
+.group.invalid legend{color:var(--alert)}
+.group.invalid > .err{display:block}
+.check-inline{
+  display:flex;align-items:center;gap:.6rem;margin-top:1.4rem;
+  font-size:.9rem;color:var(--ink-60);cursor:pointer;
+}
+.check-inline input{accent-color:var(--olive);width:1.05rem;height:1.05rem}
+.field.off input{opacity:.4;pointer-events:none;background:rgba(35,35,35,.03)}
+
+.credo{
+  margin-top:1.25rem;padding:1.35rem 1.5rem;
+  background:var(--paper);border-left:3px solid var(--sand);border-radius:0 4px 4px 0;
+}
+.credo p{font-size:.92rem;line-height:1.7;color:var(--ink-60)}
+.credo p + p{margin-top:.85rem}
+.credo p:first-child{color:var(--ink);font-weight:500}
+
+/* Steuerung */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;margin-top:3rem;padding-top:1.75rem;
+  border-top:1px solid var(--line);
+}
+.btn{
+  font-family:inherit;font-size:.85rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:.95rem 2rem;border-radius:4px;border:1px solid transparent;
+  cursor:pointer;transition:background .15s,color .15s,border-color .15s;
+}
+.btn-primary{background:var(--olive);color:#fff}
+.btn-primary:hover{background:var(--olive-dark)}
+.btn-primary:disabled{background:var(--line);color:var(--ink-40);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--ink-60);border-color:var(--line);padding:.95rem 1.4rem}
+.btn-ghost:hover{color:var(--olive);border-color:var(--olive)}
+.btn-ghost[hidden]{display:none}
+#next,#send{margin-left:auto}
+.nav[hidden]{display:none}
+[hidden]{display:none !important}
+
+/* Intro + Abschluss */
+.intro h1,.done h1{
+  font-size:clamp(1.8rem,6vw,2.6rem);font-weight:300;
+  letter-spacing:.07em;text-transform:uppercase;line-height:1.2;
+  color:var(--olive);
+}
+.intro .kicker,.done .kicker{
+  font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--sand);font-weight:600;margin-bottom:.9rem;
+}
+.intro .lead{margin-top:1.5rem;font-size:1.05rem;color:var(--ink-60);max-width:50ch}
+.notes{margin-top:2.5rem;border-top:1px solid var(--line);padding-top:1.75rem}
+.notes li{
+  list-style:none;position:relative;padding-left:1.6rem;
+  font-size:.92rem;color:var(--ink-60);line-height:1.6;
+}
+.notes li + li{margin-top:.9rem}
+.notes li::before{
+  content:"";position:absolute;left:.35rem;top:.62rem;
+  width:5px;height:5px;border-radius:50%;background:var(--sand);
+}
+.notes strong{color:var(--ink);font-weight:600}
+
+.done{padding-top:3.5rem;text-align:center}
+.done .lead{margin-top:1.5rem;color:var(--ink-60);max-width:46ch;margin-inline:auto}
+.seal{width:64px;height:64px;margin:0 auto 1.75rem}
+
+/* Status */
+.status{
+  margin-top:1.25rem;font-size:.9rem;min-height:1.4rem;
+  text-align:right;
+}
+.status.err-msg{color:var(--alert);text-align:left;line-height:1.6}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+footer{
+  border-top:1px solid var(--line);margin-top:4rem;
+  padding:2rem var(--gut);text-align:center;
+  font-size:.78rem;color:var(--ink-40);
+}
+footer a{color:var(--ink-40);text-decoration:none;margin:0 .5rem}
+footer a:hover{color:var(--olive)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <a href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <span class="topnav" id="topnav">
+      <a class="backlink" href="index.html">← Startseite</a>
+    </span>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Fortschritt -->
+  <div class="climb" id="climb" hidden>
+    <div class="climb-meta">
+      <span class="climb-step" id="climbLabel">Befinden</span>
+      <span class="climb-count" id="climbCount">01 / 03</span>
+    </div>
+    <div class="climb-track"><div class="climb-fill" id="climbFill"></div></div>
+  </div>
+
+  <form id="form" novalidate>
+
+    <!-- ============ INTRO ============ -->
+    <section class="step active intro" data-title="Start">
+      <p class="kicker">Dein wöchentlicher</p>
+      <h1>Check-in</h1>
+      <p class="lead">
+        Kurz und knapp: Lass uns festhalten, wie Deine Woche lief und wie sich Deine Werte entwickelt haben.
+      </p>
+
+      <ul class="notes">
+        <li><strong>Nimm Dir 3 Minuten Zeit.</strong> Die regelmäßige Dokumentation ist der Schlüssel zu messbarem Erfolg.</li>
+        <li><strong>Messe immer unter den gleichen Bedingungen.</strong> Am besten morgens, nüchtern und nach dem Toilettengang.</li>
+        <li><strong>Sei ehrlich zu Dir selbst.</strong> Es geht nicht um perfekte Zahlen, sondern um echte Trends.</li>
+      </ul>
+      
+      <div class="field" style="max-width: 320px; margin-top: 2rem;">
+          <label for="email">Deine E-Mail-Adresse zur Zuordnung<span class="req">*</span></label>
+          <input type="email" id="email" name="email" autocomplete="email" required>
+          <span class="err">Bitte trag Deine E-Mail-Adresse ein.</span>
+      </div>
+
+      <div class="nav">
+        <span></span>
+        <button type="button" class="btn btn-primary" data-next>Los geht's</button>
+      </div>
+    </section>
+
+    <!-- ============ 01: BEFINDEN ============ -->
+    <section class="step" data-title="Befinden">
+      <h2>Befinden</h2>
+      <p class="legend-req"><span class="req">*</span> Pflichtangabe.</p>
+
+      <fieldset class="group" data-required>
+        <legend>Wie war Deine Laune diese Woche?<span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="radio" name="laune" value="Gut" required> Gut</label>
+          <label><input type="radio" name="laune" value="Mittel" required> Mittel</label>
+          <label><input type="radio" name="laune" value="Schlecht" required> Schlecht</label>
+        </div>
+        <span class="err">Bitte wähle eine Option.</span>
+      </fieldset>
+
+      <div class="field">
+        <label for="energielevel">Wie hoch war Dein Energielevel im Durchschnitt? (1 = sehr niedrig, 5 = sehr hoch)<span class="req">*</span></label>
+        <select id="energielevel" name="energielevel" required>
+          <option value="" selected disabled>Bitte wählen</option>
+          <option value="1">1 - Sehr niedrig</option>
+          <option value="2">2 - Eher niedrig</option>
+          <option value="3">3 - Mittel</option>
+          <option value="4">4 - Eher hoch</option>
+          <option value="5">5 - Sehr hoch</option>
+        </select>
+        <span class="err">Bitte wähle Dein Energielevel.</span>
+      </div>
+    </section>
+
+    <!-- ============ 02: KÖRPERDATEN ============ -->
+    <section class="step" data-title="Körperdaten">
+      <h2>Körperdaten</h2>
+      
+      <div class="credo">
+        <p>Denk daran: Schwankungen sind völlig normal. Hydration, Stress oder Schlaf beeinflussen die Waage. Konzentriere Dich auf den langfristigen Trend.</p>
+      </div>
+
+      <div class="field" style="max-width: 50%;">
+          <label for="koerpergewicht">Körpergewicht (kg)<span class="req">*</span></label>
+          <input type="number" id="koerpergewicht" name="koerpergewicht" min="30" max="300" step="0.1" inputmode="decimal" required>
+          <span class="err">Bitte trag Dein Gewicht ein.</span>
+      </div>
+
+      <h3 style="font-size: 1.1rem; color: var(--olive); margin-top: 2.5rem; margin-bottom: 1rem;">Umfänge (in cm)</h3>
+      
+      <div class="row">
+        <div class="field" style="margin-top: 0;">
+          <label for="brustumfang">Brustumfang</label>
+          <input type="number" id="brustumfang" name="brustumfang" min="50" max="200" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field" style="margin-top: 0;">
+          <label for="taillenumfang">Taillenumfang</label>
+          <input type="number" id="taillenumfang" name="taillenumfang" min="40" max="200" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="field">
+          <label for="bauchumfang">Bauchumfang</label>
+          <input type="number" id="bauchumfang" name="bauchumfang" min="40" max="200" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="hueftumfang">Hüftumfang</label>
+          <input type="number" id="hueftumfang" name="hueftumfang" min="40" max="200" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="armumfang_links">Armumfang links</label>
+          <input type="number" id="armumfang_links" name="armumfang_links" min="15" max="70" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="armumfang_rechts">Armumfang rechts</label>
+          <input type="number" id="armumfang_rechts" name="armumfang_rechts" min="15" max="70" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="oberschenkelumfang_links">Oberschenkelumfang links</label>
+          <input type="number" id="oberschenkelumfang_links" name="oberschenkelumfang_links" min="20" max="120" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="oberschenkelumfang_rechts">Oberschenkelumfang rechts</label>
+          <input type="number" id="oberschenkelumfang_rechts" name="oberschenkelumfang_rechts" min="20" max="120" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="wadenumfang_links">Wadenumfang links</label>
+          <input type="number" id="wadenumfang_links" name="wadenumfang_links" min="15" max="80" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="wadenumfang_rechts">Wadenumfang rechts</label>
+          <input type="number" id="wadenumfang_rechts" name="wadenumfang_rechts" min="15" max="80" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ 03: ABSCHLUSS & NOTIZEN ============ -->
+    <section class="step" data-title="Abschluss">
+      <h2>Notizen & Abschluss</h2>
+      
+      <div class="field">
+        <label for="notiz">Gibt es sonst noch etwas Wichtiges zu dieser Woche?</label>
+        <textarea id="notiz" name="notiz" placeholder="Herausforderungen, Besonderheiten, Erfolge..."></textarea>
+      </div>
+
+      <div class="consent">
+        <p>
+          Ich willige ein, dass ASCENSUS (Patrick Spengler, Buber-Neumann-Weg 32,
+          60439 Frankfurt am Main) die von mir gemachten Angaben zum Zweck meiner
+          individuellen Ernährungsberatung verarbeitet.
+        </p>
+        <label class="check">
+          <input type="checkbox" id="einwilligung" name="einwilligung" required>
+          <span>Ich habe das gelesen und willige ein.</span>
+        </label>
+      </div>
+      <span class="err" id="consentErr">Ohne Deine Einwilligung darf ich die Angaben nicht verarbeiten.</span>
+
+      <!-- Spamschutz: für Menschen unsichtbar -->
+      <div class="hp" aria-hidden="true">
+        <label for="webseite">Bitte nicht ausfüllen</label>
+        <input type="text" id="webseite" name="webseite" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- ============ NAVIGATION ============ -->
+    <div class="nav" id="nav" hidden>
+      <button type="button" class="btn btn-ghost" id="prev">Zurück</button>
+      <button type="button" class="btn btn-primary" id="next">Weiter</button>
+      <button type="submit" class="btn btn-primary" id="send" hidden>Absenden</button>
+    </div>
+
+  </form>
+
+  <!-- ============ ABSCHLUSS ============ -->
+  <section class="done" id="done" hidden>
+    <img class="seal" src="seal.png" alt="" aria-hidden="true">
+    <p class="kicker">Erfolgreich</p>
+    <h1>Check-in<br><span id="doneName">gespeichert</span></h1>
+    <p class="lead">
+      Deine Daten für diese Woche wurden erfolgreich übermittelt. Weiter so!
+    </p>
+    <p class="lead" style="margin-top:2rem">
+      <a href="index.html">Zurück zur Startseite</a>
+    </p>
+  </section>
+
+</div>
+
+<footer>
+  <a href="index.html">Startseite</a>
+  <a href="impressum.html" target="_blank" rel="noopener">Impressum</a>
+  <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutz</a>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===== HIER ANPASSEN: Webhook-URL für den Check-in eintragen ===== */
+  var ENDPOINT = 'https://n8n.ascensus.fit/webhook/checkin'; 
+  /* ================================================================= */
+
+  var form     = document.getElementById('form');
+  var steps    = Array.prototype.slice.call(form.querySelectorAll('.step'));
+  var nav      = document.getElementById('nav');
+  var prevBtn  = document.getElementById('prev');
+  var nextBtn  = document.getElementById('next');
+  var sendBtn  = document.getElementById('send');
+  var climb    = document.getElementById('climb');
+  var fill     = document.getElementById('climbFill');
+  var label    = document.getElementById('climbLabel');
+  var count    = document.getElementById('climbCount');
+  var status   = document.getElementById('status');
+  var doneBox  = document.getElementById('done');
+  var consentErrEl = document.getElementById('consentErr');
+
+  var current  = 0;
+  var last     = steps.length - 1;
+  var opened   = Date.now();
+  var sent     = false;
+  var touched  = false;
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function show(i){
+    steps[current].classList.remove('active');
+    current = i;
+    steps[current].classList.add('active');
+
+    var isIntro = (current === 0);
+    climb.hidden = isIntro;
+    nav.hidden   = isIntro;
+    prevBtn.hidden = (current <= 1);
+    nextBtn.hidden = (current === last);
+    sendBtn.hidden = (current !== last);
+
+    if (!isIntro){
+      label.textContent = steps[current].dataset.title;
+      // -1 weil das Intro nicht als Fortschrittsschritt gezählt werden soll, wenn wir 01/03 anzeigen
+      count.textContent = pad(current) + ' / ' + pad(last);
+      fill.style.width  = ((current / last) * 100) + '%';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    var first = steps[current].querySelector('input,select,textarea,button');
+    if (first && !isIntro) { first.focus({ preventScroll: true }); }
+  }
+
+  /* --- Prüfung eines Schritts --- */
+  function check(step){
+    var ok = true;
+    var fields = step.querySelectorAll('[required]');
+
+    Array.prototype.forEach.call(fields, function(el){
+      var wrap = el.closest('.field') || el.closest('.consent');
+      var valid = el.type === 'checkbox' ? el.checked : String(el.value).trim() !== '';
+      
+      if(el.type === 'radio') {
+          // Prüfen ob irgendein Radio dieser Gruppe gecheckt ist
+          var groupName = el.name;
+          var groupChecked = step.querySelector('input[name="'+groupName+'"]:checked');
+          valid = !!groupChecked;
+          // Fehlerklasse an der Fieldset anbringen, nicht am einzelnen Radio
+          var fieldset = el.closest('fieldset');
+          if(fieldset) fieldset.classList.toggle('invalid', !valid);
+      }
+
+      if (valid && el.type === 'email'){
+        valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim());
+      }
+      if (valid && el.type === 'number'){
+        var n = parseFloat(el.value);
+        if (el.min !== '' && n < parseFloat(el.min)) valid = false;
+        if (el.max !== '' && n > parseFloat(el.max)) valid = false;
+      }
+
+      if (el.id === 'einwilligung'){
+        consentErrEl.style.display = valid ? 'none' : 'block';
+      } else if (wrap && el.type !== 'radio'){
+        wrap.classList.toggle('invalid', !valid);
+      }
+
+      if (!valid && ok){ ok = false; el.focus({ preventScroll: false }); }
+    });
+    
+    // Check radio groups specifically for scrolling
+    Array.prototype.forEach.call(step.querySelectorAll('fieldset[data-required]'), function(fs){
+        if(!fs.querySelector('input[type="radio"]:checked')) {
+            fs.classList.add('invalid');
+            if(ok) {
+                ok = false;
+                fs.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        }
+    });
+
+    return ok;
+  }
+
+  /* --- Eingaben lösen die Fehlermarkierung --- */
+  form.addEventListener('input', function(e){
+    touched = true;
+    var wrap = e.target.closest('.field') || e.target.closest('fieldset');
+    if (wrap) wrap.classList.remove('invalid');
+    if (e.target.id === 'einwilligung') consentErrEl.style.display = 'none';
+  });
+  form.addEventListener('change', function(){ touched = true; });
+
+  /* --- Navigation --- */
+  form.addEventListener('click', function(e){
+    if (e.target.hasAttribute('data-next')) show(1);
+  });
+  nextBtn.addEventListener('click', function(){
+    if (check(steps[current])) show(Math.min(current + 1, last));
+  });
+  prevBtn.addEventListener('click', function(){
+    show(Math.max(current - 1, 1));
+  });
+
+  /* --- Schutz vor versehentlichem Verlassen --- */
+  window.addEventListener('beforeunload', function(e){
+    if (touched && !sent){ e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* --- Daten einsammeln --- */
+  function collect(){
+    var data = {};
+    var els = form.querySelectorAll('input,select,textarea');
+
+    Array.prototype.forEach.call(els, function(el){
+      if (!el.name || el.name === 'webseite') return;
+
+      if (el.type === 'checkbox'){
+        data[el.name] = el.checked;
+      } else if (el.type === 'radio'){
+        if (el.checked) data[el.name] = el.value;
+      } else if (el.type === 'number') {
+        var v = String(el.value).trim();
+        if (v !== '') data[el.name] = parseFloat(v); // Als Zahl übergeben
+      } else {
+        var v = String(el.value).trim();
+        if (v !== '') data[el.name] = v;
+      }
+    });
+
+    data.eingereicht_am = new Date().toISOString();
+    data.formular       = 'wochen-checkin';
+    return data;
+  }
+
+  /* --- Absenden --- */
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!check(steps[last])) return;
+
+    // Spamschutz: Honeypot + Mindestdauer
+    if (document.getElementById('webseite').value !== ''){ return; }
+    if (Date.now() - opened < 5000){ // Für Checkin etwas kürzer
+      status.className = 'status err-msg';
+      status.textContent = 'Einen Moment noch — bitte versuch es gleich noch einmal.';
+      return;
+    }
+
+    sendBtn.disabled = true;
+    status.className = 'status';
+    status.textContent = 'Wird übermittelt …';
+
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(collect())
+    })
+    .then(function(res){
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      sent = true;
+      form.hidden   = true;
+      climb.hidden  = true;
+      doneBox.hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(function(){
+      sendBtn.disabled = false;
+      status.className = 'status err-msg';
+      status.innerHTML = 'Die Übermittlung hat nicht geklappt. Bitte versuche es in einer Minute noch einmal. Wenn es dann immer noch nicht geht, schreib mir kurz an <a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a>.';
+    });
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>
