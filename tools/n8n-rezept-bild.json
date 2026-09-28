@@ -1,0 +1,131 @@
+{
+  "name": "ASCENSUS - Rezept-Teaserbild",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rezept-bild",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "721a76f0-c18f-4190-ab12-fb0d686e6c0b",
+      "name": "Webhook",
+      "webhookId": "44e35348-5369-4e92-be99-4a5698a06cd9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e3728a40-9098-4485-964e-00677051aa4f",
+              "name": "=prompt",
+              "value": "={{ (() => {\n  const b = $json.body || {};\n  const kat = b.kategorie || '';\n  const tags = b.tags || [];\n  const zutaten = (b.zutaten || []).slice(0, 8).join(', ');\n  const schritte = (b.schritte || []).join(' ').replace(/\\s+/g, ' ').slice(0, 800);\n  const portionen = b.portionen || 1;\n\n  // Diaetvorgabe aus den Tags - ohne sie landet Sauerrahm auf veganen Gerichten\n  let diaet = '';\n  if (tags.includes('Vegan')) {\n    diaet = 'The dish is strictly vegan: no dairy, no cream, no yoghurt, no cheese, no butter, no egg, no honey, no meat, no fish. ';\n  } else if (tags.includes('Vegetarisch')) {\n    diaet = 'The dish is vegetarian: no meat, no fish, no seafood. ';\n  }\n\n  // Szene aus der Rubrik - der alte Prompt kannte nur Abendessen mit Beilage\n  let szene;\n  if (kat === 'Getr\\u00e4nk') {\n    szene = 'It is a drink: serve it in a drinking glass, no plate, no cutlery, no side dish. ';\n  } else if (kat === 'Snack' || kat === 'Nachtisch') {\n    szene = 'It is a ' + (kat === 'Snack' ? 'snack' : 'dessert') + ': serve it on its own as a small portion on a small plate or in a bowl. Do not add rice, potatoes, pasta, bread, salad, dips or any other side dish - only what the ingredient list names appears. ';\n  } else if (kat === 'Fruehstueck') {\n    szene = 'It is breakfast: a bright scene in soft morning daylight, served on a plate or in a bowl. No dinner plates and no evening side dishes anywhere in the frame. ';\n  } else {\n    szene = 'It is a main course: serve it on a plain white or light-coloured ceramic plate. Only components named in the ingredient list appear on the plate - do not invent a side dish. ';\n  }\n\n  // Die Schritte tragen die Form (Tasse, Glas, Pfanne, Auflaufform). Sie muessen\n  // ausdruecklich als Hinweis auf das Ergebnis deklariert werden, sonst rendert\n  // das Modell eine Prozessaufnahme mit Haenden und Pfanne.\n  const zubereitung = schritte\n    ? 'This is how it was prepared - use it only to get the final form, the vessel and the texture right: ' + schritte + ' Show exclusively the finished dish as it is served and eaten. Never show the cooking process, no pans, no pots, no mixing bowls, no raw or half-prepared ingredients, no hands, no steps. '\n    : '';\n\n  const menge = portionen > 2\n    ? 'The recipe yields ' + portionen + ' portions, but show a single served portion. '\n    : '';\n\n  return 'Realistic smartphone snapshot of a home-cooked German dish, beautifully and appetizingly served: \"' + (b.name || '') + '\". '\n    + 'Visible components, and nothing beyond them: ' + zutaten + '. '\n    + diaet\n    + szene\n    + menge\n    + zubereitung\n    + 'The plate or glass rests on a thin, wide table placemat on a dark, rustic wood dining table with visible wood grain. '\n    + 'Setting: cozy home kitchen or dining table, warm ambient light. The table looks like real, everyday life: a glass of water near the main plate, a spice shaker or pepper mill nearby, and slightly out of focus in the background a hint of a second place setting. '\n    + 'Never any alcohol, no beer, no wine. '\n    + 'The main dish stays the clear focus. The food looks appetizing and nicely plated but not overly perfect - naturally scooped portions rather than smooth symmetrical domes, vibrant colours, a bit of glisten on any sauce, like a home cook proud of their meal, not a staged food-stylist photo. '\n    + 'Shot from a relaxed 3/4 angle, like a real person capturing a nice moment of their meal. '\n    + 'No text, no watermark, no hands, no logos, no brand labels, no packaging. Photorealistic, 4:5 portrait aspect ratio.';\n})() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [208, 0],
+      "id": "6b537fd0-24c8-4b9b-af58-1f9048649f45",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\":\"google/gemini-3.1-flash-image\",\n  \"messages\": [{\"role\": \"user\", \"content\": {{ JSON.stringify($json.prompt) }} }],\n  \"modalities\": [\"image\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [416, 0],
+      "id": "0ee76708-b3c2-4420-8dfb-247ed312418a",
+      "name": "HTTP Request",
+      "credentials": {
+        "openRouterApi": {
+          "id": "hs1wd9ziRyip6Jtv",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const res = $input.first().json;\nlet dataUrl = null;\nconst msg = res.choices && res.choices[0] && res.choices[0].message;\nif (msg && msg.images && msg.images.length) {\n  const img = msg.images[0];\n  dataUrl = (img.image_url && img.image_url.url) || img.url;\n}\nif (!dataUrl) {\n  const text = JSON.stringify(res);\n  const m = text.match(/data:image\\/[a-zA-Z]+;base64,[A-Za-z0-9+\\/=]+/);\n  if (m) dataUrl = m[0];\n}\nif (!dataUrl) {\n  throw new Error('Kein Bild in der Antwort gefunden: ' + JSON.stringify(res).slice(0, 500));\n}\nconst match = dataUrl.match(/^data:(image\\/[a-zA-Z]+);base64,(.+)$/);\nconst mime = match[1];\nconst base64 = match[2];\nconst buffer = Buffer.from(base64, 'base64');\nconst binary = await this.helpers.prepareBinaryData(buffer, 'rezept-bild.png', mime);\nreturn [{ json: { mime }, binary: { data: binary } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [624, 0],
+      "id": "781b836c-fa33-4765-ac3e-53b27e58ea6f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 1080,
+        "height": 1350,
+        "resizeOption": "minimumArea",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [832, 0],
+      "id": "f50e4fe0-335a-4f81-90df-52707f1dd4b9",
+      "name": "Edit Image"
+    },
+    {
+      "parameters": {
+        "operation": "crop",
+        "width": 1080,
+        "height": 1350,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [1040, 0],
+      "id": "3984559e-b634-42bb-9fce-cdee36bd2b89",
+      "name": "Edit Image1"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1248, 0],
+      "id": "4965af58-db2f-4b9b-becc-9ef0bd83577c",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Edit Fields", "type": "main", "index": 0 }]] },
+    "Edit Fields": { "main": [[{ "node": "HTTP Request", "type": "main", "index": 0 }]] },
+    "HTTP Request": { "main": [[{ "node": "Code in JavaScript", "type": "main", "index": 0 }]] },
+    "Code in JavaScript": { "main": [[{ "node": "Edit Image", "type": "main", "index": 0 }]] },
+    "Edit Image": { "main": [[{ "node": "Edit Image1", "type": "main", "index": 0 }]] },
+    "Edit Image1": { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2912ac31-9416-4847-8199-8c55645f5321",
+  "meta": {
+    "instanceId": "106a6bbe1d9c08f386884259b566a9b2cd7ac0ac2b973193f2b75ed436bbe46d"
+  },
+  "id": "akP0UnaGQp7d5NYV",
+  "tags": []
+}
