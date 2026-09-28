@@ -51,6 +51,10 @@ Rezeptdaten (Konto `api_clients`, darf lesen, anlegen und ändern):
 | `schritte` | `rezept`, `nummer`, `anweisung` |
 | `tags` | `name`, `typ` (`aus_zutaten` \| `berechnet` \| `bestaetigung`), `aktiv` |
 
+**Falle:** `zutaten.naehrwerte_pro_100g` trägt trotz seines Namens die absoluten
+Werte für die eingetragene Menge, nicht Werte je 100 g. Eine Gegenrechnung ist
+daher: Summe der Zutatenzeilen geteilt durch `portionen`.
+
 Der Mitgliederbereich nutzt daneben `members`, `invitations`, `quiz_wochen`,
 `quiz_fortschritt` und `trainingsbuch_entries` über `pocketbase.umd.js`.
 
@@ -61,10 +65,19 @@ Bilder zu den Rezepten erzeugt ein n8n-Webhook aus denselben PocketBase-Daten.
 Im September 2026 wurden acht ungeprüfte Datensätze veröffentlicht, deren Fehler
 anschließend im HTML landeten. Diese drei Prüfungen fangen das ab:
 
-1. `status` steht auf `geprueft` (Stand 28.09.2026: 495 von 515 stehen auf `neu`,
-   20 auf `geprueft`)
+1. `status` steht auf `geprueft`
 2. `zeit_gesamt` ist größer als 0
 3. Tags passen zur Zutatenliste — besonders `Vegan`, `Vegetarisch` und `Glutenfrei`
+
+Alle drei prüft `tools/pruefe-rezepte.py` für die unveröffentlichten Rezepte,
+dazu Nährwerte gegen die Zutatensumme, Vollständigkeit und Dubletten:
+
+```bash
+python3 tools/pruefe-rezepte.py            # Zusammenfassung
+python3 tools/pruefe-rezepte.py --json     # vollständiger Befund
+```
+
+Der letzte Befund liegt in `tools/PRUEFBERICHT-REZEPTE.md`.
 
 ## Konventionen
 
@@ -79,8 +92,10 @@ anschließend im HTML landeten. Diese drei Prüfungen fangen das ab:
 
 ## Offene Punkte
 
-Die Zahlen unten stammen aus einer direkten Abfrage vom 28.09.2026. Sie veralten,
-sobald geprüft wird — nachzählen statt glauben:
+**Keine Anzahlen in dieser Datei.** Sie veralten mit jeder Prüfung, und ein
+fortgeschriebener Wert ist eine Wette darauf, dass seitdem niemand gearbeitet hat.
+Der aktuelle Stand kommt aus `tools/pruefe-rezepte.py`; die bloßen Anzahlen
+notfalls direkt:
 
 ```bash
 pb=https://pb.ascensus.fit/api/collections/rezepte/records
@@ -92,12 +107,16 @@ done
 ls rezept-*.html | wc -l   # veroeffentlichte Seiten
 ```
 
-- **495 Rezepte sind inhaltlich ungeprüft** (`status: neu`). Bei ihnen sind die
-  Zutaten-Nährwerte vollständig hinterlegt, eine Gegenrechnung ist also möglich.
-  Bei den 20 veröffentlichten fehlen sie — deren Werte wurden geschätzt und
-  wurden korrigiert. Die 20 auf `geprueft` sind genau die 20 mit Rezeptseite.
-- 11 Rezepte haben `zeit_gesamt = 0`.
-- 8 Rezepte tragen `Vegan`, enthalten aber tierische Zutaten.
+- **Der Großteil der Rezepte ist inhaltlich ungeprüft** (`status: neu`). Bei ihnen
+  sind die Zutaten-Nährwerte vollständig hinterlegt, eine Gegenrechnung ist also
+  möglich. Bei den veröffentlichten fehlen sie — deren Werte wurden geschätzt und
+  wurden korrigiert.
+- Einige Rezepte haben `zeit_gesamt = 0`.
+- Einige tragen `Vegan`, enthalten aber tierische Zutaten.
 - Bircher-Müsli trägt `High-Protein` bei 13 g Eiweiß auf 401 kcal — trägt nicht.
+- **Zu klären:** es gibt mehr Rezeptseiten als Datensätze auf `status: geprueft`.
+  Entweder wurden Rezepte veröffentlicht, ohne den Status zu setzen — dann
+  verletzt das Regel 1 oben —, oder `pruefe-rezepte.py` hat den Status als
+  Kriterium ersetzt und Regel 1 muss umformuliert werden.
 - Alle sechs `wissen-*.html` verlinken auf `wissen-xxx.html`, eine Datei, die es
   nicht gibt — je drei Verweise pro Seite, also 18 tote Links.
