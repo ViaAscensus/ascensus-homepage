@@ -407,6 +407,13 @@
       // Falls n8n leere Felder ergänzt hat: frische Daten laden und anzeigen
       try { await pb.collection('members').authRefresh(); fillInfo(); } catch (e) {}
 
+      // n8n setzt fehler:true, wenn die nutrilize-API nicht geantwortet hat (Rate-Limit,
+      // Ausfall). Das ist keine fehlende Verknüpfung und darf nicht so aussehen.
+      if (data.fehler) {
+        statusEl.textContent = 'Abgleich mit nutrilize gerade nicht möglich.';
+        return;
+      }
+
       if (!data.gefunden || !data.gewicht) {
         statusEl.textContent = 'Keine Verknüpfung zu nutrilize gefunden.';
         return;
@@ -435,7 +442,7 @@
         suggestBox.style.display = 'none';
       };
     } catch (err) {
-      statusEl.textContent = '';
+      statusEl.textContent = 'Abgleich mit nutrilize gerade nicht möglich.';
       console.error('nutrilize-Abgleich fehlgeschlagen', err);
     }
   }
