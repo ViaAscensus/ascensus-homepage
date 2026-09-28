@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekly Check-in – ASCENSUS</title>
+<meta name="description" content="Your weekly check-in for your coaching at ASCENSUS.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- 1) Google Consent Mode v2 -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+</script>
+
+<style>
+:root{
+  --olive:#556B4E;
+  --olive-dark:#3E5039;
+  --sand:#B59A5D;
+  --offwhite:#F5F3EE;
+  --paper:#FFFFFF;
+  --ink:#232323;
+  --ink-60:rgba(35,35,35,.68);
+  --ink-40:rgba(35,35,35,.45);
+  --line:rgba(85,107,78,.18);
+  --alert:#A94438;
+  --maxw:720px;
+  --gut:clamp(1.25rem,5vw,2.5rem);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--offwhite);
+  color:var(--ink);
+  font-family:'Inter','Inter var',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:17px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:var(--olive)}
+:focus-visible{outline:2px solid var(--olive);outline-offset:3px;border-radius:2px}
+
+/* ---------- Header ---------- */
+.topbar{
+  border-bottom:1px solid var(--line);
+  background:var(--offwhite);
+}
+.topbar .inner{
+  max-width:var(--maxw);margin:0 auto;padding:1.1rem var(--gut);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.topbar img{height:30px;width:auto}
+.backlink{
+  font-size:.85rem;letter-spacing:.06em;text-decoration:none;
+  color:var(--ink-60);white-space:nowrap;
+}
+.backlink:hover{color:var(--olive)}
+.topnav{display:flex;align-items:center;gap:1.1rem}
+.lang{
+  font-size:.78rem;letter-spacing:.12em;font-weight:600;
+  text-decoration:none;color:var(--ink-40);
+  padding:.2rem .45rem;border:1px solid var(--line);border-radius:3px;
+}
+.lang:hover{color:var(--olive);border-color:var(--olive)}
+
+.shell{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut) 5rem}
+
+/* ---------- Progress Tracker ---------- */
+.climb{
+  position:sticky;top:0;z-index:10;
+  background:var(--offwhite);
+  padding:1.25rem 0 1rem;
+  border-bottom:1px solid var(--line);
+}
+.climb-meta{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:1rem;margin-bottom:.7rem;
+}
+.climb-step{
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sand);font-weight:600;
+}
+.climb-count{font-size:.7rem;letter-spacing:.14em;color:var(--ink-40)}
+.climb-track{
+  height:2px;background:var(--line);position:relative;overflow:hidden;
+}
+.climb-fill{
+  position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(90deg,var(--olive),var(--sand));
+  transition:width .45s cubic-bezier(.22,.61,.36,1);
+}
+
+/* ---------- Steps ---------- */
+.step{display:none;padding-top:2.5rem}
+.step.active{display:block;animation:rise .4s cubic-bezier(.22,.61,.36,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.step h2{
+  font-size:clamp(1.35rem,4.5vw,1.7rem);
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--olive);font-weight:600;line-height:1.25;
+}
+.step .sub{
+  margin-top:.65rem;font-size:.95rem;color:var(--ink-60);max-width:46ch;
+}
+
+.field{margin-top:1.9rem}
+.field > label,
+.group > legend{
+  display:block;font-size:.88rem;font-weight:600;
+  letter-spacing:.01em;margin-bottom:.55rem;line-height:1.4;
+}
+.optional{font-weight:400;color:var(--ink-40);font-size:.8rem}
+.req{color:var(--sand);font-weight:700;margin-left:.2em}
+.legend-req{
+  font-size:.78rem;color:var(--ink-40);margin-top:1.5rem;
+  padding-top:.9rem;border-top:1px solid var(--line);
+}
+.legend-req .req{margin:0 .15em 0 0}
+.hint{font-size:.78rem;color:var(--ink-40);margin-top:.45rem;line-height:1.5}
+
+input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{
+  width:100%;padding:.8rem .9rem;font-size:1rem;font-family:inherit;
+  color:var(--ink);background:var(--paper);
+  border:1px solid var(--line);border-radius:4px;
+  transition:border-color .15s,box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--olive);
+  box-shadow:0 0 0 3px rgba(85,107,78,.11);
+}
+textarea{min-height:6rem;resize:vertical;line-height:1.55}
+::placeholder{color:rgba(35,35,35,.3);font-style:italic}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:540px){.row{grid-template-columns:1fr}}
+
+/* Chips Selection */
+.group{border:0;margin-top:1.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:.55rem}
+.chips label{
+  display:flex;align-items:center;gap:.5rem;
+  font-size:.92rem;font-weight:400;
+  padding:.6rem 1rem;background:var(--paper);
+  border:1px solid var(--line);border-radius:100px;
+  cursor:pointer;transition:border-color .15s,background .15s;
+  margin:0;
+}
+.chips input{accent-color:var(--olive);margin:0}
+.chips label:hover{border-color:rgba(85,107,78,.4)}
+.chips label:has(input:checked){
+  border-color:var(--olive);background:rgba(85,107,78,.07);font-weight:600;
+}
+
+/* Rating Chips for Energy Level */
+.chips.rating-chips {
+  display: flex;
+  justify-content: space-between;
+  max-width: 360px;
+}
+.chips.rating-chips label {
+  flex: 1;
+  justify-content: center;
+  text-align: center;
+  padding: .7rem .5rem;
+  font-weight: 600;
+}
+
+/* Measurement Instructions Accordion */
+.howto {
+  margin-top: 1.8rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  padding: 0.9rem 1.1rem;
+}
+.howto summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: .88rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--olive);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.howto summary::-webkit-details-marker { display: none; }
+.howto summary::after {
+  content: "+";
+  color: var(--sand);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.howto[open] summary::after { content: "–"; }
+.howto[open] summary {
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.howto-img {
+  width: 100%;
+  max-width: 420px;
+  margin: 0.8rem auto 1.2rem;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+.howto dl { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+.howto dt { font-size: .82rem; font-weight: 600; color: var(--ink); }
+.howto dd { font-size: .83rem; color: var(--ink-60); line-height: 1.45; }
+
+/* Consent Box */
+.consent{
+  background:var(--paper);border-left:3px solid var(--sand);
+  border-radius:0 4px 4px 0;padding:1.4rem 1.5rem;margin-top:1.9rem;
+}
+.consent p{font-size:.88rem;color:var(--ink-60);line-height:1.65}
+.consent .check{
+  display:flex;align-items:flex-start;gap:.7rem;
+  margin-top:1.2rem;cursor:pointer;
+}
+.consent .check input{
+  accent-color:var(--olive);width:1.15rem;height:1.15rem;
+  margin-top:.15rem;flex-shrink:0;
+}
+.consent .check span{font-size:.95rem;color:var(--ink);font-weight:500}
+
+/* Validation Errors */
+.invalid input,.invalid select,.invalid textarea{border-color:var(--alert)}
+.err{
+  display:none;font-size:.8rem;color:var(--alert);margin-top:.4rem;font-weight:500;
+}
+.invalid .err{display:block}
+.group.invalid legend{color:var(--alert)}
+.group.invalid > .err{display:block}
+
+.credo{
+  margin-top:1.25rem;padding:1.35rem 1.5rem;
+  background:var(--paper);border-left:3px solid var(--sand);border-radius:0 4px 4px 0;
+}
+.credo p{font-size:.92rem;line-height:1.7;color:var(--ink-60)}
+
+/* Navigation Controls */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;margin-top:3rem;padding-top:1.75rem;
+  border-top:1px solid var(--line);
+}
+.btn{
+  font-family:inherit;font-size:.85rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:.95rem 2rem;border-radius:4px;border:1px solid transparent;
+  cursor:pointer;transition:background .15s,color .15s,border-color .15s;
+}
+.btn-primary{background:var(--olive);color:#fff}
+.btn-primary:hover{background:var(--olive-dark)}
+.btn-primary:disabled{background:var(--line);color:var(--ink-40);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--ink-60);border-color:var(--line);padding:.95rem 1.4rem}
+.btn-ghost:hover{color:var(--olive);border-color:var(--olive)}
+.btn-ghost[hidden]{display:none}
+#next,#send{margin-left:auto}
+.nav[hidden]{display:none}
+[hidden]{display:none !important}
+
+/* Intro & Confirmation Screen */
+.intro h1,.done h1{
+  font-size:clamp(1.8rem,6vw,2.6rem);font-weight:300;
+  letter-spacing:.07em;text-transform:uppercase;line-height:1.2;
+  color:var(--olive);
+}
+.intro .kicker,.done .kicker{
+  font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--sand);font-weight:600;margin-bottom:.9rem;
+}
+.intro .lead{margin-top:1.5rem;font-size:1.05rem;color:var(--ink-60);max-width:50ch}
+.notes{margin-top:2.5rem;border-top:1px solid var(--line);padding-top:1.75rem}
+.notes li{
+  list-style:none;position:relative;padding-left:1.6rem;
+  font-size:.92rem;color:var(--ink-60);line-height:1.6;
+}
+.notes li + li{margin-top:.9rem}
+.notes li::before{
+  content:"";position:absolute;left:.35rem;top:.62rem;
+  width:5px;height:5px;border-radius:50%;background:var(--sand);
+}
+.notes strong{color:var(--ink);font-weight:600}
+
+.done{padding-top:3.5rem;text-align:center}
+.done .lead{margin-top:1.5rem;color:var(--ink-60);max-width:46ch;margin-inline:auto}
+.seal{width:64px;height:64px;margin:0 auto 1.75rem}
+
+/* Status Notifications */
+.status{
+  margin-top:1.25rem;font-size:.9rem;min-height:1.4rem;
+  text-align:right;
+}
+.status.err-msg{color:var(--alert);text-align:left;line-height:1.6}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+footer{
+  border-top:1px solid var(--line);margin-top:4rem;
+  padding:2rem var(--gut);text-align:center;
+  font-size:.78rem;color:var(--ink-40);
+}
+footer a{color:var(--ink-40);text-decoration:none;margin:0 .5rem}
+footer a:hover{color:var(--olive)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <a href="index.html" aria-label="ASCENSUS Home"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <span class="topnav" id="topnav">
+      <a class="lang" href="checkin.html" hreflang="de" lang="de">DE</a>
+      <a class="backlink" href="index.html">← Home</a>
+    </span>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Progress Tracker -->
+  <div class="climb" id="climb" hidden>
+    <div class="climb-meta">
+      <span class="climb-step" id="climbLabel">Wellbeing</span>
+      <span class="climb-count" id="climbCount">01 / 03</span>
+    </div>
+    <div class="climb-track"><div class="climb-fill" id="climbFill"></div></div>
+  </div>
+
+  <form id="form" novalidate>
+
+    <!-- ============ INTRO ============ -->
+    <section class="step active intro" data-title="Start">
+      <p class="kicker">Your Weekly</p>
+      <h1>Check-in</h1>
+      <p class="lead">
+        Short and sweet: Let's log how your week went and how your measurements have developed.
+      </p>
+
+      <ul class="notes">
+        <li><strong>Take 3 minutes.</strong> Consistency in tracking is key to measurable success.</li>
+        <li><strong>Always measure under the same conditions.</strong> Ideally in the morning, on an empty stomach, and after using the bathroom.</li>
+        <li><strong>Be honest with yourself.</strong> It's not about perfect numbers, but about real long-term trends.</li>
+      </ul>
+      
+      <div class="field" style="max-width: 320px; margin-top: 2rem;">
+          <label for="email">Your email address for identification<span class="req">*</span></label>
+          <input type="email" id="email" name="email" autocomplete="email" required placeholder="your@email.com">
+          <span class="err">Please enter your email address.</span>
+      </div>
+
+      <div class="nav">
+        <span></span>
+        <button type="button" class="btn btn-primary" data-next>Let's go</button>
+      </div>
+    </section>
+
+    <!-- ============ 01: WELLBEING ============ -->
+    <section class="step" data-title="Wellbeing">
+      <h2>Wellbeing</h2>
+      <p class="legend-req"><span class="req">*</span> Required field.</p>
+
+      <fieldset class="group" data-required>
+        <legend>How was your mood this week?<span class="req">*</span></legend>
+        <div class="chips">
+          <label><input type="radio" name="laune" value="Schlecht" required> Poor</label>
+          <label><input type="radio" name="laune" value="Mittel" required> Fair</label>
+          <label><input type="radio" name="laune" value="Gut" required> Good</label>
+        </div>
+        <span class="err">Please select an option.</span>
+      </fieldset>
+
+      <fieldset class="group" data-required>
+        <legend>How high was your average energy level?<span class="req">*</span></legend>
+        <div class="chips rating-chips">
+          <label><input type="radio" name="energielevel" value="1" required> 1</label>
+          <label><input type="radio" name="energielevel" value="2" required> 2</label>
+          <label><input type="radio" name="energielevel" value="3" required> 3</label>
+          <label><input type="radio" name="energielevel" value="4" required> 4</label>
+          <label><input type="radio" name="energielevel" value="5" required> 5</label>
+        </div>
+        <p class="hint">1 = very low, 5 = very high</p>
+        <span class="err">Please select your energy level.</span>
+      </fieldset>
+    </section>
+
+    <!-- ============ 02: BODY MEASUREMENTS ============ -->
+    <section class="step" data-title="Body Measurements">
+      <h2>Body Measurements</h2>
+      
+      <div class="credo">
+        <p>Remember: Fluctuations are completely normal. Hydration, stress, or sleep affect the scale. Focus on the long-term trend.</p>
+      </div>
+
+      <div class="field" style="max-width: 240px;">
+          <label for="koerpergewicht">Body weight (kg)<span class="req">*</span></label>
+          <input type="number" id="koerpergewicht" name="koerpergewicht" min="30" max="300" step="0.1" inputmode="decimal" required placeholder="e.g. 75.5">
+          <span class="err">Please enter your body weight.</span>
+      </div>
+
+      <h3 style="font-size: 1.1rem; color: var(--olive); margin-top: 2.5rem; margin-bottom: .5rem;">Circumferences (in cm)</h3>
+
+      <details class="howto">
+        <summary>Instructions: Where and how to measure correctly?</summary>
+        <img class="howto-img" src="messanleitung.png" alt="Diagram: Measurement points for body circumferences" onerror="this.style.display='none'">
+        <dl>
+          <dt>Chest circumference</dt>
+          <dd>Horizontally around the chest at nipple height.</dd>
+          <dt>Waist circumference</dt>
+          <dd>Narrowest point between lower rib cage and iliac crest (above navel level).</dd>
+          <dt>Abdominal circumference</dt>
+          <dd>Horizontally at navel height, gently exhaled and relaxed.</dd>
+          <dt>Hip circumference</dt>
+          <dd>Widest point of the buttocks or hips.</dd>
+          <dt>Arm circumferences (L / R)</dt>
+          <dd>Let upper arm hang relaxed, measure at the thickest point.</dd>
+          <dt>Thigh circumferences (L / R)</dt>
+          <dd>At the thickest point of the thigh (about a hand's breadth below the groin).</dd>
+          <dt>Calf circumferences (L / R)</dt>
+          <dd>Standing, measure at the thickest part of the calf.</dd>
+        </dl>
+      </details>
+
+      <div class="row" style="margin-top: 1.5rem;">
+        <div class="field" style="margin-top: 0;">
+          <label for="brustumfang">Chest</label>
+          <input type="number" id="brustumfang" name="brustumfang" min="50" max="200" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field" style="margin-top: 0;">
+          <label for="taillenumfang">Waist</label>
+          <input type="number" id="taillenumfang" name="taillenumfang" min="40" max="200" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="field">
+          <label for="bauchumfang">Abdomen</label>
+          <input type="number" id="bauchumfang" name="bauchumfang" min="40" max="200" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="hueftumfang">Hips</label>
+          <input type="number" id="hueftumfang" name="hueftumfang" min="40" max="200" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="armumfang_links">Left arm</label>
+          <input type="number" id="armumfang_links" name="armumfang_links" min="15" max="70" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="armumfang_rechts">Right arm</label>
+          <input type="number" id="armumfang_rechts" name="armumfang_rechts" min="15" max="70" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="oberschenkelumfang_links">Left thigh</label>
+          <input type="number" id="oberschenkelumfang_links" name="oberschenkelumfang_links" min="20" max="120" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="oberschenkelumfang_rechts">Right thigh</label>
+          <input type="number" id="oberschenkelumfang_rechts" name="oberschenkelumfang_rechts" min="20" max="120" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="wadenumfang_links">Left calf</label>
+          <input type="number" id="wadenumfang_links" name="wadenumfang_links" min="15" max="80" step="0.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="wadenumfang_rechts">Right calf</label>
+          <input type="number" id="wadenumfang_rechts" name="wadenumfang_rechts" min="15" max="80" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 03: NOTES & CONSENT ============ -->
+    <section class="step" data-title="Notes &amp; Consent">
+      <h2>Notes &amp; Consent</h2>
+      
+      <div class="field">
+        <label for="notiz">Is there anything else important about this week?</label>
+        <textarea id="notiz" name="notiz" placeholder="Challenges, highlights, questions..."></textarea>
+      </div>
+
+      <div class="consent">
+        <p>
+          I agree that ASCENSUS (Patrick Spengler, Buber-Neumann-Weg 32,
+          60439 Frankfurt am Main) processes the information provided by me for the purpose of my
+          individual nutrition coaching.
+        </p>
+        <label class="check">
+          <input type="checkbox" id="einwilligung" name="einwilligung" required>
+          <span>I have read and agree to this.</span>
+        </label>
+      </div>
+      <span class="err" id="consentErr">Without your consent, I cannot process your information.</span>
+
+      <!-- Anti-Spam Honeypot -->
+      <div class="hp" aria-hidden="true">
+        <label for="webseite">Please leave this blank</label>
+        <input type="text" id="webseite" name="webseite" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- ============ NAVIGATION ============ -->
+    <div class="nav" id="nav" hidden>
+      <button type="button" class="btn btn-ghost" id="prev">Back</button>
+      <button type="button" class="btn btn-primary" id="next">Next</button>
+      <button type="submit" class="btn btn-primary" id="send" hidden>Submit</button>
+    </div>
+
+  </form>
+
+  <!-- ============ COMPLETION ============ -->
+  <section class="done" id="done" hidden>
+    <img class="seal" src="seal.png" alt="" aria-hidden="true">
+    <p class="kicker">Success</p>
+    <h1>Check-in<br><span id="doneName">Saved</span></h1>
+    <p class="lead">
+      Your data for this week has been successfully submitted. Keep up the great work!
+    </p>
+    <p class="lead" style="margin-top:2rem">
+      <a href="index.html">Back to Home</a>
+    </p>
+  </section>
+
+</div>
+
+<footer>
+  <a href="index.html">Home</a>
+  <a href="impressum.html" target="_blank" rel="noopener">Imprint</a>
+  <a href="datenschutz.html" target="_blank" rel="noopener">Privacy Policy</a>
+  <a href="#" onclick="klaro.show(); return false;">Privacy Settings</a>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  var ENDPOINT = 'https://n8n.ascensus.fit/webhook/checkin'; 
+
+  var form     = document.getElementById('form');
+  var steps    = Array.prototype.slice.call(form.querySelectorAll('.step'));
+  var nav      = document.getElementById('nav');
+  var prevBtn  = document.getElementById('prev');
+  var nextBtn  = document.getElementById('next');
+  var sendBtn  = document.getElementById('send');
+  var climb    = document.getElementById('climb');
+  var fill     = document.getElementById('climbFill');
+  var label    = document.getElementById('climbLabel');
+  var count    = document.getElementById('climbCount');
+  var status   = document.getElementById('status');
+  var doneBox  = document.getElementById('done');
+  var consentErrEl = document.getElementById('consentErr');
+  var langLink = document.querySelector('.lang');
+
+  var current  = 0;
+  var last     = steps.length - 1;
+  var opened   = Date.now();
+  var sent     = false;
+  var touched  = false;
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function show(i){
+    steps[current].classList.remove('active');
+    current = i;
+    steps[current].classList.add('active');
+
+    var isIntro = (current === 0);
+    if (langLink) langLink.hidden = !isIntro;
+    climb.hidden = isIntro;
+    nav.hidden   = isIntro;
+    prevBtn.hidden = (current <= 1);
+    nextBtn.hidden = (current === last);
+    sendBtn.hidden = (current !== last);
+
+    if (!isIntro){
+      label.textContent = steps[current].dataset.title;
+      count.textContent = pad(current) + ' / ' + pad(last);
+      fill.style.width  = ((current / last) * 100) + '%';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    var first = steps[current].querySelector('input,select,textarea,button');
+    if (first && !isIntro) { first.focus({ preventScroll: true }); }
+  }
+
+  /* --- Step Validation --- */
+  function check(step){
+    var ok = true;
+    var fields = step.querySelectorAll('[required]');
+
+    Array.prototype.forEach.call(fields, function(el){
+      var wrap = el.closest('.field') || el.closest('.consent');
+      var valid = el.type === 'checkbox' ? el.checked : String(el.value).trim() !== '';
+      
+      if(el.type === 'radio') {
+          var groupName = el.name;
+          var groupChecked = step.querySelector('input[name="'+groupName+'"]:checked');
+          valid = !!groupChecked;
+          var fieldset = el.closest('fieldset');
+          if(fieldset) fieldset.classList.toggle('invalid', !valid);
+      }
+
+      if (valid && el.type === 'email'){
+        valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim());
+      }
+      if (valid && el.type === 'number'){
+        var n = parseFloat(el.value);
+        if (el.min !== '' && n < parseFloat(el.min)) valid = false;
+        if (el.max !== '' && n > parseFloat(el.max)) valid = false;
+      }
+
+      if (el.id === 'einwilligung'){
+        consentErrEl.style.display = valid ? 'none' : 'block';
+      } else if (wrap && el.type !== 'radio'){
+        wrap.classList.toggle('invalid', !valid);
+      }
+
+      if (!valid && ok){ ok = false; el.focus({ preventScroll: false }); }
+    });
+    
+    Array.prototype.forEach.call(step.querySelectorAll('fieldset[data-required]'), function(fs){
+        if(!fs.querySelector('input[type="radio"]:checked')) {
+            fs.classList.add('invalid');
+            if(ok) {
+                ok = false;
+                fs.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        }
+    });
+
+    return ok;
+  }
+
+  /* --- Input Change Handling --- */
+  form.addEventListener('input', function(e){
+    touched = true;
+    var wrap = e.target.closest('.field') || e.target.closest('fieldset');
+    if (wrap) wrap.classList.remove('invalid');
+    if (e.target.id === 'einwilligung') consentErrEl.style.display = 'none';
+  });
+  form.addEventListener('change', function(){ touched = true; });
+
+  /* --- Navigation Event Listeners --- */
+  form.addEventListener('click', function(e){
+    if (e.target.hasAttribute('data-next')) show(1);
+  });
+  nextBtn.addEventListener('click', function(){
+    if (check(steps[current])) show(Math.min(current + 1, last));
+  });
+  prevBtn.addEventListener('click', function(){
+    show(Math.max(current - 1, 1));
+  });
+
+  /* --- Prevent Unintended Unload --- */
+  window.addEventListener('beforeunload', function(e){
+    if (touched && !sent){ e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* --- Collect Data --- */
+  function collect(){
+    var data = {};
+    var els = form.querySelectorAll('input,select,textarea');
+
+    Array.prototype.forEach.call(els, function(el){
+      if (!el.name || el.name === 'webseite') return;
+
+      if (el.type === 'checkbox'){
+        data[el.name] = el.checked;
+      } else if (el.type === 'radio'){
+        if (el.checked) data[el.name] = el.value;
+      } else if (el.type === 'number') {
+        var v = String(el.value).trim();
+        if (v !== '') data[el.name] = parseFloat(v);
+      } else {
+        var v = String(el.value).trim();
+        if (v !== '') data[el.name] = v;
+      }
+    });
+
+    data.eingereicht_am = new Date().toISOString();
+    data.formular       = 'wochen-checkin-en';
+    return data;
+  }
+
+  /* --- Submission --- */
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!check(steps[last])) return;
+
+    if (document.getElementById('webseite').value !== ''){ return; }
+    if (Date.now() - opened < 5000){
+      status.className = 'status err-msg';
+      status.textContent = 'One moment please — please try again in a second.';
+      return;
+    }
+
+    sendBtn.disabled = true;
+    status.className = 'status';
+    status.textContent = 'Submitting …';
+
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(collect())
+    })
+    .then(function(res){
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      sent = true;
+      form.hidden   = true;
+      climb.hidden  = true;
+      doneBox.hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(function(){
+      sendBtn.disabled = false;
+      status.className = 'status err-msg';
+      status.innerHTML = 'Submission failed. Please wait a minute and try again. If the issue persists, please email me at <a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a>.';
+    });
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>
