@@ -9,6 +9,10 @@
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
+<link rel="alternate" hreflang="de" href="https://ascensus.fit/checkin.html">
+<link rel="alternate" hreflang="en" href="https://ascensus.fit/checkin-en.html">
+<link rel="alternate" hreflang="x-default" href="https://ascensus.fit/checkin.html">
+
 <!-- 1) Google Consent Mode v2 -->
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -79,6 +83,12 @@ a{color:var(--olive)}
 }
 .backlink:hover{color:var(--olive)}
 .topnav{display:flex;align-items:center;gap:1.1rem}
+.lang{
+  font-size:.78rem;letter-spacing:.12em;font-weight:600;
+  text-decoration:none;color:var(--ink-40);
+  padding:.2rem .45rem;border:1px solid var(--line);border-radius:3px;
+}
+.lang:hover{color:var(--olive);border-color:var(--olive)}
 
 .shell{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut) 5rem}
 
@@ -333,6 +343,7 @@ footer a:hover{color:var(--olive)}
   <div class="inner">
     <a href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
     <span class="topnav" id="topnav">
+      <a class="lang" href="checkin-en.html" hreflang="en" lang="en">EN</a>
       <a class="backlink" href="index.html">← Startseite</a>
     </span>
   </div>
@@ -580,6 +591,7 @@ footer a:hover{color:var(--olive)}
   var status   = document.getElementById('status');
   var doneBox  = document.getElementById('done');
   var consentErrEl = document.getElementById('consentErr');
+  var langLink = document.querySelector('.lang');
 
   var current  = 0;
   var last     = steps.length - 1;
@@ -595,6 +607,7 @@ footer a:hover{color:var(--olive)}
     steps[current].classList.add('active');
 
     var isIntro = (current === 0);
+    if (langLink) langLink.hidden = !isIntro;
     climb.hidden = isIntro;
     nav.hidden   = isIntro;
     prevBtn.hidden = (current <= 1);
