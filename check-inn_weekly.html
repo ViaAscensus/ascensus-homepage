@@ -9,14 +9,7 @@
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
-<!-- ============================================================
-     Diesen kompletten Block in den <head> JEDER Seite einfügen
-     (index.html, pakete.html, alle weiteren .html-Dateien),
-     am besten direkt vor dem schließenden </head>-Tag.
-     ============================================================ -->
-
-<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
-        BEVOR irgendetwas von Google geladen wird -->
+<!-- 1) Google Consent Mode v2 -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){ dataLayer.push(arguments); }
@@ -35,16 +28,11 @@
 <script src="klaro-config.js"></script>
 <script defer src="klaro.js"></script>
 
-<!-- 3) Google tag (gtag.js) – lädt immer, sendet aber wegen Consent Mode
-        so lange nichts, bis Klaro auf 'granted' umschaltet -->
+<!-- 3) Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
 <script>
   gtag('js', new Date());
   gtag('config', 'G-P1LWRZXTMS');
-
-  // Sobald ihr die Google-Ads-Conversion-ID habt (Format AW-XXXXXXXXX),
-  // hier einfach eine zweite Zeile ergänzen:
-  // gtag('config', 'AW-XXXXXXXXX');
 </script>
 
 <style>
@@ -160,7 +148,6 @@ input:focus,select:focus,textarea:focus{
 }
 textarea{min-height:6rem;resize:vertical;line-height:1.55}
 ::placeholder{color:rgba(35,35,35,.3);font-style:italic}
-select{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23556B4E' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
 
 .row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 @media(max-width:540px){.row{grid-template-columns:1fr}}
@@ -182,13 +169,69 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3
   border-color:var(--olive);background:rgba(85,107,78,.07);font-weight:600;
 }
 
+/* Zahlenskala für Energielevel */
+.chips.rating-chips {
+  display: flex;
+  justify-content: space-between;
+  max-width: 360px;
+}
+.chips.rating-chips label {
+  flex: 1;
+  justify-content: center;
+  text-align: center;
+  padding: .7rem .5rem;
+  font-weight: 600;
+}
+
+/* Messanleitung Accordion */
+.howto {
+  margin-top: 1.8rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  padding: 0.9rem 1.1rem;
+}
+.howto summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: .88rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--olive);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.howto summary::-webkit-details-marker { display: none; }
+.howto summary::after {
+  content: "+";
+  color: var(--sand);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.howto[open] summary::after { content: "–"; }
+.howto[open] summary {
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.howto-img {
+  width: 100%;
+  max-width: 420px;
+  margin: 0.8rem auto 1.2rem;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+.howto dl { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+.howto dt { font-size: .82rem; font-weight: 600; color: var(--ink); }
+.howto dd { font-size: .83rem; color: var(--ink-60); line-height: 1.45; }
+
 /* Einwilligung */
 .consent{
   background:var(--paper);border-left:3px solid var(--sand);
   border-radius:0 4px 4px 0;padding:1.4rem 1.5rem;margin-top:1.9rem;
 }
 .consent p{font-size:.88rem;color:var(--ink-60);line-height:1.65}
-.consent p + p{margin-top:.8rem}
 .consent .check{
   display:flex;align-items:flex-start;gap:.7rem;
   margin-top:1.2rem;cursor:pointer;
@@ -207,20 +250,12 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3
 .invalid .err{display:block}
 .group.invalid legend{color:var(--alert)}
 .group.invalid > .err{display:block}
-.check-inline{
-  display:flex;align-items:center;gap:.6rem;margin-top:1.4rem;
-  font-size:.9rem;color:var(--ink-60);cursor:pointer;
-}
-.check-inline input{accent-color:var(--olive);width:1.05rem;height:1.05rem}
-.field.off input{opacity:.4;pointer-events:none;background:rgba(35,35,35,.03)}
 
 .credo{
   margin-top:1.25rem;padding:1.35rem 1.5rem;
   background:var(--paper);border-left:3px solid var(--sand);border-radius:0 4px 4px 0;
 }
 .credo p{font-size:.92rem;line-height:1.7;color:var(--ink-60)}
-.credo p + p{margin-top:.85rem}
-.credo p:first-child{color:var(--ink);font-weight:500}
 
 /* Steuerung */
 .nav{
@@ -332,7 +367,7 @@ footer a:hover{color:var(--olive)}
       
       <div class="field" style="max-width: 320px; margin-top: 2rem;">
           <label for="email">Deine E-Mail-Adresse zur Zuordnung<span class="req">*</span></label>
-          <input type="email" id="email" name="email" autocomplete="email" required>
+          <input type="email" id="email" name="email" autocomplete="email" required placeholder="deine@email.de">
           <span class="err">Bitte trag Deine E-Mail-Adresse ein.</span>
       </div>
 
@@ -350,25 +385,25 @@ footer a:hover{color:var(--olive)}
       <fieldset class="group" data-required>
         <legend>Wie war Deine Laune diese Woche?<span class="req">*</span></legend>
         <div class="chips">
-          <label><input type="radio" name="laune" value="Gut" required> Gut</label>
-          <label><input type="radio" name="laune" value="Mittel" required> Mittel</label>
           <label><input type="radio" name="laune" value="Schlecht" required> Schlecht</label>
+          <label><input type="radio" name="laune" value="Mittel" required> Mittel</label>
+          <label><input type="radio" name="laune" value="Gut" required> Gut</label>
         </div>
         <span class="err">Bitte wähle eine Option.</span>
       </fieldset>
 
-      <div class="field">
-        <label for="energielevel">Wie hoch war Dein Energielevel im Durchschnitt? (1 = sehr niedrig, 5 = sehr hoch)<span class="req">*</span></label>
-        <select id="energielevel" name="energielevel" required>
-          <option value="" selected disabled>Bitte wählen</option>
-          <option value="1">1 - Sehr niedrig</option>
-          <option value="2">2 - Eher niedrig</option>
-          <option value="3">3 - Mittel</option>
-          <option value="4">4 - Eher hoch</option>
-          <option value="5">5 - Sehr hoch</option>
-        </select>
+      <fieldset class="group" data-required>
+        <legend>Wie hoch war Dein Energielevel im Durchschnitt?<span class="req">*</span></legend>
+        <div class="chips rating-chips">
+          <label><input type="radio" name="energielevel" value="1" required> 1</label>
+          <label><input type="radio" name="energielevel" value="2" required> 2</label>
+          <label><input type="radio" name="energielevel" value="3" required> 3</label>
+          <label><input type="radio" name="energielevel" value="4" required> 4</label>
+          <label><input type="radio" name="energielevel" value="5" required> 5</label>
+        </div>
+        <p class="hint">1 = sehr niedrig, 5 = sehr hoch</p>
         <span class="err">Bitte wähle Dein Energielevel.</span>
-      </div>
+      </fieldset>
     </section>
 
     <!-- ============ 02: KÖRPERDATEN ============ -->
@@ -379,15 +414,36 @@ footer a:hover{color:var(--olive)}
         <p>Denk daran: Schwankungen sind völlig normal. Hydration, Stress oder Schlaf beeinflussen die Waage. Konzentriere Dich auf den langfristigen Trend.</p>
       </div>
 
-      <div class="field" style="max-width: 50%;">
+      <div class="field" style="max-width: 240px;">
           <label for="koerpergewicht">Körpergewicht (kg)<span class="req">*</span></label>
-          <input type="number" id="koerpergewicht" name="koerpergewicht" min="30" max="300" step="0.1" inputmode="decimal" required>
+          <input type="number" id="koerpergewicht" name="koerpergewicht" min="30" max="300" step="0.1" inputmode="decimal" required placeholder="z. B. 75,5">
           <span class="err">Bitte trag Dein Gewicht ein.</span>
       </div>
 
-      <h3 style="font-size: 1.1rem; color: var(--olive); margin-top: 2.5rem; margin-bottom: 1rem;">Umfänge (in cm)</h3>
-      
-      <div class="row">
+      <h3 style="font-size: 1.1rem; color: var(--olive); margin-top: 2.5rem; margin-bottom: .5rem;">Umfänge (in cm)</h3>
+
+      <details class="howto">
+        <summary>Anleitung: Wo und wie messe ich richtig?</summary>
+        <img class="howto-img" src="messanleitung.png" alt="Grafik: Messpunkte für Körperumfänge" onerror="this.style.display='none'">
+        <dl>
+          <dt>Brustumfang</dt>
+          <dd>Waagerecht um den Brustkorb auf Höhe der Brustwarzen.</dd>
+          <dt>Taillenumfang</dt>
+          <dd>Schmalste Stelle zwischen unterem Rippenbogen und Beckenkamm (oberhalb des Bauchnabels).</dd>
+          <dt>Bauchumfang</dt>
+          <dd>Waagerecht auf Höhe des Bauchnabels, leicht ausgeatmet und entspannt.</dd>
+          <dt>Hüftumfang</dt>
+          <dd>Breiteste Stelle des Gesäßes bzw. der Hüfte.</dd>
+          <dt>Armumfänge (L / R)</dt>
+          <dd>Oberarm entspannt hängen lassen, an der dicksten Stelle messen.</dd>
+          <dt>Oberschenkelumfänge (L / R)</dt>
+          <dd>An der stärksten Stelle des Oberschenkels (ca. handbreit unter der Leiste).</dd>
+          <dt>Wadenumfänge (L / R)</dt>
+          <dd>Im Stehen an der dicksten Stelle der Wade messen.</dd>
+        </dl>
+      </details>
+
+      <div class="row" style="margin-top: 1.5rem;">
         <div class="field" style="margin-top: 0;">
           <label for="brustumfang">Brustumfang</label>
           <input type="number" id="brustumfang" name="brustumfang" min="50" max="200" step="0.5" inputmode="decimal">
@@ -441,7 +497,6 @@ footer a:hover{color:var(--olive)}
           <input type="number" id="wadenumfang_rechts" name="wadenumfang_rechts" min="15" max="80" step="0.5" inputmode="decimal">
         </div>
       </div>
-
     </section>
 
     <!-- ============ 03: ABSCHLUSS & NOTIZEN ============ -->
@@ -503,15 +558,14 @@ footer a:hover{color:var(--olive)}
   <a href="index.html">Startseite</a>
   <a href="impressum.html" target="_blank" rel="noopener">Impressum</a>
   <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutz</a>
+  <a href="#" onclick="klaro.show(); return false;">Datenschutzeinstellungen</a>
 </footer>
 
 <script>
 (function(){
   'use strict';
 
-  /* ===== HIER ANPASSEN: Webhook-URL für den Check-in eintragen ===== */
   var ENDPOINT = 'https://n8n.ascensus.fit/webhook/checkin'; 
-  /* ================================================================= */
 
   var form     = document.getElementById('form');
   var steps    = Array.prototype.slice.call(form.querySelectorAll('.step'));
@@ -549,7 +603,6 @@ footer a:hover{color:var(--olive)}
 
     if (!isIntro){
       label.textContent = steps[current].dataset.title;
-      // -1 weil das Intro nicht als Fortschrittsschritt gezählt werden soll, wenn wir 01/03 anzeigen
       count.textContent = pad(current) + ' / ' + pad(last);
       fill.style.width  = ((current / last) * 100) + '%';
     }
@@ -569,11 +622,9 @@ footer a:hover{color:var(--olive)}
       var valid = el.type === 'checkbox' ? el.checked : String(el.value).trim() !== '';
       
       if(el.type === 'radio') {
-          // Prüfen ob irgendein Radio dieser Gruppe gecheckt ist
           var groupName = el.name;
           var groupChecked = step.querySelector('input[name="'+groupName+'"]:checked');
           valid = !!groupChecked;
-          // Fehlerklasse an der Fieldset anbringen, nicht am einzelnen Radio
           var fieldset = el.closest('fieldset');
           if(fieldset) fieldset.classList.toggle('invalid', !valid);
       }
@@ -596,7 +647,6 @@ footer a:hover{color:var(--olive)}
       if (!valid && ok){ ok = false; el.focus({ preventScroll: false }); }
     });
     
-    // Check radio groups specifically for scrolling
     Array.prototype.forEach.call(step.querySelectorAll('fieldset[data-required]'), function(fs){
         if(!fs.querySelector('input[type="radio"]:checked')) {
             fs.classList.add('invalid');
@@ -649,7 +699,7 @@ footer a:hover{color:var(--olive)}
         if (el.checked) data[el.name] = el.value;
       } else if (el.type === 'number') {
         var v = String(el.value).trim();
-        if (v !== '') data[el.name] = parseFloat(v); // Als Zahl übergeben
+        if (v !== '') data[el.name] = parseFloat(v);
       } else {
         var v = String(el.value).trim();
         if (v !== '') data[el.name] = v;
@@ -666,9 +716,8 @@ footer a:hover{color:var(--olive)}
     e.preventDefault();
     if (!check(steps[last])) return;
 
-    // Spamschutz: Honeypot + Mindestdauer
     if (document.getElementById('webseite').value !== ''){ return; }
-    if (Date.now() - opened < 5000){ // Für Checkin etwas kürzer
+    if (Date.now() - opened < 5000){
       status.className = 'status err-msg';
       status.textContent = 'Einen Moment noch — bitte versuch es gleich noch einmal.';
       return;
