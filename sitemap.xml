@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
+  <!-- Der Rezept-Abschnitt am Ende dieser Datei wird von tools/build-rezepte.py
+       erzeugt. Dort nichts von Hand eintragen - es wird beim naechsten Lauf
+       ueberschrieben. Alles oberhalb bleibt unangetastet. -->
+
   <url>
     <loc>https://ascensus.fit/</loc>
     <lastmod>2026-09-25</lastmod>
