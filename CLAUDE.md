@@ -42,7 +42,8 @@ die Rechtstexte, `anamnese*.html`, `trainingsbuch.html` und die `mitglieder-*.ht
 Umgebung — der Proxy setzt den `Authorization`-Header selbst, es ist kein Login
 nötig. PocketBase erwartet den Token **pur**, ohne `Bearer`-Präfix.
 
-Rezeptdaten (Konto `api_clients`, darf lesen, anlegen und ändern):
+Rezeptdaten (Konto `api_clients`, darf lesen, anlegen, ändern und seit dem
+30.09.2026 auch löschen):
 
 | Collection | Felder |
 |---|---|
@@ -146,10 +147,15 @@ ls rezept-*.html | wc -l   # veroeffentlichte Seiten
 - Einige Rezepte haben `zeit_gesamt = 0`, einige keine Schritte, einige
   `menge = 0` bei kalorienrelevanten Zutaten. Der Prüfer nennt sie; sie sind
   bis zum Nachtragen nicht veröffentlichbar.
-- **Nicht löschbar:** das API-Konto darf lesen, anlegen und ändern, aber nicht
-  löschen (`DELETE` gibt 403). Eine echte Dublette — *Apfel-Buchweizen-Pancakes*,
-  `r5ywxnobwwz1n6k`, identisch mit der veröffentlichten `9gh4ubu03pv4st8` — muss
-  deshalb von Hand in PocketBase weg. Solange sie steht, meldet der Prüfer sie.
+- **Erledigt:** Die Dublette der Apfel-Buchweizen-Pancakes (`r5ywxnobwwz1n6k`)
+  ist entfernt. Sie trug als einzige die Zutaten-Nährwerte, die dem
+  veröffentlichten Datensatz (`9gh4ubu03pv4st8`) fehlten — deshalb erst
+  übertragen, dann gelöscht. Dabei kam ein Fehler auf der Live-Seite heraus:
+  Die Zutatensumme ergibt 55 g Kohlenhydrat, hinterlegt waren 60 — exakt an
+  der High-Carb-Schwelle. Mit dem korrigierten Wert liegt das Rezept bei 46 %,
+  das Tag ist weg. **Regel bei künftigen Dubletten:** erst die Werte auf den
+  bleibenden Datensatz übertragen, dann löschen — nie umgekehrt, sonst sind
+  Daten weg, die nirgends sonst stehen.
 - `Ballaststoffreich` ist mangels `ballaststoffe`-Werten nicht prüfbar, siehe oben.
 - **Geklärt:** es gibt mehr Rezeptseiten als Datensätze auf `status: geprueft`,
   weil die acht im September veröffentlichten Rezepte den Status nie bekommen
