@@ -111,6 +111,13 @@ LEX = {
                                      "frutti di mare","frutti Di mare"]),
  "weichtier": dict(aus = [], tref = ["muschel","tintenfisch","calamari","auster"]),
  "milch": dict(
+   # Entscheidung 30.09.2026: Whey/Molke zaehlt IMMER gegen "Laktosefrei", auch als
+   # Isolat oder Blend, obwohl reines Isolat kaum Laktose enthaelt. Die Datenbank
+   # unterscheidet Konzentrat/Isolat/Blend nicht ("Whey Protein", "Proteinpulver
+   # Whey"), eine Zutatenzeile trifft also nicht zwingend zu. Im Zweifel gilt aber:
+   # eine faelschlich als laktosefrei markierte Seite trifft einen Kunden mit
+   # echter Intoleranz, eine zu Unrecht entfernte Markierung trifft niemanden.
+   # Nicht erneut aufmachen, ohne diese Abwaegung zu aendern.
    aus = ["laktosefrei","vegan","veganes","vegane","simply v","mandelmilch","mandeldrink",
           "mandel cuisine","kokosmilch","kokos drink","kokosdrink","kokos joghurt","kokosjoghurt",
           "kokosghurt","kokosjogurt","reismilch","reisdrink","hafermilch","haferdrink","sojamilch",
