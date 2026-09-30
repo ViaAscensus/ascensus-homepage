@@ -29,6 +29,9 @@ GRUNDREZEPTE = {"Béchamelsauce": "rezept-bechamelsauce",
 
 # Tag-Namen, die in der DB ohne Umlaute gespeichert sind
 TAG_ANZEIGE = {"Fruehstueck": "Frühstück", "Suess": "Süß"}
+# Oberhalb dieser Grenze zeigt die Seite gar keine Zeit mehr an.
+ZEIT_GRENZE = 60
+
 # Rubrik-Anzeige: die DB speichert Slugs ohne Umlaute.
 # Mittag und Abendessen werden nicht mehr unterschieden und zeigen beide
 # "Hauptgericht"; kaeme die Unterscheidung zurueck, sind das hier zwei Zeilen.
@@ -80,14 +83,27 @@ def menge_text(z):
 def iso_dauer(minuten):
     return f"PT{int(minuten)}M" if minuten else None
 
+def zeit_anzeigen(r):
+    """Angezeigt wird nur die Zubereitungszeit, und nur bis 60 Minuten.
+
+    Alles darueber schreckt eher ab, als dass es hilft - solche Rezepte laufen
+    ohne Zeitangabe. 0 heisst in der DB 'nicht erfasst'."""
+    z = r["zeit_zubereitung"]
+    return int(z) if z and 0 < z <= ZEIT_GRENZE else None
+
 def baue(r, zutaten, schritte, tagname, slug):
     kcal, ew = de(r["kcal"]), de(r["eiweiss"])
+    kh, fett = de(r["kohlenhydrate"]), de(r["fett"])
     titel = esc(r["name"])
-    lead  = f'{r["name"]} – ein Rezept von ASCENSUS. {kcal} kcal, {ew} g Eiweiß pro Portion.'
+    makros = f'{kcal} kcal · {ew} g Eiweiß · {kh} g Kohlenhydrate · {fett} g Fett pro Portion'
+    lead   = makros
+    beschreibung = (f'{r["name"]} – {kcal} kcal, {ew} g Eiweiß, {kh} g Kohlenhydrate, '
+                    f'{fett} g Fett pro Portion.')
+    zeit = zeit_anzeigen(r)
 
     badges = []
-    if r["zeit_gesamt"]:
-        badges.append(f'{int(r["zeit_gesamt"])} Min.')
+    if zeit:
+        badges.append(f'{zeit} Min.')
     sichtbar = set(tagname)
     if "Vegan" in sichtbar:          # vegan impliziert vegetarisch
         sichtbar.discard("Vegetarisch")
@@ -96,10 +112,8 @@ def baue(r, zutaten, schritte, tagname, slug):
     badges_html = "\n".join(f'        <span class="badge">{esc(TAG_ANZEIGE.get(b, b))}</span>' for b in badges)
 
     kurz = []
-    if r["zeit_zubereitung"]:
-        kurz.append(f'<span><strong>{int(r["zeit_zubereitung"])}</strong> Min. Zubereitung</span>')
-    if r["zeit_gesamt"]:
-        kurz.append(f'<span><strong>{int(r["zeit_gesamt"])}</strong> Min. gesamt</span>')
+    if zeit:
+        kurz.append(f'<span><strong>{zeit}</strong> Min. Zubereitung</span>')
     kurz.append(f'<span><strong>{kcal}</strong> kcal / Portion</span>')
 
     zut_html = "\n".join(
@@ -116,7 +130,7 @@ def baue(r, zutaten, schritte, tagname, slug):
     og = f"{SITE}/{slug}-og.png" if hat_og else f"{SITE}/logo-wordmark-claim.png"
 
     ld = {"@context":"https://schema.org","@type":"Recipe","name":r["name"],
-          "description":lead,
+          "description":beschreibung,
           **({"image": f"{SITE}/{slug}-og.png"} if hat_og else {}),
           "recipeYield":f'{r["portionen"]} Portionen',
           "recipeCategory":KATEGORIE.get(r["kategorie"], r["kategorie"]),
@@ -132,14 +146,16 @@ def baue(r, zutaten, schritte, tagname, slug):
           "author":{"@type":"Person","name":"Patrick Spengler"},
           "publisher":{"@type":"Organization","name":"ASCENSUS",
                        "logo":{"@type":"ImageObject","url":f"{SITE}/logo-wordmark.png"}}}
-    if iso_dauer(r["zeit_gesamt"]):       ld["totalTime"] = iso_dauer(r["zeit_gesamt"])
-    if iso_dauer(r["zeit_zubereitung"]):  ld["prepTime"]  = iso_dauer(r["zeit_zubereitung"])
+    # Nur auszeichnen, was die Seite auch zeigt - sonst widerspricht das
+    # Suchergebnis der Seite selbst.
+    if zeit:
+        ld["prepTime"] = iso_dauer(zeit)
 
     bild = (f'<div class="rezept-bild">\n      <img src="{SITE}/{slug}.jpg" alt="{titel}" '
             f'width="1200" height="900" loading="lazy">\n    </div>'
             if (ROOT / f"{slug}.jpg").exists() else "")
     t = (ROOT / "tools" / "rezept-template.html").read_text(encoding="utf-8")
-    for k, v in {"TITLE":titel, "DESC":esc(lead), "LEAD":esc(lead), "SLUG":slug,
+    for k, v in {"TITLE":titel, "DESC":esc(beschreibung), "LEAD":esc(lead), "SLUG":slug,
                  "KATEGORIE":esc(KATEGORIE.get(r["kategorie"], r["kategorie"])),
                  "BADGES":badges_html, "KURZINFO":"\n      ".join(kurz),
                  "PORTIONEN":str(r["portionen"]), "ZUTATEN":zut_html,
@@ -172,7 +188,8 @@ def karte(r, tagname, slug, nr):
         raise SystemExit(f'{slug}: kategorie ist {r["kategorie"]!r}, erwartet '
                          f'wird eine von {sorted(FILTER)}')
     filt, label = FILTER[r["kategorie"]]
-    badges = ([f'{int(r["zeit_gesamt"])} Min.'] if r["zeit_gesamt"] else [])
+    zeit = zeit_anzeigen(r)
+    badges = ([f'{zeit} Min.'] if zeit else [])
     sichtbar = set(tagname)
     if "Vegan" in sichtbar: sichtbar.discard("Vegetarisch")
     badges += [t for t in TAG_PRIO if t in sichtbar][:2]
