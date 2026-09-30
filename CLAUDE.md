@@ -87,6 +87,12 @@ Der letzte Befund liegt in `tools/PRUEFBERICHT-REZEPTE.md`.
 Gefundenes korrigiert `tools/korrigiere-rezepte.py` (falsche Diät-Tags, fehlende
 Allergene), beide Werkzeuge ohne `--schreiben` nur als Probelauf.
 
+**Entscheidung zu Whey/Molke:** zählt immer gegen `Laktosefrei`, auch als Isolat
+— die Datenbank unterscheidet Konzentrat/Isolat nicht. Eine falsch als
+laktosefrei markierte Seite trifft einen Kunden mit echter Intoleranz, eine zu
+Unrecht entfernte Markierung trifft niemanden. Steht als Regel in
+`tools/pruefe-rezepte.py` bei der `milch`-Erkennung.
+
 ## Berechnete Tags werden gerechnet, nicht gepflegt
 
 Fünf Tags mit `typ: berechnet` folgen aus den Zahlen und werden von
