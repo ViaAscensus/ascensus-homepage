@@ -134,18 +134,18 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
   "name": "Schoko Mug Cake",
   "description": "Schoko Mug Cake – 325 kcal, 25 g Eiweiß, 5 g Kohlenhydrate, 22 g Fett pro Portion.",
   "image": "https://ascensus.fit/rezept-schoko-mug-cake-og.png",
-  "recipeYield": "2 Portionen",
-  "recipeCategory": "Snack",
+  "recipeYield": "1 Portionen",
+  "recipeCategory": "Snack & Süßes",
   "keywords": "Airfryer, Backofen, Glutenfrei, High-Protein, Kalorienarm, Low-Carb, Midday-Snack, Nachtisch, Post Workout, Schnell und einfach, Snack, Süß, Vegetarisch, ketogen, pescetarisch",
   "recipeIngredient": [
-    "5 g Backpulver",
-    "10 g Butter",
-    "30 g Designer Whey, Schoko",
-    "120 g Eier roh",
-    "20 g Erythrit",
-    "10 g Kakaopulver stark entölt",
-    "60 g Mandeldrink, ohne Zucker",
-    "40 g Mandelmehl"
+    "2,5 g Backpulver",
+    "5 g Butter",
+    "60 g Eier roh",
+    "10 g Erythrit",
+    "5 g Kakaopulver stark entölt",
+    "30 g Mandeldrink, ohne Zucker",
+    "20 g Mandelmehl",
+    "15 g Whey-Proteinpulver, Schoko"
   ],
   "recipeInstructions": [
     {
@@ -237,7 +237,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
   <div class="art-head">
     <div class="read">
       <a class="crumb" href="https://ascensus.fit/rezepte.html">← Rezepte</a>
-      <p class="eyebrow">Snack</p>
+      <p class="eyebrow">Snack &amp; Süßes</p>
       <h1>Schoko Mug Cake</h1>
       <p class="art-lead">325 kcal · 25 g Eiweiß · 5 g Kohlenhydrate · 22 g Fett pro Portion</p>
       <div class="badges">
@@ -256,7 +256,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
     <div class="kurzinfo">
       <span class="portion-rechner">
         <button type="button" class="portion-btn" id="portion-minus" aria-label="Weniger Portionen">−</button>
-        <input type="number" class="portion-input" id="portion-input" value="2" min="1" max="99" step="1" inputmode="numeric" aria-label="Anzahl Portionen">
+        <input type="number" class="portion-input" id="portion-input" value="1" min="1" max="99" step="1" inputmode="numeric" aria-label="Anzahl Portionen">
         <span>Portionen</span>
         <button type="button" class="portion-btn" id="portion-plus" aria-label="Mehr Portionen">+</button>
       </span>
@@ -267,14 +267,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
     <div class="prose">
       <h2>Zutaten</h2>
       <ul class="zutaten-liste">
-        <li><span>Backpulver</span><span class="menge" data-menge="5" data-einheit="g">5 g</span></li>
-        <li><span>Butter</span><span class="menge" data-menge="10" data-einheit="g">10 g</span></li>
-        <li><span>Designer Whey, Schoko</span><span class="menge" data-menge="30" data-einheit="g">30 g</span></li>
-        <li><span>Eier roh</span><span class="menge" data-menge="120" data-einheit="g">120 g</span></li>
-        <li><span>Erythrit</span><span class="menge" data-menge="20" data-einheit="g">20 g</span></li>
-        <li><span>Kakaopulver stark entölt</span><span class="menge" data-menge="10" data-einheit="g">10 g</span></li>
-        <li><span>Mandeldrink, ohne Zucker</span><span class="menge" data-menge="60" data-einheit="g">60 g</span></li>
-        <li><span>Mandelmehl</span><span class="menge" data-menge="40" data-einheit="g">40 g</span></li>
+        <li><span>Backpulver</span><span class="menge" data-menge="2,5" data-einheit="g">2,5 g</span></li>
+        <li><span>Butter</span><span class="menge" data-menge="5" data-einheit="g">5 g</span></li>
+        <li><span>Eier roh</span><span class="menge" data-menge="60" data-einheit="g">60 g</span></li>
+        <li><span>Erythrit</span><span class="menge" data-menge="10" data-einheit="g">10 g</span></li>
+        <li><span>Kakaopulver stark entölt</span><span class="menge" data-menge="5" data-einheit="g">5 g</span></li>
+        <li><span>Mandeldrink, ohne Zucker</span><span class="menge" data-menge="30" data-einheit="g">30 g</span></li>
+        <li><span>Mandelmehl</span><span class="menge" data-menge="20" data-einheit="g">20 g</span></li>
+        <li><span>Whey-Proteinpulver, Schoko</span><span class="menge" data-menge="15" data-einheit="g">15 g</span></li>
       </ul>
 
       <h2>Zubereitung</h2>
@@ -287,7 +287,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
         <li>Lass den Mug Cake kurz abkühlen und genieße ihn direkt.</li>
       </ol>
 
-      <p class="allergene"><strong>Allergene:</strong> Nüsse, Milch, Eier</p>
+      <p class="allergene"><strong>Allergene:</strong> Schalenfrüchte (Mandeln), Milch, Eier</p>
     </div>
 
     <div class="call-mini">
@@ -363,7 +363,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
     const btnPlus = document.getElementById('portion-plus');
     const input = document.getElementById('portion-input');
     const menges = document.querySelectorAll('.menge');
-    const basePortions = 2;
+    const basePortions = 1;
     
     menges.forEach(el => {
       if(el.dataset.menge) el.dataset.base = el.dataset.menge;
