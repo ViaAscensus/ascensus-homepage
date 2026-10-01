@@ -171,6 +171,33 @@ LEX = {
 # Hafer ist von Natur aus glutenfrei, aber regelmaessig kontaminiert - eigene Klasse
 HAFER = ["hafer"]
 
+# Fruchtsaeuren fuer die Atwater-Gegenprobe: zaehlen nach Anhang XIV VO (EU)
+# 1169/2011 mit 3 kcal/g, stehen aber nirgends im Datenmodell - weder je Zutat
+# noch je Rezept. Ohne sie faellt bei zitruslastigen Rezepten die Energie aus
+# Eiweiss/Kohlenhydrat/Fett/Ballaststoffe spuerbar niedriger aus als die echte
+# kcal-Zahl. Werte (g Zitronensaeure je 100 g) aus naehrwerte_bls, Stand 01.10.2026.
+# Nicht erschoepfend - nur was konkret aufgefallen ist (Kurkuma-Zitrone-Ingwer Shot,
+# Zitrone-Minze Zero), keine Vorab-Abdeckung aller saeurehaltigen Lebensmittel.
+SAEURE = [
+    (r"zitronensaft.*konzentrat", 23.23),
+    (r"limettensaft.*konzentrat", 25.76),
+    (r"zitronensaft", 4.8),
+    (r"limettensaft", 4.58),
+    (r"\bzitrone\b", 4.7),
+    (r"\blimette\b", 4.58),
+]
+
+def saeure_pro_portion(zs, portionen):
+    """g Fruchtsaeure (als Zitronensaeure) je Portion, aus den Zutatennamen."""
+    tot = 0.0
+    for q in zs:
+        n = norm(q["zutat"])
+        for pat, g100 in SAEURE:
+            if re.search(pat, n):
+                tot += g100 / 100 * (q["menge"] or 0)
+                break
+    return tot / portionen if portionen else 0.0
+
 def klassifiziere(zs):
     f = {k: {} for k in LEX}
     for q in zs:
@@ -269,8 +296,12 @@ for r in UNP:
         if abw:
             sev = max(abs((ist[i]-pp[i])/max(pp[i],ist[i],1)*100) for i in range(4))
             befund["naehrwert_abweichung"].append((name, rid, "; ".join(abw), sev, offen))
-        # Atwater-Gegenprobe auf den Rezeptwerten selbst
-        atw = 4*ist[0] + 4*ist[1] + 9*ist[2]
+        # Atwater-Gegenprobe auf den Rezeptwerten selbst. Ballaststoffe zaehlen
+        # nach Anhang XIV VO (EU) 1169/2011 mit 2 kcal/g, Fruchtsaeuren mit 3 kcal/g
+        # mit - ohne das wird jedes ballaststoff- oder zitruslastige Rezept
+        # faelschlich als Widerspruch gemeldet, weil die Energie aus
+        # Eiweiss/Kohlenhydrat/Fett allein dann systematisch zu niedrig ist.
+        atw = 4*ist[0] + 4*ist[1] + 9*ist[2] + 2*(r["ballaststoffe"] or 0) + 3*saeure_pro_portion(zs, port)
         if ist[3] and abs(atw - ist[3]) / max(ist[3], 1) * 100 > 20:
             befund["atwater"].append((name, rid, f'{ist[3]:g} kcal angegeben, Makros ergeben {atw:.0f} kcal ({(atw-ist[3])/ist[3]*100:+.0f} %)'))
     if offen:

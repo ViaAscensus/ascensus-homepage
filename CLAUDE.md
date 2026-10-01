@@ -225,38 +225,30 @@ done
 ls rezept-*.html | wc -l   # veroeffentlichte Seiten
 ```
 
-- **Der Großteil der Rezepte ist inhaltlich ungeprüft** (`status: neu`). Bei ihnen
-  sind die Zutaten-Nährwerte vollständig hinterlegt, eine Gegenrechnung ist also
-  möglich. Bei den veröffentlichten fehlen sie — deren Werte wurden geschätzt und
-  wurden korrigiert.
-- Einige Rezepte haben `zeit_gesamt = 0`, einige keine Schritte, einige
-  `menge = 0` bei kalorienrelevanten Zutaten. Der Prüfer nennt sie; sie sind
-  bis zum Nachtragen nicht veröffentlichbar.
-- **Erledigt:** Die Dublette der Apfel-Buchweizen-Pancakes (`r5ywxnobwwz1n6k`)
-  ist entfernt. Sie trug als einzige die Zutaten-Nährwerte, die dem
-  veröffentlichten Datensatz (`9gh4ubu03pv4st8`) fehlten — deshalb erst
-  übertragen, dann gelöscht. Dabei kam ein Fehler auf der Live-Seite heraus:
-  Die Zutatensumme ergibt 55 g Kohlenhydrat, hinterlegt waren 60 — exakt an
-  der High-Carb-Schwelle. Mit dem korrigierten Wert liegt das Rezept bei 46 %,
-  das Tag ist weg. **Regel bei künftigen Dubletten:** erst die Werte auf den
-  bleibenden Datensatz übertragen, dann löschen — nie umgekehrt, sonst sind
-  Daten weg, die nirgends sonst stehen.
-- `Ballaststoffreich` ist mangels `ballaststoffe`-Werten nicht prüfbar, siehe oben.
-- **Geklärt:** es gibt mehr Rezeptseiten als Datensätze auf `status: geprueft`,
-  weil die acht im September veröffentlichten Rezepte den Status nie bekommen
-  haben. Regel 1 gilt also unverändert, sie wurde einmal verletzt und die
-  Betroffenen stehen noch so da. `pruefe-rezepte.py` ersetzt den Status nicht —
-  es prüft nur die *unveröffentlichten* Rezepte und sieht diese acht gar nicht.
-  Die Differenz findet sich mit:
+- **Erledigt (01.10.2026):** Alle Rezepte stehen auf `status: geprueft`, die acht
+  im September veröffentlichten Rezepte eingeschlossen — deren Zutaten-Nährwerte
+  fehlten seit der Veröffentlichung und wurden über `naehrwerte_bls` nachgetragen.
+  `pruefe-rezepte.py` meldet 0 Befunde, sowohl für die unveröffentlichten als auch
+  für die veröffentlichten Seiten. Die frühere Dublette der Apfel-Buchweizen-Pancakes
+  (`r5ywxnobwwz1n6k`) ist dabei entfernt worden — sie trug als einzige die
+  Zutaten-Nährwerte, die dem veröffentlichten Datensatz (`9gh4ubu03pv4st8`) fehlten,
+  deshalb erst übertragen, dann gelöscht. **Regel bei künftigen Dubletten:** erst
+  die Werte auf den bleibenden Datensatz übertragen, dann löschen — nie umgekehrt,
+  sonst sind Daten weg, die nirgends sonst stehen.
 
-  ```bash
-  python3 -c "import json;print(len(json.load(open('tools/slug-map.json'))))"
-  # dagegen die Anzahl auf status=geprueft, siehe Schnipsel oben
-  ```
-
-  Offen bleibt damit: **diese acht Seiten sind nie geprüft worden.** Ihre
-  Zutaten-Nährwerte fehlen, eine Gegenrechnung ist bei ihnen nicht möglich —
-  Tags, Allergene und Vollständigkeit ließen sich aber prüfen.
+  Vor dem Setzen auf `geprueft` wurden die 50 damals noch `status: neu` stehenden
+  Rezepte inhaltlich gelesen, nicht nur automatisiert geprüft (Regel 1 verlangt
+  mehr als einen bestandenen Check). Dabei kamen sieben konkrete Lücken heraus und
+  wurden behoben: zwei fehlende Zutaten, die in der Zubereitung vorkommen, aber nie
+  im Zutatenfeld standen (Kurkuma im Kurkuma-Zitrone-Ingwer Shot, Limettensaft im
+  Glasnudelsalat mit Tempeh), zwei Rezepte, die Gemüsebrühe verlangen, ohne sie zu
+  listen (beide Gnocchi-Pfannen), eine fehlende Maisstärke zum Binden (Asiatische
+  Gemüse-Reis-Pfanne), eine Frühlingszwiebel mit `menge = 0` trotz Verwendung im
+  Rezept (Nudelsalat) und ein Zubereitungsschritt, der als Fließtext-Rest im
+  vorherigen Schritt steckte, statt ein eigener zu sein (Rote Linsen Dal).
+  `Ballaststoffreich` ist seitdem für alle
+  Rezepte, die das Tag tragen, über `naehrwerte_bls` nachgerechnet und bestätigt —
+  für den großen Rest des Bestands ohne das Tag bleibt die Datenlücke bestehen.
 - **Kein Fehler:** die Verweise auf `wissen-xxx.html` in den sechs
   `wissen-*.html` stehen sämtlich in einem HTML-Kommentar — ein nie gefüllter
   Vorlagenblock „Das könnte Dich auch interessieren" mit den Platzhaltern
