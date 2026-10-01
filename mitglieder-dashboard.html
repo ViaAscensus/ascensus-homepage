@@ -62,6 +62,9 @@
   }
   .module-name{ font-weight:700; font-size:0.92rem; }
   .module-status{ font-size:0.72rem; color: var(--olive); text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+  /* Ab hier breiter als Handy: ohne Deckelung wuerden die quadratischen Kacheln mit dem
+     720px breiten main mitwachsen und der Inhalt wuerde in viel Leerflaeche "versinken". */
+  @media (min-width: 421px){ .modules{ grid-template-columns: repeat(2, minmax(0, 220px)); justify-content: center; } }
   @media (max-width: 420px){ .modules{ grid-template-columns: 1fr 1fr; gap:10px; } .module{ padding:14px; } }
 </style>
 </head>
@@ -163,7 +166,7 @@
     window.location.href = 'mitglieder-login.html';
   } else {
     document.getElementById('welcome').textContent =
-      'Willkommen, ' + (pb.authStore.model?.email || '');
+      'Willkommen, ' + (pb.authStore.model?.vorname || pb.authStore.model?.email || '');
   }
 
   document.getElementById('logoutBtn').addEventListener('click', () => {

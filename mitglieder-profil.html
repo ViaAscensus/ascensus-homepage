@@ -30,13 +30,6 @@
     text-transform: uppercase; letter-spacing: 2px; margin: 0 0 24px;
   }
 
-  .card{
-    background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 4px;
-    padding: 18px 22px; margin-bottom: 18px;
-  }
-  .info-row{ display:flex; justify-content:space-between; padding: 4px 0; font-size:0.92rem; }
-  .info-label{ opacity:0.6; }
-
   .profile-item{
     background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 4px;
     margin-bottom: 10px; overflow:hidden;
@@ -47,6 +40,10 @@
   }
   .profile-item summary::-webkit-details-marker{ display:none; }
   .profile-item summary::marker{ content:''; }
+  .profile-item-static{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 16px 22px;
+  }
   .item-label{ font-weight:600; font-size:0.95rem; }
   .item-value{ display:flex; align-items:center; gap:8px; font-size:0.88rem; opacity:0.65; }
   .item-chevron{ opacity:0.5; font-size:1rem; transition: transform 0.15s; }
@@ -95,10 +92,6 @@
 
 <main>
   <h1>Mein Profil</h1>
-
-  <div class="card">
-    <div class="info-row"><span class="info-label">Mitglied seit</span><span id="infoCreated"></span></div>
-  </div>
 
   <details class="profile-item" id="itemName">
     <summary>
@@ -228,6 +221,11 @@
       <div class="msg" id="wearableMsg"></div>
     </div>
   </details>
+
+  <div class="profile-item profile-item-static">
+    <span class="item-label">Mitglied seit</span>
+    <span class="item-value"><span id="infoCreated"></span></span>
+  </div>
 
   <details class="profile-item" id="itemPassword">
     <summary>
