@@ -16,6 +16,85 @@ Merge auf main  →  GitHub sendet push  →  Coolify deployt  →  live
 Es wird nichts gebaut — Coolify liefert die Dateien aus dem Repo direkt aus.
 Deshalb müssen **erzeugte HTML-Dateien mit eingecheckt werden**.
 
+### Cache-Header liegen in Coolify, nicht hier
+
+Die nginx-Konfiguration steht in Coolify unter *General → Build pipeline →
+Custom Nginx configuration*. **Sie ist nicht versioniert** und taucht in keinem
+PR auf; wird die Anwendung je neu angelegt, ist sie weg. Deshalb hier als Kopie:
+
+```nginx
+server {
+    root /usr/share/nginx/html;
+
+    # Standard fuer alles: nicht blind cachen, sondern per ETag rueckfragen.
+    # Der Server antwortet mit 304, es fliessen ein paar hundert Byte statt
+    # der ganzen Seite. Gilt damit auch fuer / und fuer URLs ohne Endung.
+    add_header Cache-Control "no-cache" always;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files $uri $uri.html $uri/index.html $uri/index.htm $uri/ =404;
+    }
+
+    # Schriften aendern sich nie - volle Dauer
+    location ~* \.(woff2|woff|ttf|eot)$ {
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+    }
+
+    # Bilder und PDF: eine Woche, aber ohne immutable. Rezeptfotos tragen
+    # den Rezeptnamen, ein neu erzeugtes Bild heisst genauso - der Browser
+    # muss es also nach einer Weile neu holen koennen.
+    location ~* \.(jpg|jpeg|png|gif|webp|svg|ico|pdf)$ {
+        add_header Cache-Control "public, max-age=604800" always;
+    }
+
+    # CSS und JS: kurz, weil die Dateinamen keinen Hash tragen
+    location ~* \.(css|js)$ {
+        add_header Cache-Control "public, max-age=3600, must-revalidate" always;
+    }
+
+    # Handle 404 errors
+    error_page 404 /404.html;
+    location = /404.html {
+        root /usr/share/nginx/html;
+        internal;
+    }
+
+    # Handle server errors (50x)
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+        internal;
+    }
+}
+```
+
+Drei Entscheidungen darin sind nicht beliebig:
+
+- **`no-cache` auf Server-Ebene, nicht je `location`.** In nginx *ersetzt* ein
+  `add_header` im Block den geerbten, statt ihn zu ergänzen. Die drei
+  Asset-Blöcke überschreiben also gezielt; alles übrige — HTML, `/`, URLs ohne
+  Endung — erbt `no-cache`. Eine Regel nur für `\.html$` würde die Startseite
+  und endungslose URLs verfehlen, weil die in `location /` landen.
+- **Bilder ohne `immutable`.** Rezeptfotos heißen nach dem Rezept
+  (`rezept-weiberpasta.jpg`); erzeugt n8n eines neu, trägt es denselben Namen.
+  Mit `immutable` fragt der Browser nie wieder nach und zeigt dauerhaft das
+  alte Bild.
+- **CSS und JS nur eine Stunde.** `ascensus.css` trägt keinen Inhalts-Hash im
+  Namen. Bei langer Cache-Dauer sähen Besucher nach einer Designänderung
+  monatelang die alte Fassung.
+
+Ohne diese Konfiguration raten Browser die Cache-Dauer von HTML aus dem Alter
+der Datei — in der Praxis Stunden bis Tage. Das führt dazu, dass eine frisch
+deployte Seite alt aussieht, obwohl der Server längst die neue ausliefert.
+Nachprüfen lässt sich der Zustand mit:
+
+```bash
+curl -sSI https://ascensus.fit/index.html | grep -i cache-control   # no-cache
+curl -sSI https://ascensus.fit/ascensus.css | grep -i cache-control # max-age=3600
+```
+
 ## Rezeptseiten werden generiert
 
 `rezept-*.html`, das Kachel-Grid in `rezepte.html` und der Rezept-Abschnitt der
