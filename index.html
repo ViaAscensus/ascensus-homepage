@@ -307,18 +307,38 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 }
 
 /* ---------- Ablauf ---------- */
+/* Horizontale Schritt-Strecke statt vertikaler Liste: fünf Karten mit
+   Icon und knappem Text, auf dem Desktop durch eine Linie verbunden —
+   nimmt deutlich weniger Höhe weg als fünf ausformulierte Absätze. */
 .steps{background:var(--paper)}
-.step-list{margin-top:2.2rem;display:grid;gap:0}
-.step{
-  display:grid;gap:.4rem 1.8rem;padding:1.8rem 0;border-top:1px solid var(--line);
-  grid-template-columns:auto 1fr;align-items:start;
+.step-track{
+  position:relative;margin-top:2.2rem;
+  display:grid;grid-template-columns:1fr;gap:1.8rem;
 }
-.step:last-child{border-bottom:1px solid var(--line)}
+@media(min-width:860px){
+  .step-track{grid-template-columns:repeat(5,1fr);gap:1.1rem}
+}
+.step-line{display:none}
+@media(min-width:860px){
+  .step-line{
+    display:block;position:absolute;top:28px;left:10%;right:10%;
+    height:1px;background:var(--line);z-index:0;
+  }
+}
+.step-card{position:relative;z-index:1;display:flex;flex-direction:column;gap:.3rem}
+@media(min-width:860px){.step-card{text-align:center;align-items:center}}
+.step-icon{
+  width:56px;height:56px;flex-shrink:0;border-radius:50%;
+  background:var(--olive);color:var(--offwhite);
+  display:flex;align-items:center;justify-content:center;margin-bottom:.4rem;
+}
+.step-icon svg{width:26px;height:26px}
 .step-num{
-  font-size:.78rem;font-weight:600;letter-spacing:.16em;color:var(--sand);
-  padding-top:.28rem;font-variant-numeric:tabular-nums;
+  font-size:.74rem;font-weight:600;letter-spacing:.16em;color:var(--sand);
+  font-variant-numeric:tabular-nums;
 }
-.step p{margin-top:.45rem;color:var(--ink-60);font-size:.97rem}
+.step-card h3{font-size:.96rem}
+.step-card p{margin-top:.2rem;color:var(--ink-60);font-size:.9rem;line-height:1.5}
 
 /* ---------- Pakete ---------- */
 .plans{display:grid;gap:1.5rem;margin-top:2.2rem}
@@ -804,50 +824,47 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
     <p class="eyebrow">So arbeiten wir zusammen</p>
     <h2>Dein Weg — Schritt für Schritt</h2>
 
-    <div class="step-list">
-      <div class="step">
+    <div class="step-track">
+      <div class="step-line" aria-hidden="true"></div>
+      <div class="step-card">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10H10l-3.5 3.5V15.5H4z"/></svg>
+        </div>
         <div class="step-num">01</div>
-        <div>
-          <h3>Kennenlernen</h3>
-          <p>30 Minuten, kostenlos. Wir sprechen über Deine Situation, Deine Ziele
-             und schauen, ob die Chemie stimmt. Ohne Verpflichtung.</p>
-        </div>
+        <h3>Kennenlernen</h3>
+        <p>30 Minuten, kostenlos und unverbindlich — wir klären Deine Situation und Ziele.</p>
       </div>
-      <div class="step">
+      <div class="step-card">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M9 3.5h6v2H9z"/><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4"/></svg>
+        </div>
         <div class="step-num">02</div>
-        <div>
-          <h3>Strategiegespräch &amp; Anamnese</h3>
-          <p>45 Minuten für Deine Vorgeschichte, Deinen Alltag, Deine Gewohnheiten.
-             Vorab füllst Du einen Anamnesebogen aus — damit wir die Zeit für Dich
-             nutzen und nicht für Formalitäten.</p>
-        </div>
+        <h3>Strategiegespräch &amp; Anamnese</h3>
+        <p>45 Minuten zu Deiner Vorgeschichte, Deinem Alltag, Deinen Gewohnheiten.</p>
       </div>
-      <div class="step">
+      <div class="step-card">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.3A10.6 10.6 0 0 1 12 5.2c5 0 9 3.5 10 6.8-.5 1.6-1.5 3.1-2.8 4.3M6.6 6.6C4.4 8 2.8 10 2 12c1 3.3 5 6.8 10 6.8 1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+        </div>
         <div class="step-num">03</div>
-        <div>
-          <h3>Blind-Tracking</h3>
-          <p>Eine Woche dokumentierst Du in der App, was Du isst — ohne Zielvorgaben,
-             ohne Bewertung. So entsteht ein unverfälschtes Bild statt eines
-             geschönten.</p>
-        </div>
+        <h3>Blind-Tracking</h3>
+        <p>Eine Woche tracken, ohne Zahlen zu sehen — für ein unverfälschtes Bild.</p>
       </div>
-      <div class="step">
+      <div class="step-card">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-8"/><path d="M3 20h18"/></svg>
+        </div>
         <div class="step-num">04</div>
-        <div>
-          <h3>Auswertung &amp; Fahrplan</h3>
-          <p>Wir gehen Deine Daten gemeinsam durch: Wo liegen Deine Stärken, wo die
-             Lücken, welche Stellschrauben bringen bei Dir am meisten. Daraus wird
-             Dein konkreter nächster Schritt.</p>
-        </div>
+        <h3>Auswertung &amp; Fahrplan</h3>
+        <p>Gemeinsam auswerten und Deinen konkreten nächsten Schritt festlegen.</p>
       </div>
-      <div class="step">
-        <div class="step-num">05</div>
-        <div>
-          <h3>Umsetzung im Alltag</h3>
-          <p>Je nach Paket begleite ich Dich Wochen oder Monate bei der Umsetzung —
-             mit regelmäßigen Calls und dynamischen Anpassungen, bis aus dem Plan
-             eine Routine geworden ist.</p>
+      <div class="step-card">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m14.5 9.5-2 5-5 2 2-5z"/></svg>
         </div>
+        <div class="step-num">05</div>
+        <h3>Umsetzung im Alltag</h3>
+        <p>Wochen oder Monate Begleitung, bis aus dem Plan eine Routine wird.</p>
       </div>
     </div>
   </div>
@@ -1054,55 +1071,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
   </div>
 </section>
 
-<!-- ============ ERSTGESPRÄCH ============ -->
-<!-- ============ IN VORBEREITUNG ============ -->
-<section id="bald" class="section-tight">
-  <div class="wrap reveal">
-    <p class="eyebrow">In Vorbereitung</p>
-    <h2>Bald auch fürs Laufen</h2>
-    <p class="lead" style="margin-top:1.2rem">
-      Ernährung ist die eine Hälfte. Die andere ist Bewegung — und ich bin
-      selbst Läufer. Zwei Angebote stehen in den Startlöchern.
-    </p>
-
-    <div class="soon-grid">
-      <article class="soon">
-        <div class="soon-badge">Coming soon</div>
-        <h3>Laufcoaching 1:1</h3>
-        <p class="soon-desc">
-          Reine Performance — ob erster 5er oder neue Marathon-Bestzeit.
-        </p>
-        <ul>
-          <li>Analyse Deines Leistungsstands: Lauferfahrung, Pulswerte, Ziele</li>
-          <li>Individueller Trainingsplan mit Intervallen, Grundlagen und Regeneration</li>
-          <li>Betreuung Deiner Läufe über Strava oder TrainingPeaks</li>
-          <li>Wöchentliches Feedback und flexible Plananpassung</li>
-        </ul>
-      </article>
-
-      <article class="soon">
-        <div class="soon-badge">Coming soon</div>
-        <h3>Premium Hybrid</h3>
-        <p class="soon-desc">
-          Ernährung und Laufen zusammen gedacht — abgestimmt auf Deine
-          Trainingsumfänge.
-        </p>
-        <ul>
-          <li>Volles Ernährungscoaching inklusive Nährstoff-Timing</li>
-          <li>Volles Laufcoaching mit flexibel gesteuerten Trainingsplänen</li>
-          <li>Monatlicher 20-Min. Strategie-Call</li>
-          <li>Wöchentliches Messenger-Feedback</li>
-        </ul>
-      </article>
-    </div>
-
-    <p class="soon-note">
-      Interesse? Sag mir im Erstgespräch Bescheid — dann melde ich mich, sobald
-      es losgeht.
-    </p>
-  </div>
-</section>
-
 <!-- ============ WISSEN ============
      Zeigt die neuesten Beiträge (gleiche Kacheln wie auf wissen.html).
      -->
@@ -1271,6 +1239,54 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
         </p>
       </details>
     </div>
+  </div>
+</section>
+
+<!-- ============ IN VORBEREITUNG ============ -->
+<section id="bald" class="section-tight">
+  <div class="wrap reveal">
+    <p class="eyebrow">In Vorbereitung</p>
+    <h2>Bald auch fürs Laufen</h2>
+    <p class="lead" style="margin-top:1.2rem">
+      Ernährung ist die eine Hälfte. Die andere ist Bewegung — und ich bin
+      selbst Läufer. Zwei Angebote stehen in den Startlöchern.
+    </p>
+
+    <div class="soon-grid">
+      <article class="soon">
+        <div class="soon-badge">Coming soon</div>
+        <h3>Laufcoaching 1:1</h3>
+        <p class="soon-desc">
+          Reine Performance — ob erster 5er oder neue Marathon-Bestzeit.
+        </p>
+        <ul>
+          <li>Analyse Deines Leistungsstands: Lauferfahrung, Pulswerte, Ziele</li>
+          <li>Individueller Trainingsplan mit Intervallen, Grundlagen und Regeneration</li>
+          <li>Betreuung Deiner Läufe über Strava oder TrainingPeaks</li>
+          <li>Wöchentliches Feedback und flexible Plananpassung</li>
+        </ul>
+      </article>
+
+      <article class="soon">
+        <div class="soon-badge">Coming soon</div>
+        <h3>Premium Hybrid</h3>
+        <p class="soon-desc">
+          Ernährung und Laufen zusammen gedacht — abgestimmt auf Deine
+          Trainingsumfänge.
+        </p>
+        <ul>
+          <li>Volles Ernährungscoaching inklusive Nährstoff-Timing</li>
+          <li>Volles Laufcoaching mit flexibel gesteuerten Trainingsplänen</li>
+          <li>Monatlicher 20-Min. Strategie-Call</li>
+          <li>Wöchentliches Messenger-Feedback</li>
+        </ul>
+      </article>
+    </div>
+
+    <p class="soon-note">
+      Interesse? Sag mir im Erstgespräch Bescheid — dann melde ich mich, sobald
+      es losgeht.
+    </p>
   </div>
 </section>
 
