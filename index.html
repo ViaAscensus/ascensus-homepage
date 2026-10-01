@@ -173,7 +173,10 @@ p{max-width:62ch}
 
 /* ---------- Layout ---------- */
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
-section{padding:clamp(4.5rem,10vw,8rem) 0;position:relative}
+section{padding:clamp(3.6rem,8vw,6.5rem) 0;position:relative}
+/* Kurze Übergangs-/Teaser-Abschnitte brauchen nicht so viel Luft wie
+   inhaltsschwere Sections — sonst atmet alles gleich laut. */
+section.section-tight{padding:clamp(2.6rem,5.5vw,4.2rem) 0}
 .rule{height:1px;background:var(--line);border:0;max-width:var(--maxw);margin:0 auto}
 
 /* ---------- Signature: der Weg ---------- */
@@ -863,7 +866,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 
 <!-- ============ PAKETE ============ -->
 <!-- ============ PAKETE (TEASER) ============ -->
-<section id="pakete">
+<section id="pakete" class="section-tight">
   <div class="wrap reveal">
     <p class="eyebrow">Ernährungscoaching</p>
     <h2>Drei Pakete, die aufeinander aufbauen</h2>
@@ -1232,7 +1235,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 </section>
 
 <!-- ============ KONTAKT ============ -->
-<section id="kontakt">
+<section id="kontakt" class="section-tight">
   <div class="wrap reveal">
     <p class="eyebrow">Direkter Draht</p>
     <h2>Du hast eine Frage?</h2>
