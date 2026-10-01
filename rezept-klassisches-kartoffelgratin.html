@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="https://ascensus.fit/ascensus.css">
   <link rel="stylesheet" href="https://ascensus.fit/klaro.css">
   <link rel="stylesheet" href="https://ascensus.fit/ascensus-klaro-theme.css">
+  <script src="https://ascensus.fit/ascensus.js" defer></script>
 
 <style>
 :root { 
@@ -58,160 +59,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
 /* Progress Bar */
 .progress { position: fixed; left: 0px; top: 0px; height: 2px; width: 0px; background: var(--sand); z-index: 70; transition: width 0.1s; }
 
-/* Header & Navigation */
-.asc-header { 
-  position: sticky; 
-  top: 0px; 
-  z-index: 50; 
-  background: rgba(245, 243, 238, 0.95); 
-  backdrop-filter: blur(10px); 
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid transparent; 
-  transition: border-color 0.3s, background-color 0.3s; 
-}
-.asc-header.scrolled { border-bottom-color: var(--line); }
-.asc-header-inner { 
-  max-width: var(--maxw); 
-  margin: 0px auto; 
-  padding: .85rem var(--gut); 
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  gap: 1.5rem; 
-}
-.asc-header-brand img { height: 38px; width: auto; }
-.asc-header-nav { display: flex; align-items: center; gap: 1.8rem; }
-.asc-navlink { 
-  font-size: 0.78rem; 
-  font-weight: 500; 
-  letter-spacing: 0.13em; 
-  text-transform: uppercase; 
-  text-decoration: none; 
-  color: var(--ink-60); 
-  transition: color 0.2s; 
-}
-.asc-navlink:hover, .asc-navlink.is-active { color: var(--olive); }
-.asc-header-actions { display: flex; align-items: center; gap: 0.8rem; }
-
-/* Buttons */
-.asc-btn { 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center;
-  gap: 0.6rem; 
-  padding: 0.92rem 1.7rem; 
-  border: 1px solid var(--olive); 
-  background: var(--olive); 
-  color: var(--offwhite); 
-  font-size: 0.79rem; 
-  font-weight: 600; 
-  letter-spacing: 0.14em; 
-  text-transform: uppercase; 
-  text-decoration: none; 
-  transition: background 0.25s, border-color 0.25s, transform 0.25s; 
-  border-radius: 4px;
-}
-.asc-btn:hover { background: var(--olive-dark); border-color: var(--olive-dark); transform: translateY(-2px); color: var(--offwhite); }
-.asc-btn-sm { padding: 0.66rem 1.2rem; font-size: 0.72rem; }
-
-/* Mobile Menu Button */
-.asc-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  width: 40px;
-  height: 40px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-}
-.asc-menu-btn span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--ink);
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.asc-header.is-open .asc-menu-btn span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.asc-header.is-open .asc-menu-btn span:nth-child(2) { opacity: 0; }
-.asc-header.is-open .asc-menu-btn span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* Mobile Bottom Bar */
-.asc-bottombar { display: none; }
-
-@media (max-width: 900px) {
-  body { padding-bottom: 58px; }
-  .asc-menu-btn { display: flex; }
-  
-  .asc-header-nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--offwhite);
-    border-bottom: 1px solid var(--line);
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1.4rem var(--gut) 1.8rem;
-    gap: 1.2rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-  }
-  .asc-header.is-open .asc-header-nav { display: flex; }
-  .asc-header-nav .asc-navlink { font-size: 0.88rem; width: 100%; padding: 0.35rem 0; }
-
-  .asc-bottombar {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 58px;
-    background: rgba(245, 243, 238, 0.96);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--line);
-    z-index: 60;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 0.5rem;
-  }
-  .asc-bottombar a {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: var(--ink-60);
-    padding: 6px 2px;
-    transition: color 0.2s;
-  }
-  .asc-bottombar a.is-active {
-    color: var(--olive);
-    font-weight: 700;
-  }
-  .asc-bottombar a.asc-bottombar-cta {
-    background: var(--olive);
-    color: var(--offwhite);
-    border-radius: 4px;
-    margin: 6px 4px;
-    padding: 8px 10px;
-    font-weight: 600;
-  }
-  .asc-bottombar a.asc-bottombar-cta:hover {
-    background: var(--olive-dark);
-    color: var(--offwhite);
-  }
-}
+/* Header, Navigation & Footer: siehe ascensus.css (gleiches Design wie index.html) */
 
 /* Page Layout */
 .eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--sand); margin-bottom: 1.1rem; }
@@ -250,15 +98,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
 .back { padding: 1.5rem 0px 4rem; }
 .back a { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase; color: var(--olive); text-decoration: none; }
 .back a:hover { text-decoration: underline; text-underline-offset: 4px; }
-footer { background: var(--ink); color: rgba(245, 243, 238, 0.7); padding: 3.2rem 0px 2.4rem; font-size: 0.86rem; }
-.foot-grid { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; align-items: flex-start; }
-.foot-brand { display: flex; gap: 1rem; align-items: flex-start; }
-.foot-brand img { width: 52px; height: 52px; flex-shrink: 0; }
-footer .fslogan { font-size: 0.72rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--sand); margin-top: 0.7rem; }
-.foot-links { display: flex; flex-wrap: wrap; gap: 1.4rem; }
-.foot-links a { color: rgba(245, 243, 238, 0.7); text-decoration: none; transition: color 0.2s; }
-.foot-links a:hover { color: var(--sand); }
-.copyright { margin-top: 2.4rem; padding-top: 1.4rem; border-top: 1px solid rgba(245, 243, 238, 0.14); font-size: 0.78rem; color: rgba(245, 243, 238, 0.45); }
 @media (max-width: 520px) { .kurzinfo { font-size: 0.82rem; gap: 0.5rem 1.2rem; } .zutaten-liste li { font-size: 0.94rem; } }
 @media (prefers-reduced-motion: reduce) { * { animation: auto ease 0s 1 normal none running none !important; transition: none !important; scroll-behavior: auto !important; } }
 </style>
@@ -359,23 +198,24 @@ footer .fslogan { font-size: 0.72rem; letter-spacing: 0.24em; text-transform: up
 
 <div class="progress" id="progress" aria-hidden="true" style="width: 0%;"></div>
 
-<header class="asc-header" id="hdr">
+<header class="asc-header" id="hdr" data-asc-header>
   <div class="asc-header-inner">
-    <a class="asc-header-brand" href="https://ascensus.fit/index.html" aria-label="ASCENSUS Startseite">
-      <img src="https://ascensus.fit/logo-wordmark.png" alt="ASCENSUS" width="160" height="38">
+    <a class="asc-header-logo" href="https://ascensus.fit/index.html" aria-label="ASCENSUS Startseite">
+      <img src="https://ascensus.fit/logo-wordmark.png" alt="ASCENSUS">
     </a>
-    <nav class="asc-header-nav" id="main-nav" aria-label="Hauptnavigation">
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Hauptnavigation">
       <a class="asc-navlink" href="https://ascensus.fit/index.html#ansatz">Ansatz</a>
       <a class="asc-navlink" href="https://ascensus.fit/index.html#ablauf">Ablauf</a>
       <a class="asc-navlink" href="https://ascensus.fit/pakete.html">Pakete</a>
       <a class="asc-navlink" href="https://ascensus.fit/wissen.html">Wissen</a>
-      <a class="asc-navlink is-active" href="https://ascensus.fit/rezepte.html">Rezepte</a>
+      <a class="asc-navlink is-active" aria-current="page" href="https://ascensus.fit/rezepte.html">Rezepte</a>
       <a class="asc-navlink" href="https://ascensus.fit/index.html#faq">FAQ</a>
       <a class="asc-navlink" href="https://ascensus.fit/index.html#kontakt">Kontakt</a>
+      <a class="asc-btn asc-btn-primary asc-nav-cta" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Kostenloses Erstgespräch</a>
     </nav>
     <div class="asc-header-actions">
-      <a class="asc-btn asc-btn-primary asc-btn-sm" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Erstgespräch</a>
-      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Menü öffnen">
+      <a class="asc-btn asc-btn-primary" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Erstgespräch</a>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -439,7 +279,7 @@ footer .fslogan { font-size: 0.72rem; letter-spacing: 0.24em; text-transform: up
 
     <div class="call-mini">
       <p><strong>Passt das zu Deinem Alltag?</strong><br>In einem kostenlosen 30-minütigen Erstgespräch schauen wir gemeinsam auf Deine Ernährung — ohne Verkaufsdruck.</p>
-      <a class="asc-btn" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Erstgespräch buchen</a>
+      <a class="asc-btn asc-btn-primary" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Erstgespräch buchen</a>
     </div>
 
     <div class="back"><a href="https://ascensus.fit/rezepte.html">← Alle Rezepte</a></div>
@@ -447,61 +287,55 @@ footer .fslogan { font-size: 0.72rem; letter-spacing: 0.24em; text-transform: up
 </article>
 </main>
 
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div class="foot-brand">
-        <img src="https://ascensus.fit/icon-olive.png" alt="" aria-hidden="true" width="52" height="52">
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="https://ascensus.fit/bildmarke-weiss.png" alt="" aria-hidden="true">
         <div>
-          <div style="font-size:1rem;letter-spacing:.2em;text-transform:uppercase;color:var(--offwhite);font-weight:500">
-            Ascensus
-          </div>
-          <div style="font-size:.82rem;margin-top:.4rem">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
-          <div class="fslogan">Echt · Fundiert · Nachhaltig</div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
         </div>
       </div>
-      <div class="foot-links">
-        <a href="https://ascensus.fit/impressum.html">Impressum</a>
-        <a href="https://ascensus.fit/datenschutz.html">Datenschutz</a>
-        <a href="https://ascensus.fit/agb.html">AGB</a>
-        <a href="https://ascensus.fit/widerruf.html">Widerruf</a>
-        <a href="#">Datenschutzeinstellungen</a>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="https://ascensus.fit/impressum.html">Impressum</a></li>
+          <li><a href="https://ascensus.fit/datenschutz.html">Datenschutz</a></li>
+          <li><a href="https://ascensus.fit/agb.html">AGB</a></li>
+          <li><a href="https://ascensus.fit/widerruf.html">Widerruf</a></li>
+          <li><a href="https://ascensus.fit/datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
       </div>
     </div>
-    <div class="copyright">© <span id="yr">2026</span> ASCENSUS · Patrick Spengler</div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="https://ascensus.fit/mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
   </div>
 </footer>
 
 <nav class="asc-bottombar" aria-label="Schnellzugriff">
   <a href="https://ascensus.fit/pakete.html">Pakete</a>
-  <a class="is-active" href="https://ascensus.fit/rezepte.html">Rezepte</a>
+  <a href="https://ascensus.fit/rezepte.html">Rezepte</a>
   <a href="https://ascensus.fit/wissen.html">Wissen</a>
   <a class="asc-bottombar-cta" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Erstgespräch</a>
 </nav>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Mobile Navigation Toggle
-    const header = document.getElementById('hdr');
-    const menuBtn = document.querySelector('.asc-menu-btn');
-    if (menuBtn && header) {
-      menuBtn.addEventListener('click', () => {
-        const isOpen = header.classList.toggle('is-open');
-        menuBtn.setAttribute('aria-expanded', isOpen);
-        menuBtn.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
-      });
-    }
-
-    // Header Scroll & Reading Progress
+    // Reading Progress (Menü, Header-Scroll-Linie & Jahreszahl übernimmt ascensus.js)
     const progress = document.getElementById('progress');
     window.addEventListener('scroll', () => {
-      if (header) {
-        if (window.scrollY > 20) {
-          header.classList.add('scrolled');
-        } else {
-          header.classList.remove('scrolled');
-        }
-      }
       if (progress) {
         const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
         if (totalHeight > 0) {
@@ -510,12 +344,6 @@ footer .fslogan { font-size: 0.72rem; letter-spacing: 0.24em; text-transform: up
         }
       }
     }, { passive: true });
-
-    // Dynamic Copyright Year
-    const yrEl = document.getElementById('yr');
-    if (yrEl) {
-      yrEl.textContent = new Date().getFullYear();
-    }
 
     // Portion Calculator
     const btnMinus = document.getElementById('portion-minus');
