@@ -478,15 +478,22 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .soon-note{margin-top:2rem;font-size:.9rem;color:var(--ink-40);max-width:58ch}
 
 /* ---------- Blind-Tracking ---------- */
-.method-grid{display:grid;gap:2rem}
+.method-grid{display:grid;gap:2.4rem;align-items:center}
 @media(min-width:860px){
-  .method-grid{grid-template-columns:.85fr 1.15fr;gap:4rem;align-items:start}
+  .method-grid{grid-template-columns:1.3fr .7fr;gap:3.5rem;align-items:center}
 }
+.method-text{margin-top:1.6rem}
 .method-text p{font-size:1rem;line-height:1.62;color:var(--ink-60)}
 .method-text p+p{margin-top:1rem}
 .method-text p:first-child{
   font-size:clamp(1.05rem,2.2vw,1.28rem);font-weight:300;line-height:1.45;
   color:var(--olive);letter-spacing:.01em;
+}
+.method-shot{justify-self:center;max-width:220px}
+.method-shot img{width:100%;height:auto;display:block;border-radius:18px;box-shadow:0 18px 40px -16px rgba(35,35,35,.35)}
+.method-shot figcaption{
+  margin-top:.8rem;font-size:.76rem;color:var(--ink-40);text-align:center;
+  letter-spacing:.02em;
 }
 
 .plan ul{list-style:none;margin-bottom:1.8rem;flex-grow:1}
@@ -836,25 +843,29 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
       <div>
         <p class="eyebrow">Das Prinzip dahinter</p>
         <h2>Erst messen.<br>Dann bewerten.</h2>
+        <div class="method-text">
+          <p>
+            In der ersten Woche ist die Kalorien- und Nährstoffanzeige in Deiner
+            App bewusst ausgeblendet. Du trackst — siehst aber keine Zahlen.
+          </p>
+          <p>
+            Das klingt erst einmal seltsam, ist aber der wichtigste Schritt.
+            Sobald Zahlen sichtbar sind, verändert sich das Essverhalten
+            automatisch: Man isst ein bisschen besser, lässt den Nachtisch weg,
+            trackt den Keks nicht mit. Am Ende steht eine Woche, die schöner
+            aussieht als der Alltag — und ein Plan, der auf einer Illusion
+            aufbaut.
+          </p>
+          <p>
+            Ohne Anzeige entsteht ein unverfälschtes Bild. Erst nach unserer
+            gemeinsamen Auswertung schalte ich Dein Dashboard vollständig frei.
+          </p>
+        </div>
       </div>
-      <div class="method-text">
-        <p>
-          In der ersten Woche ist die Kalorien- und Nährstoffanzeige in Deiner
-          App bewusst ausgeblendet. Du trackst — siehst aber keine Zahlen.
-        </p>
-        <p>
-          Das klingt erst einmal seltsam, ist aber der wichtigste Schritt.
-          Sobald Zahlen sichtbar sind, verändert sich das Essverhalten
-          automatisch: Man isst ein bisschen besser, lässt den Nachtisch weg,
-          trackt den Keks nicht mit. Am Ende steht eine Woche, die schöner
-          aussieht als der Alltag — und ein Plan, der auf einer Illusion
-          aufbaut.
-        </p>
-        <p>
-          Ohne Anzeige entsteht ein unverfälschtes Bild. Erst nach unserer
-          gemeinsamen Auswertung schalte ich Dein Dashboard vollständig frei.
-        </p>
-      </div>
+      <figure class="method-shot">
+        <img src="app-dashboard-mockup.png" alt="Dashboard der Nutrilize-App mit Kalorien- und Makronährstoff-Tracking" width="640" height="1289" loading="lazy">
+        <figcaption>Nach der Auswertung: volle Nährwertanzeige in der App.</figcaption>
+      </figure>
     </div>
   </div>
 </section>
