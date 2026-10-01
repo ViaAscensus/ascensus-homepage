@@ -300,10 +300,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .cred-link:hover{color:var(--olive);border-color:var(--olive)}
 .trust-line{display:inline-flex;align-items:center;gap:.45rem}
 .trust-line svg{width:14px;height:14px;color:var(--sand);flex-shrink:0}
+.pullquote-wrap{display:flex;align-items:center;gap:1.4rem;margin:2rem 0}
+.ascent-graphic{width:72px;height:72px;flex-shrink:0}
 .pullquote{
-  margin:2rem 0;padding:1.5rem 0 1.5rem 1.6rem;border-left:2px solid var(--olive);
+  margin:0;padding:1.5rem 0 1.5rem 1.6rem;border-left:2px solid var(--olive);
   font-size:clamp(1.1rem,2.4vw,1.45rem);font-weight:300;line-height:1.4;color:var(--olive);
   letter-spacing:.01em;
+}
+@media(max-width:480px){
+  .pullquote-wrap{flex-direction:column;align-items:flex-start;gap:.8rem}
 }
 
 /* ---------- Ablauf ---------- */
@@ -747,10 +752,17 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
           einfach nicht.“
         </p>
 
-        <p class="pullquote">
-          Nicht das Extreme gewinnt. Sondern das, was zu Dir passt
-          und was Du kontinuierlich in Dein Leben integrieren kannst.
-        </p>
+        <div class="pullquote-wrap">
+          <svg class="ascent-graphic" viewBox="0 0 100 100" aria-hidden="true">
+            <path d="M5 90 L40 30 L55 55 L80 15 L98 90 Z" fill="none" stroke="var(--olive)" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M15 88 C 35 75, 28 55, 45 50 C 62 45, 55 28, 72 22 C 78 19.5, 83 17, 80 15" fill="none" stroke="var(--sand)" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1 8"/>
+            <circle cx="80" cy="15" r="2.4" fill="var(--sand)"/>
+          </svg>
+          <p class="pullquote">
+            Nicht das Extreme gewinnt. Sondern das, was zu Dir passt
+            und was Du kontinuierlich in Dein Leben integrieren kannst.
+          </p>
+        </div>
 
         <p>
           Deshalb steht bei mir am Anfang immer eine ehrliche Ist-Analyse. Denn nur
