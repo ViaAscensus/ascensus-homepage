@@ -257,6 +257,20 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 }
 .quote em{font-style:normal;color:var(--ink-60);display:block;margin-top:.7rem;font-size:.9rem}
 
+/* ---------- Stimmen ---------- */
+.reviews-grid{display:grid;gap:1.6rem;margin-top:2rem}
+@media(min-width:760px){.reviews-grid{grid-template-columns:repeat(2,1fr);gap:1.8rem}}
+.review{
+  border:1px solid var(--line);background:var(--paper);
+  padding:1.8rem 1.7rem;display:flex;flex-direction:column;gap:.9rem;
+}
+.review p{font-size:1rem;line-height:1.6;color:var(--ink)}
+.review-lead{font-weight:700;color:var(--olive);font-size:1.05rem}
+.review cite{
+  font-style:normal;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-40);margin-top:auto;padding-top:.4rem;
+}
+
 /* ---------- Über ---------- */
 .about-grid{display:grid;gap:2.6rem;align-items:start}
 @media(min-width:860px){.about-grid{grid-template-columns:340px 1fr;gap:4rem}}
@@ -1127,6 +1141,25 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
   </div>
 </a>
 <!-- WISSEN-ENDE -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ STIMMEN ============ -->
+<section id="stimmen">
+  <div class="wrap reveal">
+    <p class="eyebrow">Was Klienten sagen</p>
+    <h2>Keine Theorie — echte Veränderung</h2>
+    <div class="reviews-grid">
+      <blockquote class="review">
+        <p>„Nach jahrelangen Diäten habe ich dank der alltagstauglichen Beratung meine Ernährung endlich dauerhaft umgestellt. Keine strengen Verbote, sondern ein nachhaltiges Konzept, das perfekt in den Büroalltag passt. Jeden Cent wert!“</p>
+        <cite>Paul, 43 Jahre</cite>
+      </blockquote>
+      <blockquote class="review">
+        <p class="review-lead">Wissen statt starrer Regeln!</p>
+        <p>„Keine Pläne, keine Verbote: Statt starrer Vorgaben gab es echtes Verständnis für Ernährung. Die Anpassungen kamen ganz automatisch – auf manches verzichte ich heute völlig freiwillig, weil ich weiß, was meinem Körper guttut.“</p>
+        <cite>Laura, 38 Jahre</cite>
+      </blockquote>
     </div>
   </div>
 </section>
