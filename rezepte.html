@@ -70,8 +70,26 @@ h3 { font-size: 1.12rem; font-weight: 600; line-height: 1.35; color: var(--ink);
 section { padding: clamp(3.5rem, 7vw, 5.5rem) 0px; position: relative; }
 .intro { padding-bottom: 1rem; }
 
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Suchfeld */
+.search-bar { margin-top: 2.6rem; }
+.search-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+.search-input:focus { outline: none; border-color: var(--olive); }
+.search-input::placeholder { color: var(--ink-40); }
+
 /* Filter Bar */
-.filter-bar { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2.6rem; }
+.filter-bar { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.3rem; }
 .filter-btn { 
   padding: 0.6rem 1.3rem; 
   border: 1px solid var(--line); 
@@ -251,12 +269,22 @@ section { padding: clamp(3.5rem, 7vw, 5.5rem) 0px; position: relative; }
         Ausgewogene Gerichte mit Nährwertangaben — nachgekocht, nicht nur schön fotografiert.
         Passe die Portionen direkt an Deinen individuellen Bedarf an.
       </p>
+      <p class="lead" style="margin-top:1rem">
+        Diese Sammlung wächst laufend weiter — es kommen immer wieder neue Gerichte dazu.
+        Schau gerne regelmäßig vorbei.
+      </p>
     </div>
   </section>
 
   <!-- Rezepte Liste & Filter -->
   <section style="padding-top:0">
     <div class="wrap reveal in">
+
+      <!-- Suchfeld -->
+      <div class="search-bar">
+        <label for="rezept-suche" class="sr-only">Rezepte durchsuchen</label>
+        <input type="search" id="rezept-suche" class="search-input" placeholder="Rezept suchen, z. B. „Nudeln“ …" autocomplete="off">
+      </div>
 
       <!-- Filter Bar -->
       <div class="filter-bar" role="tablist" aria-label="Rezeptfilter">
@@ -899,34 +927,47 @@ section { padding: clamp(3.5rem, 7vw, 5.5rem) 0px; position: relative; }
   document.addEventListener("DOMContentLoaded", () => {
     // Menü, Header-Scroll-Linie & Jahreszahl übernimmt ascensus.js
 
-    // Interaktive Filter-Logik für Rezept-Kategorien
+    // Interaktive Filter- & Such-Logik für Rezept-Kategorien
     const filterBtns = document.querySelectorAll('.filter-btn');
     const posts = document.querySelectorAll('.post');
     const emptyMsg = document.getElementById('rezept-leer');
+    const suchfeld = document.getElementById('rezept-suche');
+    let aktiverFilter = 'alle';
+
+    function anwenden() {
+      const suchtext = suchfeld ? suchfeld.value.trim().toLowerCase() : '';
+      let visibleCount = 0;
+
+      posts.forEach(post => {
+        const cat = post.getAttribute('data-kategorie');
+        const passtKategorie = aktiverFilter === 'alle' || aktiverFilter === 'all' || cat === aktiverFilter;
+        const passtSuche = !suchtext || post.textContent.toLowerCase().includes(suchtext);
+
+        if (passtKategorie && passtSuche) {
+          post.style.display = 'flex';
+          visibleCount++;
+        } else {
+          post.style.display = 'none';
+        }
+      });
+
+      if (emptyMsg) {
+        emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    }
 
     filterBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         filterBtns.forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
-
-        const filter = btn.getAttribute('data-filter');
-        let visibleCount = 0;
-
-        posts.forEach(post => {
-          const cat = post.getAttribute('data-kategorie');
-          if (filter === 'alle' || filter === 'all' || cat === filter) {
-            post.style.display = 'flex';
-            visibleCount++;
-          } else {
-            post.style.display = 'none';
-          }
-        });
-
-        if (emptyMsg) {
-          emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
-        }
+        aktiverFilter = btn.getAttribute('data-filter');
+        anwenden();
       });
     });
+
+    if (suchfeld) {
+      suchfeld.addEventListener('input', anwenden);
+    }
   });
 </script>
 
