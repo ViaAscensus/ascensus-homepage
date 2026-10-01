@@ -269,8 +269,11 @@ for r in UNP:
         if abw:
             sev = max(abs((ist[i]-pp[i])/max(pp[i],ist[i],1)*100) for i in range(4))
             befund["naehrwert_abweichung"].append((name, rid, "; ".join(abw), sev, offen))
-        # Atwater-Gegenprobe auf den Rezeptwerten selbst
-        atw = 4*ist[0] + 4*ist[1] + 9*ist[2]
+        # Atwater-Gegenprobe auf den Rezeptwerten selbst. Ballaststoffe zaehlen
+        # nach Anhang XIV VO (EU) 1169/2011 mit 2 kcal/g mit - ohne das wird jedes
+        # ballaststoffreiche Rezept faelschlich als Widerspruch gemeldet, weil die
+        # Energie aus Eiweiss/Kohlenhydrat/Fett allein dann systematisch zu niedrig ist.
+        atw = 4*ist[0] + 4*ist[1] + 9*ist[2] + 2*(r["ballaststoffe"] or 0)
         if ist[3] and abs(atw - ist[3]) / max(ist[3], 1) * 100 > 20:
             befund["atwater"].append((name, rid, f'{ist[3]:g} kcal angegeben, Makros ergeben {atw:.0f} kcal ({(atw-ist[3])/ist[3]*100:+.0f} %)'))
     if offen:
