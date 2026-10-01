@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Auszeichnungen – ASCENSUS</title>
+<title>Badges – ASCENSUS</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="favicon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -41,9 +41,12 @@
     display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px;
   }
   .badge-tile{
-    background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 8px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    aspect-ratio: 1; background:#fff; border: 1px solid rgba(35,35,35,0.1); border-radius: 8px;
     padding: 20px 14px; text-align:center;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   }
+  .badge-tile:not(.gesperrt):hover{ border-color: var(--olive); box-shadow: 0 10px 24px rgba(35,35,35,0.08); transform: translateY(-2px); }
   .badge-tile.gesperrt{ opacity:0.5; }
   .badge-tile.hervorgehoben{ border-color: var(--olive); box-shadow: 0 0 0 2px var(--olive); transition: box-shadow 0.3s; }
   .badge-icon{
@@ -67,6 +70,7 @@
       <a class="asc-navlink" href="mitglieder-dashboard.html">Übersicht</a>
       <a class="asc-navlink" href="trainingsbuch.html">Trainingsbuch</a>
       <a class="asc-navlink" href="mitglieder-quiz.html">Quiz</a>
+      <a class="asc-navlink is-active" aria-current="page" href="mitglieder-badges.html">Badges</a>
       <a class="asc-navlink" href="mitglieder-profil.html">Profil</a>
       <button class="asc-btn asc-btn-secondary asc-nav-cta" type="button" data-asc-logout>Ausloggen</button>
     </nav>
@@ -78,7 +82,7 @@
 </header>
 
 <main>
-  <h1>Auszeichnungen</h1>
+  <h1>Badges</h1>
   <p class="sub" id="fortschrittSub"></p>
 
   <div class="tabs">
@@ -192,8 +196,8 @@
       grid.style.display = 'none';
       hinweis.style.display = '';
       hinweis.textContent = aktiverTab === 'erhalten'
-        ? 'Noch keine Auszeichnung erhalten – mach Dein erstes Wochen-Quiz!'
-        : 'Alle Auszeichnungen erreicht – stark!';
+        ? 'Noch kein Badge erhalten – mach Dein erstes Wochen-Quiz!'
+        : 'Alle Badges erreicht – stark!';
     } else {
       grid.style.display = '';
       hinweis.style.display = 'none';
