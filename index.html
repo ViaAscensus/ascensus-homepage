@@ -175,10 +175,10 @@ p{max-width:62ch}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
 /* Oben knapper als unten: Überschrift rückt näher an den vorherigen
    Abschnitt, statt mittig in viel Leerraum zu schweben. */
-section{padding:clamp(2.4rem,5vw,4rem) 0 clamp(2.6rem,5.5vw,4.4rem);position:relative}
+section{padding:clamp(1.8rem,3.8vw,3rem) 0 clamp(2rem,4.2vw,3.4rem);position:relative}
 /* Kurze Übergangs-/Teaser-Abschnitte brauchen nicht so viel Luft wie
    inhaltsschwere Sections — sonst atmet alles gleich laut. */
-section.section-tight{padding:clamp(1.8rem,3.5vw,2.8rem) 0 clamp(2rem,4vw,3.2rem)}
+section.section-tight{padding:clamp(1.3rem,2.6vw,2.1rem) 0 clamp(1.5rem,3vw,2.4rem)}
 .rule{height:1px;background:var(--line);border:0;max-width:var(--maxw);margin:0 auto}
 
 /* ---------- Signature: der Weg ---------- */
@@ -217,7 +217,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 /* ---------- Hero ---------- */
 .hero{
   padding-top:clamp(3.5rem,8vw,6rem);
-  padding-bottom:clamp(2.6rem,5.5vw,4.4rem);
+  padding-bottom:clamp(2rem,4.2vw,3.4rem);
   position:relative;overflow:hidden;
 }
 .contours{
@@ -227,7 +227,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .hero .wrap{position:relative;z-index:1}
 .hero h1{max-width:16ch}
 .hero .lead{margin-top:1.6rem;max-width:52ch}
-.hero-cta{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:2.4rem}
+.hero-cta{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:1.8rem}
 .hero-note{
   margin-top:1.5rem;font-size:.82rem;color:var(--ink-40);letter-spacing:.02em;
 }
@@ -242,14 +242,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 
 .slogan{
   display:flex;gap:1.1rem;flex-wrap:wrap;align-items:center;
-  margin-top:3.5rem;padding-top:1.6rem;border-top:1px solid var(--line);
+  margin-top:2.6rem;padding-top:1.3rem;border-top:1px solid var(--line);
   font-size:.76rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--olive);
 }
 .slogan span:nth-child(even){color:var(--sand)}
 
 /* ---------- Wiedererkennung ---------- */
 .mirror{background:var(--paper)}
-.quotes{display:grid;gap:1.6rem;margin-top:2.6rem}
+.quotes{display:grid;gap:1.6rem;margin-top:2rem}
 @media(min-width:760px){.quotes{grid-template-columns:repeat(3,1fr);gap:2rem}}
 .quote{
   border-left:2px solid var(--sand);padding:.2rem 0 .2rem 1.4rem;
@@ -290,7 +290,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 
 /* ---------- Ablauf ---------- */
 .steps{background:var(--paper)}
-.step-list{margin-top:3rem;display:grid;gap:0}
+.step-list{margin-top:2.2rem;display:grid;gap:0}
 .step{
   display:grid;gap:.4rem 1.8rem;padding:1.8rem 0;border-top:1px solid var(--line);
   grid-template-columns:auto 1fr;align-items:start;
@@ -303,7 +303,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .step p{margin-top:.45rem;color:var(--ink-60);font-size:.97rem}
 
 /* ---------- Pakete ---------- */
-.plans{display:grid;gap:1.5rem;margin-top:3rem}
+.plans{display:grid;gap:1.5rem;margin-top:2.2rem}
 @media(min-width:900px){
   .plans{grid-template-columns:repeat(3,1fr);gap:1.5rem;align-items:end}
 }
@@ -342,11 +342,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
   margin-top:-.7rem;margin-bottom:1.1rem;
 }
 .plans-note{
-  margin-top:2.4rem;font-size:.86rem;color:var(--ink-40);max-width:56ch;
+  margin-top:1.8rem;font-size:.86rem;color:var(--ink-40);max-width:56ch;
 }
 
 /* ---------- Betreuungs-Vergleich ---------- */
-.support-table{margin-top:3.4rem}
+.support-table{margin-top:2.5rem}
 .st-head,.up-head{
   font-size:.98rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
   color:var(--olive);margin-bottom:1.3rem;
@@ -395,7 +395,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 
 /* ---------- Upgrades ---------- */
 .upgrade{
-  margin-top:3.4rem;padding-top:2.6rem;border-top:1px solid var(--line);
+  margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--line);
 }
 .up-intro{font-size:.96rem;color:var(--ink-60);max-width:62ch;margin-bottom:2rem}
 .up-grid{display:grid;gap:1.2rem}
@@ -415,7 +415,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .up-item p{font-size:.9rem;color:var(--ink-60);margin:0}
 
 /* ---------- Coming soon ---------- */
-.soon-grid{display:grid;gap:1.5rem;margin-top:2.8rem}
+.soon-grid{display:grid;gap:1.5rem;margin-top:2.1rem}
 @media(min-width:800px){.soon-grid{grid-template-columns:repeat(2,1fr)}}
 .soon{
   background:var(--paper);border:1px dashed var(--line);
@@ -453,7 +453,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 
 /* ---------- Ablauf im Detail (Akkordeon) ---------- */
 .detail{background:var(--paper)}
-.accordion{margin-top:2.8rem;border-top:1px solid var(--line)}
+.accordion{margin-top:2.1rem;border-top:1px solid var(--line)}
 .accordion details{border-bottom:1px solid var(--line)}
 .accordion summary{
   display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;
@@ -533,7 +533,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .call-box .btn{width:100%;justify-content:center}
 
 /* ---------- Kontakt ---------- */
-.contact-grid{display:grid;gap:2.5rem;margin-top:2.6rem}
+.contact-grid{display:grid;gap:2.5rem;margin-top:2rem}
 @media(min-width:760px){.contact-grid{grid-template-columns:repeat(2,1fr);gap:3rem}}
 .contact-list{list-style:none}
 .contact-list li{padding:1rem 0;border-bottom:1px solid var(--line)}
@@ -549,7 +549,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .contact-list a:hover{border-bottom-color:var(--sand)}
 
 /* ---------- FAQ ---------- */
-.faq-list{margin-top:2.6rem;max-width:74ch}
+.faq-list{margin-top:2rem;max-width:74ch}
 .faq-item{border-bottom:1px solid var(--line)}
 .faq-item:first-child{border-top:1px solid var(--line)}
 .faq-item summary{
@@ -573,7 +573,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
   color:var(--olive);text-decoration:none;white-space:nowrap;
 }
 .wissen-all:hover{text-decoration:underline;text-underline-offset:4px}
-.post-grid{display:grid;gap:1.5rem;margin-top:2.4rem}
+.post-grid{display:grid;gap:1.5rem;margin-top:1.8rem}
 @media(min-width:720px){.post-grid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:1000px){.post-grid{grid-template-columns:repeat(3,1fr)}}
 .post{
