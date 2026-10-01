@@ -46,15 +46,23 @@
   .badge-preview-titel{ font-size:0.7rem; font-weight:600; line-height:1.3; }
   .badges-preview-link{ font-size:0.82rem; color: var(--olive); text-decoration:none; font-weight:600; }
 
-  .modules{ display:flex; flex-direction:column; gap:12px; }
+  .modules{ display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
   .module{
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 20px 22px; background:#fff; border: 1px solid rgba(35,35,35,0.1);
-    border-radius: 4px; text-decoration:none; color: var(--anthrazit);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    aspect-ratio: 1; padding: 18px; background:#fff; border: 1px solid rgba(35,35,35,0.1);
+    border-radius: 8px; text-decoration:none; color: var(--anthrazit); text-align:center;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   }
+  .module:hover{ border-color: var(--olive); box-shadow: 0 10px 24px rgba(35,35,35,0.08); transform: translateY(-2px); }
   .module.disabled{ opacity:0.55; pointer-events:none; }
-  .module-name{ font-weight:600; font-size:1rem; }
-  .module-status{ font-size:0.8rem; color: var(--sand); text-transform:uppercase; letter-spacing:1px; }
+  .module-icon{
+    width:52px; height:52px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+    background: var(--offwhite); border: 2px solid var(--sand);
+  }
+  .module-name{ font-weight:700; font-size:0.92rem; }
+  .module-status{ font-size:0.72rem; color: var(--olive); text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+  @media (max-width: 420px){ .modules{ grid-template-columns: 1fr 1fr; gap:10px; } .module{ padding:14px; } }
 </style>
 </head>
 <body>
@@ -66,6 +74,7 @@
       <a class="asc-navlink is-active" aria-current="page" href="mitglieder-dashboard.html">Übersicht</a>
       <a class="asc-navlink" href="trainingsbuch.html">Trainingsbuch</a>
       <a class="asc-navlink" href="mitglieder-quiz.html">Quiz</a>
+      <a class="asc-navlink" href="mitglieder-badges.html">Badges</a>
       <a class="asc-navlink" href="mitglieder-profil.html">Profil</a>
       <button class="asc-btn asc-btn-secondary asc-nav-cta" type="button" data-asc-logout>Ausloggen</button>
     </nav>
@@ -82,23 +91,27 @@
 
   <div class="badges-preview" id="badgesPreview" style="display:none;">
     <div class="badges-preview-row" id="badgesPreviewRow"></div>
-    <a class="badges-preview-link" href="mitglieder-badges.html">Alle Auszeichnungen ansehen →</a>
+    <a class="badges-preview-link" href="mitglieder-badges.html">Alle Badges ansehen →</a>
   </div>
 
   <div class="modules">
     <a href="trainingsbuch.html" class="module">
+      <span class="module-icon">📘</span>
       <span class="module-name">Trainingsbuch</span>
       <span class="module-status">Öffnen</span>
     </a>
     <a href="mitglieder-quiz.html" class="module">
+      <span class="module-icon">🧩</span>
       <span class="module-name">Wochen-Quiz</span>
       <span class="module-status">Öffnen</span>
     </a>
     <a href="mitglieder-badges.html" class="module">
-      <span class="module-name">Auszeichnungen</span>
+      <span class="module-icon">🏅</span>
+      <span class="module-name">Badges</span>
       <span class="module-status">Öffnen</span>
     </a>
     <a href="mitglieder-profil.html" class="module">
+      <span class="module-icon">👤</span>
       <span class="module-name">Mein Profil</span>
       <span class="module-status">Öffnen</span>
     </a>
@@ -158,7 +171,7 @@
     window.location.href = 'mitglieder-login.html';
   });
 
-  // ---------- Quiz-Fortschritt: Vorschau der zuletzt erhaltenen Auszeichnungen ----------
+  // ---------- Quiz-Fortschritt: Vorschau der zuletzt erhaltenen Badges ----------
   // Gleiche Badge-Definitionen wie auf mitglieder-badges.html – bei neuen Badge-Typen dort UND hier ergänzen.
   const BADGE_DEFS = {
     erste_woche: { icon: '🎯', titel: 'Erste Woche' },
