@@ -78,7 +78,7 @@ Drei Entscheidungen darin sind nicht beliebig:
   Endung — erbt `no-cache`. Eine Regel nur für `\.html$` würde die Startseite
   und endungslose URLs verfehlen, weil die in `location /` landen.
 - **Bilder ohne `immutable`.** Rezeptfotos heißen nach dem Rezept
-  (`rezept-weiberpasta.jpg`); erzeugt n8n eines neu, trägt es denselben Namen.
+  (`rezept-brokkoli-pasta.jpg`); erzeugt n8n eines neu, trägt es denselben Namen.
   Mit `immutable` fragt der Browser nie wieder nach und zeigt dauerhaft das
   alte Bild.
 - **CSS und JS nur eine Stunde.** `ascensus.css` trägt keinen Inhalts-Hash im
