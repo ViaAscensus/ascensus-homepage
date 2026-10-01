@@ -1,9 +1,15 @@
 # Prüfbericht: 478 unveröffentlichte Rezepte
 
-Stand 01.10.2026 · Quelle `pb.ascensus.fit` · geprüft wurden alle 506 `rezepte`-Datensätze
-abzüglich der 28 in `tools/slug-map.json`. Grundlage ist der aktuelle Code-Stand von
-`tools/pruefe-rezepte.py` inklusive der heutigen Atwater-Erweiterung (Ballaststoffe
-2 kcal/g, Fruchtsäuren 3 kcal/g nach Anhang XIV VO (EU) 1169/2011).
+Stand 01.10.2026 (aktualisiert) · Quelle `pb.ascensus.fit` · geprüft wurden alle 506
+`rezepte`-Datensätze abzüglich der 28 in `tools/slug-map.json`. Grundlage ist der aktuelle
+Code-Stand von `tools/pruefe-rezepte.py` inklusive der heutigen Atwater-Erweiterung
+(Ballaststoffe 2 kcal/g, Fruchtsäuren 3 kcal/g nach Anhang XIV VO (EU) 1169/2011).
+
+**Nachtrag vom selben Tag:** Die 44 Rezepte unter „Ballaststoffreich ohne Datenbasis" (siehe
+vorherige Fassung dieses Berichts) sind erledigt — Ballaststoffwerte je Zutat aus
+`naehrwerte_bls` nachgerechnet und ins Rezept geschrieben. Bei allen 44 bestätigt sich das
+Tag (durchweg deutlich über der 5-g-Schwelle, 7,4 bis 35,7 g/Portion), keines musste entfernt
+werden. Offen bleibt damit nur noch der Grüner-Spargel-Befund unten.
 
 ## Was sich seit dem letzten Bericht (28.09.2026) geändert hat
 
@@ -33,75 +39,82 @@ den alten vollständig, nicht nur in den Zahlen.
 
 | Fehlerklasse | Anzahl | Wirkung |
 |---|---|---|
-| Ballaststoffreich ohne Datenbasis | **44** | Tag nicht verifizierbar |
 | Zutatenzeile: Makros ergeben mehr kcal als eingetragen | **2** | Einzelwert prüfen |
-| Alles andere (Tags, Allergene, Vollständigkeit, Rezept-Nährwerte, Dubletten) | **0** | — |
+| Alles andere (Tags, Allergene, Vollständigkeit, Rezept-Nährwerte, Ballaststoffreich, Dubletten) | **0** | — |
 
-Das sind insgesamt zwei offene Punkte, beide bereits aus früheren Ständen bekannt und beide
-strukturell bedingt, nicht neu entstanden.
+Nur noch ein offener Punkt, bereits aus früheren Ständen bekannt und strukturell bedingt,
+nicht neu entstanden.
 
-### Ballaststoffreich ohne Datenbasis — 44
+### Ballaststoffreich — erledigt (vormals 44 ohne Datenbasis)
 
-Diese 44 Rezepte tragen das Tag „Ballaststoffreich", aber `ballaststoffe` steht bei allen
-unveröffentlichten Rezepten auf 0 und die Zutatenzeilen führen ebenfalls keine Ballaststoffe
-— eine Gegenrechnung ist nicht möglich. Das Tag ist damit weder bestätigt noch widerlegt,
-nur nicht prüfbar. `tools/berechne-tags.py` lässt es deshalb bewusst unberührt.
+Die 44 Rezepte mit dem Tag „Ballaststoffreich" hatten bis heute `ballaststoffe = 0` und
+keine Ballaststoffwerte in den Zutatenzeilen — nicht prüfbar. Nachgerechnet aus
+`naehrwerte_bls` (Feld `FIBT`, je Zutat mit der eingetragenen Menge multipliziert, durch
+Portionen geteilt) bestätigt sich das Tag bei **allen 44** — niedrigster Wert 7,4 g/Portion,
+höchster 35,7 g/Portion, alle deutlich über der 5-g-Schwelle. Kein einziges musste korrigiert
+werden.
 
-<details><summary>Alle 44 Rezepte</summary>
+<details><summary>Alle 44 Rezepte mit nachgerechnetem Wert</summary>
 
-| Rezept |
-|---|
-| Asia-Bowl mit Hähnchen |
-| Asiatische Gemüse-Pfanne mit Hähnchen |
-| Asiatische Gemüse-Reis-Pfanne mit Hähnchen |
-| Asiatisches Gemüse mit Tofu-Streifen |
-| Beerige Baked Oats |
-| Beerige Overnight Oats |
-| Blattsalat mit Süßkartoffel |
-| Bowl mit gegrillten Garnelen |
-| Brokkoli-Mandel-Bowl mit Zitronen-Dressing |
-| Buchweizen Spaghetti mit Gemüse und Rührei |
-| Buchweizen-Linsen Pasta mit Gemüse |
-| Buchweizen-Spaghetti-Paprika Pfanne mit Ei |
-| Bunter Quinoa-Salat mit Schafskäse |
-| Bunter Raddichio Salat |
-| Carrot Cake Baked Oats |
-| Cheesecake Overnight Oats mit körnigem Frischkäse |
-| Cremige Linsen-Pasta - Vegan |
-| Cremige Pasta mit Lauch und Tomate |
-| Cremige Pasta mit Lauch und Tomate - Vegan |
-| Gebratene Hähnchenbrust mit griechischem Salat |
-| Gelbes Curry |
-| Gemüse-Linsen-Kokos Pfanne |
-| Gemüse-Quinoa-One Pot mit Kalbsleber |
-| Gemüse-Sesam-Pfanne mit Tofu |
-| Glasnudelsalat mit Tempeh |
-| Gnocchi-Pfanne mit Lachs und Tomate |
-| Gnocchi-Pfanne mit Linsenbratlingen |
-| Green Smoothie-Bowl |
-| Kichererbsen-Curry |
-| Kichererbsen-Dal mit Hirse |
-| Kichererbsen-Paprika Pfanne mit Kartoffelpüree |
-| Kichererbsen-Paprika-Garnelen Pfanne mit Kartoffelpüree |
-| Kokos-Chia-Pudding |
-| Linsenragout mit Zucchini und Tofu |
-| Nudelsalat |
-| Pancakes - Glutenfrei |
-| Reis-Süßkartoffel-Pfanne mit Tofu |
-| Rote Linsen Dal |
-| Schoko-Kokos Porridge |
-| Schoko-Kokos Porridge (proteinreicher) |
-| Schoko-Kokos Porridge (proteinreicher) - Vegan |
-| Süßer Karotte-Zucchini Porridge |
-| Very Berry Smoothie Bowl |
-| Winterliche Bowl mit Kürbis |
+| Rezept | Ballaststoffe/Portion |
+|---|---|
+| Asia-Bowl mit Hähnchen | 10,9 g |
+| Asiatische Gemüse-Pfanne mit Hähnchen | 12,3 g |
+| Asiatische Gemüse-Reis-Pfanne mit Hähnchen | 9,5 g |
+| Asiatisches Gemüse mit Tofu-Streifen | 11,0 g |
+| Beerige Baked Oats | 11,9 g |
+| Beerige Overnight Oats | 16,3 g |
+| Blattsalat mit Süßkartoffel | 10,6 g |
+| Bowl mit gegrillten Garnelen | 24,8 g |
+| Brokkoli-Mandel-Bowl mit Zitronen-Dressing | 12,6 g |
+| Buchweizen Spaghetti mit Gemüse und Rührei | 14,8 g |
+| Buchweizen-Linsen Pasta mit Gemüse | 21,0 g |
+| Buchweizen-Spaghetti-Paprika Pfanne mit Ei | 10,9 g |
+| Bunter Quinoa-Salat mit Schafskäse | 7,4 g |
+| Bunter Raddichio Salat | 11,2 g |
+| Carrot Cake Baked Oats | 10,2 g |
+| Cheesecake Overnight Oats mit körnigem Frischkäse | 14,6 g |
+| Cremige Linsen-Pasta - Vegan | 15,5 g |
+| Cremige Pasta mit Lauch und Tomate | 10,1 g |
+| Cremige Pasta mit Lauch und Tomate - Vegan | 12,8 g |
+| Gebratene Hähnchenbrust mit griechischem Salat | 11,8 g |
+| Gelbes Curry | 13,0 g |
+| Gemüse-Linsen-Kokos Pfanne | 20,8 g |
+| Gemüse-Quinoa-One Pot mit Kalbsleber | 12,8 g |
+| Gemüse-Sesam-Pfanne mit Tofu | 13,8 g |
+| Glasnudelsalat mit Tempeh | 16,0 g |
+| Gnocchi-Pfanne mit Lachs und Tomate | 10,9 g |
+| Gnocchi-Pfanne mit Linsenbratlingen | 10,2 g |
+| Green Smoothie-Bowl | 15,9 g |
+| Kichererbsen-Curry | 27,1 g |
+| Kichererbsen-Dal mit Hirse | 22,1 g |
+| Kichererbsen-Paprika Pfanne mit Kartoffelpüree | 35,7 g |
+| Kichererbsen-Paprika-Garnelen Pfanne mit Kartoffelpüree | 26,2 g |
+| Kokos-Chia-Pudding | 11,0 g |
+| Linsenragout mit Zucchini und Tofu | 13,0 g |
+| Nudelsalat | 21,4 g |
+| Pancakes - Glutenfrei | 10,0 g |
+| Reis-Süßkartoffel-Pfanne mit Tofu | 12,4 g |
+| Rote Linsen Dal | 25,8 g |
+| Schoko-Kokos Porridge | 24,0 g |
+| Schoko-Kokos Porridge (proteinreicher) | 18,0 g |
+| Schoko-Kokos Porridge (proteinreicher) - Vegan | 18,5 g |
+| Süßer Karotte-Zucchini Porridge | 11,3 g |
+| Very Berry Smoothie Bowl | 21,9 g |
+| Winterliche Bowl mit Kürbis | 35,4 g |
 
 </details>
 
-**Lösung liegt außerhalb dieses Prüfers**: Ballaststoffwerte müssten je Zutat in PocketBase
-nachgetragen werden (z. B. aus `naehrwerte_bls`, Feld `FIBT`, wie es heute für die 4 Getränke
-unter D unten gemacht wurde). Das wäre eine eigene, größere Aktion über alle Zutaten hinweg,
-nicht nur diese 44 Rezepte.
+Bei den beiden höchsten Werten (Kichererbsen-Paprika Pfanne 35,7 g, Winterliche Bowl mit
+Kürbis 35,4 g) steckt die Menge in großen Mengen roher/trockener Hülsenfrüchte (180 g
+Kichererbsen bzw. 125 g Kidneybohnen, jeweils `portionen: 1`) — rechnerisch korrekt, aber an
+der oberen Grenze dessen, was in einer Portion plausibel ist. Nicht Teil dieser Prüfung, aber
+der Hinweis gehört hierher, falls die Portionsgröße selbst noch mal geprüft werden soll.
+
+Nicht in PocketBase gespeichert ist der Ballaststoffwert je Zutat (nur das Rezept-Aggregat) —
+anders als bei den Haupt-Nährwerten gibt es dafür kein Feld in `zutaten`. Eine künftige
+Gegenrechnung „Summe der Zeilen" wie bei kcal/Eiweiß/Kohlenhydrat/Fett ist für Ballaststoffe
+deshalb nicht möglich, ohne das Datenmodell zu erweitern.
 
 ### Zutatenzeile: Makros ergeben mehr kcal als eingetragen — 2
 
@@ -133,11 +146,10 @@ Was zwischen `status: neu` (50 Datensätze) und der Veröffentlichung steht, ist
 Wesentlichen nur noch die inhaltliche Prüfung selbst (Regel 1 aus `CLAUDE.md`) — nicht mehr
 eine Liste bekannter Datenfehler, die vorher abgearbeitet werden müsste.
 
-Offen bleiben die beiden Punkte oben, beide nicht kurzfristig lösbar:
+Offen bleibt nur noch:
 
-1. **Ballaststoffreich bei 44 Rezepten** bleibt unprüfbar, bis es eine Datenquelle für
-   Ballaststoffe je Zutat gibt.
-2. **Grüner Spargel** in 2 Rezepten hat eine unplausible Nährwertzeile — betrifft nur die
-   beiden genannten Rezepte, kein systematisches Problem.
+- **Grüner Spargel** in 2 Rezepten hat eine unplausible Nährwertzeile — betrifft nur die
+  beiden genannten Rezepte, kein systematisches Problem.
 
-Ich habe für diesen Bericht nichts an den Daten verändert — nur gelesen und ausgewertet.
+Für den Ballaststoffreich-Nachtrag habe ich die 44 Rezepte in PocketBase geschrieben
+(`ballaststoffe`-Feld), sonst nichts an den Daten verändert — nur gelesen und ausgewertet.
