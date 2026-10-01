@@ -143,11 +143,21 @@ nachgetragen wurden.
 
 Der Bestand ist strukturell sauber: keine Tag-Widersprüche, keine fehlenden Allergene, keine
 leeren Rubriken, keine Dubletten, keine Rezepte ohne Zutaten/Schritte/Zeit, keine
-Nährwert-Widersprüche mehr. Was zwischen `status: neu` (50 Datensätze) und der
-Veröffentlichung steht, ist damit ausschließlich noch die inhaltliche Prüfung selbst
-(Regel 1 aus `CLAUDE.md`) — keine Liste bekannter Datenfehler mehr, die vorher abgearbeitet
-werden müsste.
+Nährwert-Widersprüche mehr.
+
+**Nachtrag:** Die 50 Rezepte, die noch auf `status: neu` standen, wurden danach inhaltlich
+gelesen (nicht nur automatisiert geprüft — Regel 1 verlangt mehr) und stehen jetzt auf
+`geprueft`. Dabei kamen sieben konkrete, vom automatischen Check nicht erfasste Lücken heraus:
+zwei in der Zubereitung verwendete, aber nie im Zutatenfeld stehende Zutaten (Kurkuma, Kurkuma-
+Zitrone-Ingwer Shot; Limettensaft, Glasnudelsalat mit Tempeh), fehlende Gemüsebrühe in beiden
+Gnocchi-Pfannen, fehlende Maisstärke in der Asiatischen Gemüse-Reis-Pfanne, eine Frühlingszwiebel
+mit `menge = 0` trotz Verwendung (Nudelsalat), und ein als Fließtext-Rest in den Vorgänger
+gerutschter Zubereitungsschritt (Rote Linsen Dal). Alle sieben behoben, Details dazu in
+`CLAUDE.md` unter „Offene Punkte". Damit ist der komplette Bestand (506 Rezepte) auf
+`status: geprueft`, und `pruefe-rezepte.py` meldet für beide Bestände (veröffentlicht und
+unveröffentlicht) 0 Befunde.
 
 Für die Nachträge habe ich in PocketBase geschrieben: `ballaststoffe` bei den 44
 Ballaststoffreich-Rezepten, die Zutatenzeile und die Rezeptsumme bei den beiden
-Grüner-Spargel-Rezepten. Sonst nichts an den Daten verändert — nur gelesen und ausgewertet.
+Grüner-Spargel-Rezepten, die sieben oben genannten Korrekturen, und zuletzt `status` bei
+den 50 Rezepten. Sonst nichts an den Daten verändert.
