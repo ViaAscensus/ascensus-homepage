@@ -5,11 +5,12 @@ Stand 01.10.2026 (aktualisiert) · Quelle `pb.ascensus.fit` · geprüft wurden a
 Code-Stand von `tools/pruefe-rezepte.py` inklusive der heutigen Atwater-Erweiterung
 (Ballaststoffe 2 kcal/g, Fruchtsäuren 3 kcal/g nach Anhang XIV VO (EU) 1169/2011).
 
-**Nachtrag vom selben Tag:** Die 44 Rezepte unter „Ballaststoffreich ohne Datenbasis" (siehe
+**Nachträge vom selben Tag:** Die 44 Rezepte unter „Ballaststoffreich ohne Datenbasis" (siehe
 vorherige Fassung dieses Berichts) sind erledigt — Ballaststoffwerte je Zutat aus
 `naehrwerte_bls` nachgerechnet und ins Rezept geschrieben. Bei allen 44 bestätigt sich das
 Tag (durchweg deutlich über der 5-g-Schwelle, 7,4 bis 35,7 g/Portion), keines musste entfernt
-werden. Offen bleibt damit nur noch der Grüner-Spargel-Befund unten.
+werden. Danach auch der Grüner-Spargel-Befund korrigiert (siehe unten) — **der Bestand steht
+damit bei 0 Befunden.**
 
 ## Was sich seit dem letzten Bericht (28.09.2026) geändert hat
 
@@ -37,13 +38,9 @@ den alten vollständig, nicht nur in den Zahlen.
 
 ## Aktueller Befund
 
-| Fehlerklasse | Anzahl | Wirkung |
-|---|---|---|
-| Zutatenzeile: Makros ergeben mehr kcal als eingetragen | **2** | Einzelwert prüfen |
-| Alles andere (Tags, Allergene, Vollständigkeit, Rezept-Nährwerte, Ballaststoffreich, Dubletten) | **0** | — |
-
-Nur noch ein offener Punkt, bereits aus früheren Ständen bekannt und strukturell bedingt,
-nicht neu entstanden.
+**0 von 478 unveröffentlichten Rezepten haben noch einen Befund.** Tags, Allergene,
+Vollständigkeit, Rezept-Nährwerte, Ballaststoffreich, Dubletten und die
+Zutaten-Plausibilität (Atwater) sind durchweg sauber.
 
 ### Ballaststoffreich — erledigt (vormals 44 ohne Datenbasis)
 
@@ -116,20 +113,24 @@ anders als bei den Haupt-Nährwerten gibt es dafür kein Feld in `zutaten`. Eine
 Gegenrechnung „Summe der Zeilen" wie bei kcal/Eiweiß/Kohlenhydrat/Fett ist für Ballaststoffe
 deshalb nicht möglich, ohne das Datenmodell zu erweitern.
 
-### Zutatenzeile: Makros ergeben mehr kcal als eingetragen — 2
+### Grüner Spargel — erledigt (vormals 2 Treffer bei der Zutaten-Plausibilität)
 
-Geprüft wird nur der Überschuss: ein Minus erklären Ballaststoffe und Zuckeralkohole
-(Erythrit 0 kcal/g, Xylit 2,4 statt 4 — beide von der Prüfung ausgenommen), ein Plus nicht.
-Beide verbliebenen Treffer betreffen dasselbe Lebensmittel:
+Zwei Zutatenzeilen hatten Makros, die mehr kcal ergeben als eingetragen (Grüner Spargel mit
+Hähnchen und Curry: 44 kcal angegeben, Makros ergaben 64; Quinoasalat mit grünem Spargel,
+Kichererbsen und Walnüssen: 33 kcal angegeben, Makros ergaben 47). Beide Zeilen trugen
+offensichtlich falsche Werte — 200 g bzw. 150 g „Grüner Spargel" mit 44 bzw. 33 kcal wären
+22 kcal/100 g gewesen, aber mit Protein- und Fettanteilen, die dazu nicht passten (4 g Eiweiß
+und 4 g Fett auf 200 g Spargel ist für das Gemüse zu viel).
 
-| Rezept | Befund |
+Mit `naehrwerte_bls` („Spargel roh", 28 kcal / 3,98 g K / 1,96 g E / 0,156 g F je 100 g)
+neu berechnet und in beide Rezepte geschrieben, Rezeptsummen entsprechend angepasst:
+
+| Rezept | kcal vorher → nachher |
 |---|---|
-| Grüner Spargel mit Hähnchen und Curry | Grüner Spargel: 44 kcal, Makros ergeben 64 kcal (+45 %) |
-| Quinoasalat mit grünem Spargel, Kichererbsen und Walnüssen | Grüner Spargel: 33 kcal, Makros ergeben 47 kcal (+42 %) |
+| Grüner Spargel mit Hähnchen und Curry | 386 → 397 kcal |
+| Quinoasalat mit grünem Spargel, Kichererbsen und Walnüssen | 639 → 649 kcal |
 
-Grüner Spargel hat real rund 20 kcal/100 g — die eingetragenen Makros (vermutlich mit weißem
-Spargel oder einer falschen Mengenbasis verwechselt) passen nicht dazu. Unverändert seit dem
-letzten Bericht, nicht Teil der heutigen Arbeit.
+Berechnete Tags wurden danach geprüft, keine Änderung nötig.
 
 ## Veröffentlichte Seiten: 28 von 28 sauber
 
@@ -140,16 +141,13 @@ nachgetragen wurden.
 
 ## Was das für die Veröffentlichung heißt
 
-Der Bestand ist strukturell in einem guten Zustand: keine Tag-Widersprüche, keine fehlenden
-Allergene, keine leeren Rubriken, keine Dubletten, keine Rezepte ohne Zutaten/Schritte/Zeit.
-Was zwischen `status: neu` (50 Datensätze) und der Veröffentlichung steht, ist damit im
-Wesentlichen nur noch die inhaltliche Prüfung selbst (Regel 1 aus `CLAUDE.md`) — nicht mehr
-eine Liste bekannter Datenfehler, die vorher abgearbeitet werden müsste.
+Der Bestand ist strukturell sauber: keine Tag-Widersprüche, keine fehlenden Allergene, keine
+leeren Rubriken, keine Dubletten, keine Rezepte ohne Zutaten/Schritte/Zeit, keine
+Nährwert-Widersprüche mehr. Was zwischen `status: neu` (50 Datensätze) und der
+Veröffentlichung steht, ist damit ausschließlich noch die inhaltliche Prüfung selbst
+(Regel 1 aus `CLAUDE.md`) — keine Liste bekannter Datenfehler mehr, die vorher abgearbeitet
+werden müsste.
 
-Offen bleibt nur noch:
-
-- **Grüner Spargel** in 2 Rezepten hat eine unplausible Nährwertzeile — betrifft nur die
-  beiden genannten Rezepte, kein systematisches Problem.
-
-Für den Ballaststoffreich-Nachtrag habe ich die 44 Rezepte in PocketBase geschrieben
-(`ballaststoffe`-Feld), sonst nichts an den Daten verändert — nur gelesen und ausgewertet.
+Für die Nachträge habe ich in PocketBase geschrieben: `ballaststoffe` bei den 44
+Ballaststoffreich-Rezepten, die Zutatenzeile und die Rezeptsumme bei den beiden
+Grüner-Spargel-Rezepten. Sonst nichts an den Daten verändert — nur gelesen und ausgewertet.
