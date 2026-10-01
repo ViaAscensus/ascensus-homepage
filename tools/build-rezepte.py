@@ -37,7 +37,7 @@ ZEIT_GRENZE = 60
 # "Hauptgericht"; kaeme die Unterscheidung zurueck, sind das hier zwei Zeilen.
 KATEGORIE = {"Fruehstueck":"Frühstück","Hauptgericht":"Hauptgericht",
              "Mittag":"Hauptgericht","Abendessen":"Hauptgericht",
-             "Snack":"Snack","Nachtisch":"Nachtisch","Grundrezept":"Grundrezept",
+             "Snack":"Snack & Süßes","Nachtisch":"Snack & Süßes","Grundrezept":"Grundrezept",
              "Vor dem Training":"Vor dem Training",
              "Nach dem Training":"Nach dem Training"}
 
