@@ -1,0 +1,80 @@
+[
+  {
+    "name": "bewertungen",
+    "type": "base",
+    "listRule": null,
+    "viewRule": null,
+    "createRule": "",
+    "updateRule": null,
+    "deleteRule": null,
+    "fields": [
+      {
+        "name": "sterne",
+        "type": "number",
+        "required": true,
+        "min": 1,
+        "max": 5,
+        "onlyInt": true
+      },
+      {
+        "name": "text",
+        "type": "text",
+        "required": true,
+        "min": 10,
+        "max": 2000
+      },
+      {
+        "name": "paket",
+        "type": "text",
+        "required": false,
+        "max": 100
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "required": false,
+        "max": 80
+      },
+      {
+        "name": "email",
+        "type": "email",
+        "required": false
+      },
+      {
+        "name": "oeffentlich",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "eingereicht_am",
+        "type": "date",
+        "required": false
+      },
+      {
+        "name": "formular",
+        "type": "text",
+        "required": false,
+        "max": 50
+      },
+      {
+        "name": "status",
+        "type": "select",
+        "required": false,
+        "maxSelect": 1,
+        "values": ["neu", "gelesen", "veroeffentlicht", "verworfen"]
+      },
+      {
+        "name": "created",
+        "type": "autodate",
+        "onCreate": true,
+        "onUpdate": false
+      },
+      {
+        "name": "updated",
+        "type": "autodate",
+        "onCreate": true,
+        "onUpdate": true
+      }
+    ]
+  }
+]
