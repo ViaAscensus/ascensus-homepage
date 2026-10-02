@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bewertung abgeben – ASCENSUS</title>
+<meta name="description" content="Wie war Deine Erfahrung mit ASCENSUS? Teile Dein Feedback – direkt mit Patrick oder öffentlich bei Google.">
+<link rel="canonical" href="https://ascensus.fit/bewertung.html">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
+<style>
+:root{
+  --olive:#556B4E;
+  --olive-dark:#3E5039;
+  --sand:#B59A5D;
+  --offwhite:#F5F3EE;
+  --paper:#FFFFFF;
+  --ink:#232323;
+  --ink-60:rgba(35,35,35,.68);
+  --ink-40:rgba(35,35,35,.45);
+  --line:rgba(85,107,78,.18);
+  --maxw:1140px;
+  --gut:clamp(1.5rem,5vw,4rem);
+  --err:#A4432F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--offwhite);
+  color:var(--ink);
+  font-family:'Inter','Inter var',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:17px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;flex-direction:column;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+.eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sand);margin-bottom:1rem;
+}
+h1{
+  font-size:clamp(1.9rem,4.8vw,2.7rem);
+  font-weight:200;letter-spacing:.03em;text-transform:uppercase;
+  line-height:1.15;color:var(--olive);margin-bottom:1.1rem;
+}
+h2{
+  font-size:.86rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--olive);margin-bottom:1rem;
+}
+p{max-width:62ch}
+.lead{font-size:1.04rem;line-height:1.65;color:var(--ink-60)}
+
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.92rem 1.7rem;border:1px solid var(--olive);
+  background:var(--olive);color:var(--offwhite);
+  font-size:.79rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;transition:background .25s,color .25s,transform .25s;
+  cursor:pointer;
+}
+.btn:hover{background:var(--olive-dark);border-color:var(--olive-dark);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--olive)}
+.btn-ghost:hover{background:var(--olive);color:var(--offwhite)}
+.btn-sand{background:var(--sand);border-color:var(--sand);color:#fff}
+.btn-sand:hover{background:#9c8449;border-color:#9c8449}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:2px solid var(--sand);outline-offset:3px;
+}
+
+/* ---------- Intro ---------- */
+.intro{padding:clamp(2.6rem,6vw,4rem) 0 clamp(1.6rem,3vw,2.2rem)}
+.intro .lead{margin-top:1.2rem;max-width:58ch}
+
+/* ---------- Formular ---------- */
+.formsec{padding:0 0 clamp(2.6rem,5vw,3.6rem)}
+.card{
+  background:var(--paper);border:1px solid var(--line);
+  padding:clamp(1.8rem,4vw,2.6rem);max-width:640px;
+}
+.field{margin-bottom:1.5rem}
+.field label{
+  display:block;font-size:.8rem;font-weight:600;letter-spacing:.04em;
+  color:var(--olive);margin-bottom:.5rem;
+}
+.field .opt{font-weight:400;color:var(--ink-40);text-transform:none;letter-spacing:0}
+.field input[type=text],
+.field input[type=email],
+.field select,
+.field textarea{
+  width:100%;padding:.8rem .9rem;border:1px solid var(--line);background:var(--offwhite);
+  font:inherit;color:var(--ink);
+}
+.field textarea{resize:vertical;min-height:7rem}
+.field input:invalid:not(:placeholder-shown){border-color:var(--err)}
+
+/* Sterne: echte Radiobuttons, nur optisch als Sterne dargestellt — per
+   Tastatur und Screenreader weiterhin ein normales Radio-Set. */
+.stars{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:.2rem}
+.stars input{position:absolute;opacity:0;width:1px;height:1px}
+.stars label{
+  width:2.4rem;height:2.4rem;cursor:pointer;color:var(--line);margin:0;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.stars label svg{width:100%;height:100%;fill:currentColor}
+.stars input:checked ~ label,
+.stars label:hover,
+.stars label:hover ~ label{color:var(--sand)}
+.stars-hint{margin-top:.5rem;font-size:.84rem;color:var(--ink-40)}
+
+.check{display:flex;align-items:flex-start;gap:.7rem;cursor:pointer}
+.check input{margin-top:.3rem;flex-shrink:0}
+.check span{font-size:.9rem;color:var(--ink-60);line-height:1.5}
+.check a{color:var(--olive);text-decoration:underline;text-underline-offset:2px}
+
+.err{display:none;color:var(--err);font-size:.84rem;margin-top:.4rem}
+.err.show{display:block}
+
+/* Spamschutz: für Menschen unsichtbar, nicht nur hidden-Attribut, damit
+   Formular-Bots, die hidden-Felder trotzdem ausfüllen, hier anschlagen. */
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+.status{margin-top:1.2rem;font-size:.9rem}
+.status.err-msg{color:var(--err)}
+.status.ok-msg{color:var(--olive)}
+
+/* ---------- Danke / Google-Einladung ---------- */
+/* Wird nach erfolgreichem Absenden gezeigt — unabhängig von der
+   Sternezahl, damit niemand von der öffentlichen Bewertung
+   ausgeschlossen wird (Google verbietet "Review-Gating": selektiv nur
+   zufriedene Kunden zu einer öffentlichen Bewertung einzuladen). */
+.done{display:none}
+.done.show{display:block}
+.done .mark{
+  width:52px;height:52px;border-radius:50%;background:var(--olive);
+  display:flex;align-items:center;justify-content:center;margin-bottom:1.3rem;
+}
+.done .mark svg{width:24px;height:24px}
+.done h2{font-size:1.2rem;letter-spacing:.02em;text-transform:none;margin-bottom:.8rem}
+.google-box{
+  margin-top:1.8rem;padding:1.6rem 1.5rem;border:1px solid var(--line);background:var(--offwhite);
+}
+.google-box p{font-size:.94rem;color:var(--ink-60);margin-bottom:1.1rem}
+.google-box .btn{width:100%;justify-content:center}
+
+@media(max-width:480px){
+  .card{padding:1.5rem 1.3rem}
+  .stars label{width:2.1rem;height:2.1rem}
+}
+</style>
+
+<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
+        BEVOR irgendetwas von Google geladen wird -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent-Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+  gtag('config', 'AW-18465350303');
+</script>
+</head>
+<body>
+
+<header class="asc-header" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="index.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <div class="asc-header-actions"><a class="asc-back" href="index.html">← Startseite</a></div>
+  </div>
+</header>
+
+<!-- ============ INTRO ============ -->
+<section class="intro">
+  <div class="wrap">
+    <p class="eyebrow">Dein Feedback</p>
+    <h1>Wie war Deine<br>Erfahrung mit mir?</h1>
+    <p class="lead">
+      Egal ob rundum zufrieden oder mit Luft nach oben — ich lese jede
+      Rückmeldung persönlich und nutze sie, um besser zu werden. Zwei Minuten
+      reichen.
+    </p>
+  </div>
+</section>
+
+<!-- ============ FORMULAR ============ -->
+<section class="formsec">
+  <div class="wrap">
+    <form id="form" class="card" novalidate>
+
+      <div class="field">
+        <label id="sterneLabel">Wie zufrieden warst Du insgesamt? *</label>
+        <div class="stars" role="radiogroup" aria-labelledby="sterneLabel">
+          <input type="radio" id="s5" name="sterne" value="5" required>
+          <label for="s5" title="5 von 5 Sternen"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8L12 17.8l-6.1 3.2 1.5-6.8-5.2-4.7 6.9-.7z"/></svg></label>
+          <input type="radio" id="s4" name="sterne" value="4">
+          <label for="s4" title="4 von 5 Sternen"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8L12 17.8l-6.1 3.2 1.5-6.8-5.2-4.7 6.9-.7z"/></svg></label>
+          <input type="radio" id="s3" name="sterne" value="3">
+          <label for="s3" title="3 von 5 Sternen"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8L12 17.8l-6.1 3.2 1.5-6.8-5.2-4.7 6.9-.7z"/></svg></label>
+          <input type="radio" id="s2" name="sterne" value="2">
+          <label for="s2" title="2 von 5 Sternen"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8L12 17.8l-6.1 3.2 1.5-6.8-5.2-4.7 6.9-.7z"/></svg></label>
+          <input type="radio" id="s1" name="sterne" value="1">
+          <label for="s1" title="1 von 5 Sternen"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8L12 17.8l-6.1 3.2 1.5-6.8-5.2-4.7 6.9-.7z"/></svg></label>
+        </div>
+        <p class="stars-hint">Zum Auswählen klicken oder mit Tab + Pfeiltasten erreichen.</p>
+        <span class="err" id="sterneErr">Bitte wähle eine Sternebewertung aus.</span>
+      </div>
+
+      <div class="field">
+        <label for="text">Was lief gut, was können wir besser machen? *</label>
+        <textarea id="text" name="text" required minlength="10" maxlength="2000"
+          placeholder="Erzähl mir von Deiner Erfahrung – je konkreter, desto mehr kann ich daraus lernen."></textarea>
+        <span class="err" id="textErr">Magst Du uns ein paar Worte dazu schreiben?</span>
+      </div>
+
+      <div class="field">
+        <label for="paket">Welches Programm hast Du gemacht? <span class="opt">(optional)</span></label>
+        <select id="paket" name="paket">
+          <option value="">Bitte wählen</option>
+          <option value="Das Fundament">Das Fundament</option>
+          <option value="Der Weg">Der Weg</option>
+          <option value="Die Nachhaltigkeit">Die Nachhaltigkeit</option>
+          <option value="Laufcoaching">Laufcoaching</option>
+          <option value="Erstgespräch">Nur Erstgespräch</option>
+          <option value="Sonstiges">Sonstiges</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="name">Dein Vorname <span class="opt">(optional)</span></label>
+        <input type="text" id="name" name="name" maxlength="80" autocomplete="given-name">
+      </div>
+
+      <div class="field">
+        <label for="email">Deine E-Mail <span class="opt">(optional – nur falls ich bei Rückfragen auf Dich zukommen soll)</span></label>
+        <input type="email" id="email" name="email" maxlength="200" autocomplete="email">
+      </div>
+
+      <div class="field">
+        <label class="check">
+          <input type="checkbox" id="oeffentlich" name="oeffentlich" value="ja">
+          <span>Ich bin einverstanden, dass diese Bewertung (ggf. gekürzt, mit Vorname) auf
+            ascensus.fit oder meinen Social-Media-Kanälen veröffentlicht werden darf.
+            Ohne Haken bleibt sie intern.</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label class="check">
+          <input type="checkbox" id="einwilligung" name="einwilligung" required>
+          <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung dieser Rückmeldung
+            gespeichert werden. Details in der <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung</a>.
+            Diese Einwilligung kann ich jederzeit per E-Mail widerrufen.</span>
+        </label>
+        <span class="err" id="consentErr">Ohne Deine Einwilligung kann ich die Angaben nicht verarbeiten.</span>
+      </div>
+
+      <!-- Spamschutz: für Menschen unsichtbar -->
+      <div class="hp" aria-hidden="true">
+        <label for="webseite">Bitte nicht ausfüllen</label>
+        <input type="text" id="webseite" name="webseite" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button type="submit" class="btn" id="send">Bewertung absenden</button>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </form>
+
+    <!-- ============ DANKE ============
+         Erscheint für JEDE abgeschickte Bewertung gleich, unabhängig von der
+         Sternezahl — siehe .done-Kommentar oben in den Styles. -->
+    <div class="card done" id="done">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#F5F3EE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h2>Danke Dir, <span id="doneName">das ist angekommen</span>.</h2>
+      <p class="lead" style="font-size:.96rem">
+        Ich lese jede Rückmeldung persönlich. Wenn Du etwas Konkretes brauchst,
+        melde ich mich direkt bei Dir.
+      </p>
+
+      <div class="google-box">
+        <p>
+          Magst Du Deine Erfahrung – so wie sie war – auch öffentlich bei Google
+          teilen? Das hilft anderen bei der Entscheidung, unabhängig davon, wie
+          Deine Bewertung ausfällt.
+        </p>
+        <!-- Google-Unternehmensprofil von ASCENSUS. Für einen Link, der den
+             Rezensions-Dialog direkt öffnet, in der Google Business Profile
+             Verwaltung unter "Rezensionen → Mehr Rezensionen erhalten" den
+             kurzen "g.page/r/…/review"-Link holen und hier eintragen. -->
+        <a class="btn btn-sand" href="https://share.google/cWRTctVhdSqGDD7yh" target="_blank" rel="noopener" onclick="gtag('event','google_bewertung_klick');">
+          Bei Google bewerten
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+          <li><a href="widerruf.html">Widerruf</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Datenschutzeinstellungen</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Mitglieder-Login →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+(function(){
+  var ENDPOINT = 'https://n8n.ascensus.fit/webhook/bewertung';
+
+  var form     = document.getElementById('form');
+  var sendBtn  = document.getElementById('send');
+  var status   = document.getElementById('status');
+  var done     = document.getElementById('done');
+  var opened   = Date.now();
+
+  function setErr(id, show){
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle('show', !!show);
+  }
+
+  function valid(){
+    var ok = true;
+    var hasStar = form.querySelector('input[name=sterne]:checked');
+    setErr('sterneErr', !hasStar); if (!hasStar) ok = false;
+
+    var text = document.getElementById('text');
+    var textOk = text.value.trim().length >= 10;
+    setErr('textErr', !textOk); if (!textOk) ok = false;
+
+    var consent = document.getElementById('einwilligung');
+    setErr('consentErr', !consent.checked); if (!consent.checked) ok = false;
+
+    return ok;
+  }
+
+  function collect(){
+    var data = {
+      sterne: Number(form.querySelector('input[name=sterne]:checked').value),
+      text: document.getElementById('text').value.trim(),
+      paket: document.getElementById('paket').value,
+      name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      oeffentlich: document.getElementById('oeffentlich').checked,
+      eingereicht_am: new Date().toISOString(),
+      formular: 'bewertung'
+    };
+    return data;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!valid()) return;
+
+    // Spamschutz: Honeypot + Mindestdauer
+    if (document.getElementById('webseite').value !== ''){ return; }
+    if (Date.now() - opened < 4000){
+      status.className = 'status err-msg';
+      status.textContent = 'Einen Moment noch — bitte versuch es gleich noch einmal.';
+      return;
+    }
+
+    sendBtn.disabled = true;
+    status.className = 'status';
+    status.textContent = 'Wird übermittelt …';
+
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(collect())
+    })
+    .then(function(res){
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var vorname = document.getElementById('name').value.trim();
+      document.getElementById('doneName').textContent = vorname ? vorname + ', das ist angekommen' : 'das ist angekommen';
+      form.hidden = true;
+      done.classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+    .catch(function(){
+      sendBtn.disabled = false;
+      status.className = 'status err-msg';
+      status.innerHTML = 'Die Übermittlung hat nicht geklappt. Bitte versuch es gleich noch ' +
+        'einmal, oder schreib mir direkt an <a href="mailto:patrick@ascensus.fit">' +
+        'patrick@ascensus.fit</a>.';
+    });
+  });
+})();
+</script>
+</body>
+</html>
