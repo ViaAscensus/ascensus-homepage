@@ -1,7 +1,9 @@
 [
   {
+    "id": "pbc_9448320237",
     "name": "bewertungen",
     "type": "base",
+    "system": false,
     "listRule": null,
     "viewRule": null,
     "createRule": "",
@@ -9,72 +11,152 @@
     "deleteRule": null,
     "fields": [
       {
+        "id": "text6409192446",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "required": true,
+        "primaryKey": true,
+        "hidden": false,
+        "presentable": false,
+        "autogeneratePattern": "[a-z0-9]{15}",
+        "pattern": "^[a-z0-9]+$",
+        "min": 15,
+        "max": 15
+      },
+      {
+        "id": "number6602185915",
         "name": "sterne",
         "type": "number",
+        "system": false,
         "required": true,
+        "hidden": false,
+        "presentable": false,
         "min": 1,
         "max": 5,
         "onlyInt": true
       },
       {
+        "id": "text8168618292",
         "name": "text",
         "type": "text",
+        "system": false,
         "required": true,
+        "hidden": false,
+        "presentable": false,
         "min": 10,
-        "max": 2000
+        "max": 2000,
+        "pattern": "",
+        "autogeneratePattern": ""
       },
       {
+        "id": "text4616603718",
         "name": "paket",
         "type": "text",
+        "system": false,
         "required": false,
-        "max": 100
+        "hidden": false,
+        "presentable": false,
+        "min": 0,
+        "max": 100,
+        "pattern": "",
+        "autogeneratePattern": ""
       },
       {
+        "id": "text7809119879",
         "name": "name",
         "type": "text",
+        "system": false,
         "required": false,
-        "max": 80
+        "hidden": false,
+        "presentable": false,
+        "min": 0,
+        "max": 80,
+        "pattern": "",
+        "autogeneratePattern": ""
       },
       {
+        "id": "email4394179360",
         "name": "email",
         "type": "email",
-        "required": false
+        "system": false,
+        "required": false,
+        "hidden": false,
+        "presentable": false,
+        "exceptDomains": null,
+        "onlyDomains": null
       },
       {
+        "id": "bool2836286150",
         "name": "oeffentlich",
         "type": "bool",
-        "required": false
+        "system": false,
+        "required": false,
+        "hidden": false,
+        "presentable": false
       },
       {
+        "id": "date1727792615",
         "name": "eingereicht_am",
         "type": "date",
-        "required": false
+        "system": false,
+        "required": false,
+        "hidden": false,
+        "presentable": false,
+        "min": "",
+        "max": ""
       },
       {
+        "id": "text3548688082",
         "name": "formular",
         "type": "text",
+        "system": false,
         "required": false,
-        "max": 50
+        "hidden": false,
+        "presentable": false,
+        "min": 0,
+        "max": 50,
+        "pattern": "",
+        "autogeneratePattern": ""
       },
       {
+        "id": "select7101283171",
         "name": "status",
         "type": "select",
+        "system": false,
         "required": false,
+        "hidden": false,
+        "presentable": false,
         "maxSelect": 1,
-        "values": ["neu", "gelesen", "veroeffentlicht", "verworfen"]
+        "values": [
+          "neu",
+          "gelesen",
+          "veroeffentlicht",
+          "verworfen"
+        ]
       },
       {
+        "id": "autodate4503640087",
         "name": "created",
         "type": "autodate",
+        "system": false,
+        "hidden": false,
+        "presentable": false,
         "onCreate": true,
         "onUpdate": false
       },
       {
+        "id": "autodate7054313471",
         "name": "updated",
         "type": "autodate",
+        "system": false,
+        "hidden": false,
+        "presentable": false,
         "onCreate": true,
         "onUpdate": true
       }
-    ]
+    ],
+    "indexes": [],
+    "options": {}
   }
 ]
