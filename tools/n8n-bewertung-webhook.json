@@ -1,0 +1,115 @@
+{
+  "name": "ASCENSUS - Bewertung entgegennehmen",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bewertung",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Webhook",
+      "webhookId": "bewertung-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $json.body || {};\n\n// Spamschutz: Honeypot-Feld 'webseite' sollte vom echten Formular nie\n// gefuellt ankommen (nur fuer Menschen unsichtbar). Ist es trotzdem\n// gefuellt, kam die Anfrage an der Browser-Pruefung vorbei - still\n// verwerfen, ohne den Bot durch eine Fehlermeldung zu warnen.\nconst isSpam = !!(b.webseite && String(b.webseite).trim() !== '');\n\nconst sterne = Math.min(5, Math.max(1, Math.round(Number(b.sterne) || 0)));\nconst text = String(b.text || '').trim().slice(0, 2000);\n\nreturn [{\n  json: {\n    isSpam,\n    valid: !isSpam && sterne >= 1 && text.length >= 10,\n    record: {\n      sterne,\n      text,\n      paket: String(b.paket || '').trim().slice(0, 100),\n      name: String(b.name || '').trim().slice(0, 80),\n      email: String(b.email || '').trim().slice(0, 200),\n      oeffentlich: !!b.oeffentlich,\n      eingereicht_am: b.eingereicht_am || new Date().toISOString(),\n      formular: 'bewertung',\n      status: 'neu'\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [208, 0],
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Pruefen & Aufbereiten"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [416, 0],
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Gueltig?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pb.ascensus.fit/api/collections/bewertungen/records",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.record) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [624, -96],
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "In PocketBase anlegen"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [832, -96],
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "Antwort: Gespeichert"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 200,
+        "responseBody": "={{ { ok: true } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [624, 96],
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "Antwort: Verworfen (Spam/ungueltig)"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Pruefen & Aufbereiten", "type": "main", "index": 0 }]]
+    },
+    "Pruefen & Aufbereiten": {
+      "main": [[{ "node": "Gueltig?", "type": "main", "index": 0 }]]
+    },
+    "Gueltig?": {
+      "main": [
+        [{ "node": "In PocketBase anlegen", "type": "main", "index": 0 }],
+        [{ "node": "Antwort: Verworfen (Spam/ungueltig)", "type": "main", "index": 0 }]
+      ]
+    },
+    "In PocketBase anlegen": {
+      "main": [[{ "node": "Antwort: Gespeichert", "type": "main", "index": 0 }]]
+    }
+  }
+}
