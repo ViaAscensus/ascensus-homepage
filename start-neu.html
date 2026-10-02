@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASCENSUS – Testseite Redesign (nicht live)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
+<style>
+:root{
+  --olive:#556B4E;
+  --olive-dark:#3E5039;
+  --sand:#B59A5D;
+  --offwhite:#F5F3EE;
+  --paper:#FFFFFF;
+  --ink:#232323;
+  --ink-60:rgba(35,35,35,.68);
+  --ink-40:rgba(35,35,35,.45);
+  --line:rgba(85,107,78,.18);
+  --maxw:1140px;
+  --gut:clamp(1.5rem,5vw,4rem);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--offwhite);color:var(--ink);
+  font-family:'Inter','Inter var',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:17px;line-height:1.55;font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+
+/* ---------- Testseiten-Banner ---------- */
+.testbanner{
+  background:var(--ink);color:#fff;text-align:center;
+  font-size:.78rem;font-weight:600;letter-spacing:.04em;
+  padding:.6rem 1rem;position:relative;z-index:50;
+}
+.testbanner b{color:var(--sand)}
+
+/* ---------- Typo-Skala (wie index.html) ---------- */
+.eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--sand);margin-bottom:1.1rem}
+h1{font-size:clamp(2.1rem,6.2vw,4.15rem);font-weight:200;letter-spacing:.055em;text-transform:uppercase;line-height:1.06;color:var(--olive)}
+h2{font-size:clamp(1.4rem,3.4vw,2rem);font-weight:700;letter-spacing:.1em;text-transform:uppercase;line-height:1.2;color:var(--olive)}
+h3{font-size:1.06rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--olive)}
+p{max-width:62ch}
+.lead{font-size:clamp(1.02rem,2vw,1.2rem);line-height:1.6;color:var(--ink-60)}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+section{padding:clamp(1.8rem,3.8vw,3rem) 0 clamp(2rem,4.2vw,3.4rem);position:relative}
+section.section-tight{padding:clamp(1.3rem,2.6vw,2.1rem) 0 clamp(1.5rem,3vw,2.4rem)}
+.rule{height:1px;background:var(--line);border:0;max-width:var(--maxw);margin:0 auto}
+
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;padding:.92rem 1.7rem;border:1px solid var(--olive);
+  background:var(--olive);color:var(--offwhite);font-size:.79rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;text-decoration:none;transition:background .25s,color .25s,transform .25s;
+}
+.btn:hover{background:var(--olive-dark);border-color:var(--olive-dark);transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn-ghost{background:transparent;color:var(--olive)}
+.btn-ghost:hover{background:var(--olive);color:var(--offwhite)}
+.btn-sand{background:var(--sand);border-color:var(--sand);color:#fff}
+.btn-sand:hover{background:#9c8449;border-color:#9c8449}
+a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offset:3px}
+
+/* ---------- HERO (neu) ---------- */
+.hero{position:relative;padding-top:clamp(2.6rem,6vw,4rem);padding-bottom:0;overflow:hidden;
+  background:radial-gradient(ellipse at 88% 0%,rgba(181,154,93,.10),transparent 60%),var(--offwhite);}
+.contours{position:absolute;inset:0;z-index:0;opacity:.5;pointer-events:none}
+.hero .wrap{position:relative;z-index:1}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:clamp(2rem,6vw,3.4rem)}
+.hero-top img.logo{height:30px;width:auto}
+.trailmark{font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-40);display:flex;gap:.5rem;align-items:center}
+.trailmark b{color:var(--sand)}
+@media(max-width:640px){.trailmark{display:none}}
+
+.hero-main{display:grid;grid-template-columns:1fr;gap:2.2rem;padding-bottom:clamp(2rem,5vw,3rem)}
+@media(min-width:760px){.hero-main{grid-template-columns:1.3fr .9fr;align-items:end}}
+.hero h1{max-width:16ch}
+.hero .lead{margin-top:1.6rem;max-width:48ch}
+.hero-cta{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:1.8rem}
+
+.hero-portrait{position:relative;justify-self:center}
+.hero-portrait .frame-img{width:clamp(170px,22vw,230px);border:1px solid var(--line);background:var(--paper);overflow:hidden}
+.hero-portrait .frame-img img{width:100%;height:auto;display:block}
+.hero-portrait .seal{position:absolute;right:-16px;bottom:-20px;width:clamp(68px,9vw,92px);filter:drop-shadow(0 8px 16px rgba(0,0,0,.22))}
+@media(max-width:759px){.hero-portrait{justify-self:start}}
+
+.stat-rail{position:relative;z-index:1;border-top:1px solid var(--line);display:flex;flex-wrap:wrap}
+.stat-rail div{flex:1 1 180px;padding:1rem var(--gut);border-right:1px solid var(--line);font-size:.74rem;font-weight:600;letter-spacing:.04em;color:var(--ink-60)}
+.stat-rail div:last-child{border-right:0}
+.stat-rail b{display:block;color:var(--olive);font-weight:700;font-size:.92rem;margin-bottom:.15rem;letter-spacing:.01em}
+@media(max-width:700px){.stat-rail div{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* ---------- Wiedererkennung ---------- */
+.mirror{background:var(--paper)}
+.quotes{display:grid;gap:1.6rem;margin-top:2rem}
+@media(min-width:760px){.quotes{grid-template-columns:repeat(3,1fr);gap:2rem}}
+.quote{border-left:2px solid var(--sand);padding:.2rem 0 .2rem 1.4rem;font-size:1.02rem;line-height:1.55;color:var(--ink)}
+
+/* ---------- Über ---------- */
+.about-grid{display:grid;gap:2.6rem;align-items:start}
+@media(min-width:860px){.about-grid{grid-template-columns:340px 1fr;gap:4rem}}
+.portrait{border:1px solid var(--line)}
+.portrait img{width:100%;height:auto}
+.portrait figcaption{padding:1rem 1.1rem;background:var(--paper);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--olive);font-weight:600}
+.portrait figcaption small{display:block;margin-top:.35rem;letter-spacing:.02em;text-transform:none;font-weight:400;color:var(--ink-40);font-size:.8rem}
+.about p+p{margin-top:1.1rem}
+.cred{margin-top:2.2rem;padding:1.3rem 1.4rem;border:1px solid var(--line);background:var(--paper);display:flex;gap:1.1rem;align-items:flex-start}
+.cred-icon{flex-shrink:0;width:34px;height:34px;color:var(--sand)}
+.cred-title{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive)}
+.cred-meta{margin-top:.35rem;font-size:.88rem;color:var(--ink-60);line-height:1.5}
+.cred-link{display:inline-block;margin-top:.55rem;font-size:.82rem;color:var(--sand);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(181,154,93,.4)}
+.cred-link:hover{color:var(--olive);border-color:var(--olive)}
+
+/* ---------- Etappen / Ablauf (neu: Aufstieg statt Kartenreihe) ---------- */
+.steps{background:var(--paper)}
+.climb{position:relative;margin-top:3.2rem;padding-bottom:.5rem}
+.climb svg.climbline{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.climb-track{position:relative;z-index:1;display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;align-items:end}
+.et{display:flex;flex-direction:column;gap:.4rem;text-align:center}
+.et:nth-child(2){margin-bottom:1.6rem}
+.et:nth-child(3){margin-bottom:3.2rem}
+.et:nth-child(4){margin-bottom:4.8rem}
+.et:nth-child(5){margin-bottom:6.4rem}
+.et-dot{width:52px;height:52px;border-radius:50%;background:var(--offwhite);border:2px solid var(--sand);display:flex;align-items:center;justify-content:center;margin:0 auto;color:var(--olive);flex:none;box-shadow:0 8px 20px -12px rgba(0,0,0,.25)}
+.et-dot svg{width:22px;height:22px}
+.et-num{font-size:.68rem;font-weight:700;letter-spacing:.14em;color:var(--sand);font-variant-numeric:tabular-nums;margin-top:.3rem}
+.et h3{font-size:.88rem;margin-top:.1rem}
+.et p{font-size:.82rem;line-height:1.4;color:var(--ink-60);margin:.2rem auto 0;max-width:16ch}
+@media(max-width:860px){
+  .climb svg.climbline{display:none}
+  .climb-track{grid-template-columns:1fr;gap:1.6rem}
+  .et{flex-direction:row;text-align:left;margin-bottom:0 !important;gap:1rem}
+  .et-dot{margin:0}
+  .et p{max-width:none;margin:.2rem 0 0}
+}
+
+/* ---------- Blind-Tracking ---------- */
+.method-grid{display:grid;gap:2.4rem;align-items:center}
+@media(min-width:860px){.method-grid{grid-template-columns:1.3fr .7fr;gap:3.5rem;align-items:center}}
+.method-text{margin-top:1.6rem}
+.method-text p{font-size:1rem;line-height:1.62;color:var(--ink-60)}
+.method-text p+p{margin-top:1rem}
+.method-text p:first-child{font-size:clamp(1.05rem,2.2vw,1.28rem);font-weight:300;line-height:1.45;color:var(--olive);letter-spacing:.01em}
+.method-shot{justify-self:center;max-width:220px}
+.method-shot img{width:100%;height:auto;display:block}
+.method-shot figcaption{margin-top:.8rem;font-size:.76rem;color:var(--ink-40);text-align:center;letter-spacing:.02em}
+
+/* ---------- Pakete-Teaser ---------- */
+/* ---------- Wissen-Teaser ---------- */
+.wissen-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.2rem}
+.wissen-all{font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.78rem;color:var(--olive);text-decoration:none;white-space:nowrap}
+.wissen-all:hover{text-decoration:underline;text-underline-offset:4px}
+.post-grid{display:grid;gap:1.5rem;margin-top:1.8rem}
+@media(min-width:720px){.post-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.post-grid{grid-template-columns:repeat(3,1fr)}}
+.post{background:var(--paper);border:1px solid var(--line);padding:1.8rem 1.7rem 1.6rem;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);transition:transform .3s,box-shadow .3s,border-color .3s}
+.post:hover{transform:translateY(-4px);box-shadow:0 14px 40px -22px rgba(35,35,35,.35);border-color:rgba(85,107,78,.35)}
+.post-cat{font-size:.66rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--sand)}
+.post h3{margin:.8rem 0 .8rem;font-size:1.06rem;line-height:1.35;letter-spacing:.06em}
+.post p{font-size:.93rem;line-height:1.55;color:var(--ink-60);flex-grow:1}
+.post-foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.78rem;color:var(--ink-40)}
+.post-more{font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:.7rem;color:var(--olive)}
+
+/* ---------- Stimmen (neu: editorial statt Kartenraster) ---------- */
+#stimmen{background:var(--paper)}
+.stimmen-feature{border-left:3px solid var(--sand);padding-left:1.8rem;margin-top:2.2rem;max-width:68ch}
+.stimmen-feature .review-lead{font-size:clamp(1.3rem,2.6vw,1.7rem);font-weight:300;color:var(--olive);line-height:1.35;margin-bottom:.9rem}
+.stimmen-feature .review-quote{font-size:1.1rem;line-height:1.6;color:var(--ink)}
+.stimmen-feature cite{display:block;margin-top:1rem;font-style:normal;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-40)}
+.stimmen-sub{margin-top:2.2rem;padding-top:1.6rem;border-top:1px solid var(--line);max-width:60ch}
+.stimmen-sub .review-quote{font-style:italic;font-size:.98rem;line-height:1.55;color:var(--ink-60)}
+.stimmen-sub cite{display:block;margin-top:.6rem;font-style:normal;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-40)}
+
+/* ---------- Erstgespräch ---------- */
+.call{background:var(--olive);color:var(--offwhite)}
+.call h2,.call .eyebrow{color:var(--offwhite)}
+.call .eyebrow{color:rgba(245,243,238,.55)}
+.call p{color:rgba(245,243,238,.85)}
+.call-grid{display:grid;gap:2.5rem;align-items:center}
+@media(min-width:860px){.call-grid{grid-template-columns:1.15fr .85fr;gap:4rem}}
+.call ul{list-style:none;margin-top:1.6rem}
+.call li{position:relative;padding-left:1.5rem;margin-bottom:.7rem;color:rgba(245,243,238,.85);font-size:.97rem}
+.call li::before{content:"";position:absolute;left:0;top:.6em;width:8px;height:1px;background:var(--sand)}
+.call-box{background:rgba(245,243,238,.07);border:1px solid rgba(245,243,238,.18);padding:2rem 1.7rem;text-align:center}
+.call-box .dur{font-size:2.6rem;font-weight:200;letter-spacing:.02em;color:var(--offwhite);line-height:1}
+.call-box .durlbl{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,243,238,.6);margin-top:.6rem;margin-bottom:1.6rem}
+.call-box .btn{width:100%;justify-content:center}
+
+/* ---------- FAQ ---------- */
+.faq-list{margin-top:2rem;max-width:74ch}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item:first-child{border-top:1px solid var(--line)}
+.faq-item summary{list-style:none;cursor:pointer;padding:1.3rem 2.2rem 1.3rem 0;position:relative;font-size:1.02rem;font-weight:600;color:var(--olive)}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";position:absolute;right:0;top:1.2rem;font-size:1.3rem;font-weight:400;color:var(--sand);transition:transform .25s}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-item p{padding-bottom:1.5rem;color:var(--ink-60);font-size:.96rem;line-height:1.6;max-width:66ch}
+
+/* ---------- Kontakt ---------- */
+.contact-grid{display:grid;gap:2.5rem;margin-top:2rem}
+@media(min-width:760px){.contact-grid{grid-template-columns:repeat(2,1fr);gap:3rem}}
+.contact-list{list-style:none}
+.contact-list li{padding:1rem 0;border-bottom:1px solid var(--line)}
+.contact-list li:first-child{border-top:1px solid var(--line)}
+.contact-list .lbl{display:block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-40);margin-bottom:.3rem}
+.contact-list a{text-decoration:none;color:var(--olive);font-weight:500;font-size:1.02rem;border-bottom:1px solid transparent;transition:border-color .2s}
+.contact-list a:hover{border-bottom-color:var(--sand)}
+
+/* ---------- Reveal ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="testbanner">🧪 Testseite — <b>nicht die aktuelle Homepage</b>, nirgends verlinkt, für Suchmaschinen gesperrt.</div>
+
+<header class="asc-header" id="hdr" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="start-neu.html" aria-label="ASCENSUS Startseite"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Hauptnavigation">
+      <a class="asc-navlink" href="#ansatz">Ansatz</a>
+      <a class="asc-navlink" href="#ablauf">Ablauf</a>
+      <a class="asc-navlink" href="pakete.html">Pakete</a>
+      <a class="asc-navlink" href="wissen.html">Wissen</a>
+      <a class="asc-navlink" href="#faq">FAQ</a>
+      <a class="asc-navlink" href="#kontakt">Kontakt</a>
+      <a class="asc-btn asc-btn-primary asc-nav-cta" href="#erstgespraech">Kostenloses Erstgespräch</a>
+    </nav>
+    <div class="asc-header-actions">
+      <a class="asc-btn asc-btn-primary" href="#erstgespraech">Erstgespräch</a>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO (neu) ============ -->
+<section class="hero" id="top">
+  <svg class="contours" viewBox="0 0 1440 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="#556B4E" stroke-width="1">
+      <path d="M-40 600 C 240 560, 380 470, 560 430 S 900 370, 1120 300 S 1380 210, 1500 170" opacity=".10"/>
+      <path d="M-40 640 C 260 600, 400 510, 590 465 S 930 405, 1150 335 S 1400 245, 1520 205" opacity=".09"/>
+      <path d="M-40 680 C 280 640, 430 550, 620 500 S 960 440, 1180 370 S 1420 280, 1540 240" opacity=".08"/>
+    </g>
+    <g fill="none" stroke="#B59A5D" stroke-width="1.4" opacity=".28">
+      <path d="M-40 610 C 250 575, 395 480, 575 440 S 915 380, 1135 312 S 1390 220, 1510 180"/>
+    </g>
+  </svg>
+
+  <div class="wrap">
+    <div class="trailmark">Frankfurt a. M. <b>·</b> Online deutschlandweit <b>·</b> Start: heute</div>
+
+    <div class="hero-main reveal">
+      <div>
+        <p class="eyebrow">Ernährungs- &amp; Laufcoaching</p>
+        <h1>Nachhaltig<br>leistungsfähig.</h1>
+        <p class="lead">
+          Keine Crash-Diät, kein Verbot, kein Dogma. Wir schauen uns wertfrei an,
+          wie Du Dich heute ernährst und bauen daraus Schritt für Schritt eine
+          Ernährung die zu Deinem Alltag und Deinem Ziel passt.
+        </p>
+        <div class="hero-cta">
+          <a class="btn" href="#erstgespraech">Kostenloses Erstgespräch</a>
+          <a class="btn btn-ghost" href="pakete.html">Pakete ansehen</a>
+        </div>
+      </div>
+      <div class="hero-portrait">
+        <div class="frame-img"><img src="patrick.jpg" alt="Patrick Spengler, Gründer von ASCENSUS" width="600" height="374"></div>
+        <img class="seal" src="seal.png" alt="">
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-rail">
+    <div><b>B-Lizenz</b>Zertifizierter Ernährungsberater</div>
+    <div><b>1:1</b>Keine Gruppenprogramme</div>
+    <div><b>30 Min.</b>Kostenlos, unverbindlich</div>
+    <div><b>100&nbsp;%</b>Online, deutschlandweit</div>
+  </div>
+</section>
+
+<!-- ============ WIEDERERKENNUNG ============ -->
+<section class="mirror" id="mirror">
+  <div class="wrap reveal">
+    <p class="eyebrow">Kommt Dir das bekannt vor?</p>
+    <h2>Du weißt, was zu tun ist —<br>nur im Alltag hält es nicht</h2>
+    <div class="quotes">
+      <blockquote class="quote">
+        „Ich weiß eigentlich, was gesund ist — kriege es aber einfach nicht
+        nachhaltig in meinen Alltag integriert.“
+      </blockquote>
+      <blockquote class="quote">
+        „Ich will weg von dieser Ganz-oder-gar-nicht-Mentalität, bei der ein
+        kleiner Ausrutscher gleich den ganzen Erfolg umwirft.“
+      </blockquote>
+      <blockquote class="quote">
+        „Ich habe keine Lust mehr auf extreme Verbote und Hypes, die nach ein
+        paar Wochen doch wieder im Sand verlaufen.“
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANSATZ ============ -->
+<section id="ansatz">
+  <div class="wrap reveal">
+    <div class="about-grid">
+      <figure class="portrait">
+        <img src="patrick.jpg" alt="Patrick Spengler, Gründer von ASCENSUS" width="600" height="374">
+        <figcaption>Patrick Spengler<small>Gründer · Zertifizierter Ernährungsberater (B-Lizenz) · Laufcoach</small></figcaption>
+      </figure>
+      <div class="about">
+        <p class="eyebrow">Mein Ansatz</p>
+        <h2>Warum Ascensus</h2>
+        <p style="margin-top:1.6rem">
+          Hi, ich bin Patrick — und ich kenne die Diät-Spirale aus eigener Erfahrung.
+          Ich habe früher vieles ausprobiert: von extremen Crash-Diäten bis hin zu
+          exzessivem Sport. Kurzfristig hat das funktioniert. Nach ein paar Wochen
+          waren die Kilos zurück.
+        </p>
+        <p>
+          Nicht das Extreme gewinnt. Sondern das, was zu Dir passt und was Du
+          kontinuierlich in Dein Leben integrieren kannst.
+        </p>
+        <div class="cred">
+          <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+            <circle cx="12" cy="9" r="6"/><path d="M8.5 13.9 7 22l5-2.6 5 2.6-1.5-8.1"/><path d="m9.5 9 1.7 1.7L14.8 7"/>
+          </svg>
+          <div>
+            <p class="cred-title">Ernährungsberater B-Lizenz</p>
+            <p class="cred-meta">Akademie für Sport und Gesundheit · 128 Unterrichtseinheiten · Qualifikationslevel 3 · 2026</p>
+            <a class="cred-link" href="zertifikat-ernaehrungsberater.pdf" target="_blank" rel="noopener">Zertifikat ansehen →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ============ ABLAUF — ETAPPEN (neu) ============ -->
+<section class="steps" id="ablauf">
+  <div class="wrap reveal">
+    <p class="eyebrow">So arbeiten wir zusammen</p>
+    <h2>Fünf Etappen auf dem Weg nach oben</h2>
+
+    <div class="climb">
+      <svg class="climbline" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">
+        <polyline points="100,190 300,150 500,110 700,65 900,20" fill="none" stroke="#B59A5D" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round" opacity=".55"/>
+      </svg>
+      <div class="climb-track">
+        <div class="et">
+          <div class="et-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10H10l-3.5 3.5V15.5H4z"/></svg></div>
+          <div class="et-num">Etappe 01</div>
+          <h3>Kennenlernen</h3>
+          <p>30 Min., kostenlos und unverbindlich</p>
+        </div>
+        <div class="et">
+          <div class="et-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M9 3.5h6v2H9z"/></svg></div>
+          <div class="et-num">Etappe 02</div>
+          <h3>Strategie &amp; Anamnese</h3>
+          <p>45 Min. zu Vorgeschichte &amp; Alltag</p>
+        </div>
+        <div class="et">
+          <div class="et-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.3A10.6 10.6 0 0 1 12 5.2c5 0 9 3.5 10 6.8-.5 1.6-1.5 3.1-2.8 4.3"/></svg></div>
+          <div class="et-num">Etappe 03</div>
+          <h3>Blind-Tracking</h3>
+          <p>1 Woche tracken, ungefiltert</p>
+        </div>
+        <div class="et">
+          <div class="et-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V5M16 20v-8"/><path d="M3 20h18"/></svg></div>
+          <div class="et-num">Etappe 04</div>
+          <h3>Auswertung</h3>
+          <p>Gemeinsamer Fahrplan</p>
+        </div>
+        <div class="et">
+          <div class="et-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m14.5 9.5-2 5-5 2 2-5z"/></svg></div>
+          <div class="et-num">Etappe 05</div>
+          <h3>Umsetzung</h3>
+          <p>Bis daraus Routine wird</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLIND-TRACKING ============ -->
+<section id="methode">
+  <div class="wrap reveal">
+    <div class="method-grid">
+      <div>
+        <p class="eyebrow">Das Prinzip dahinter</p>
+        <h2>Erst messen.<br>Dann bewerten.</h2>
+        <div class="method-text">
+          <p>In der ersten Woche ist die Kalorien- und Nährstoffanzeige in Deiner App bewusst ausgeblendet. Du trackst — siehst aber keine Zahlen.</p>
+          <p>Ohne Anzeige entsteht ein unverfälschtes Bild. Erst nach unserer gemeinsamen Auswertung schalte ich Dein Dashboard vollständig frei.</p>
+        </div>
+      </div>
+      <figure class="method-shot">
+        <img src="app-dashboard-mockup.png" alt="Dashboard der Nutrilize-App" width="640" height="1289" loading="lazy">
+        <figcaption>Nach der Auswertung: volle Nährwertanzeige in der App.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAKETE (TEASER) ============ -->
+<section id="pakete" class="section-tight">
+  <div class="wrap reveal">
+    <p class="eyebrow">Ernährungscoaching</p>
+    <h2>Drei Pakete, die aufeinander aufbauen</h2>
+    <p class="lead" style="margin-top:1.2rem">
+      Von der ehrlichen Bestandsaufnahme bis zur nachhaltigen Umsetzung — Das Fundament, Der Weg und Die Nachhaltigkeit.
+    </p>
+    <a class="btn" style="margin-top:2rem" href="pakete.html">Alle Pakete ansehen</a>
+  </div>
+</section>
+
+<!-- ============ WISSEN ============ -->
+<section id="wissen" class="section-tight">
+  <div class="wrap reveal">
+    <div class="wissen-head">
+      <div>
+        <p class="eyebrow">Wissen für Deinen Alltag</p>
+        <h2>Fundiert statt Hype</h2>
+      </div>
+      <a class="wissen-all" href="wissen.html">Alle Beiträge →</a>
+    </div>
+    <div class="post-grid">
+      <a class="post" href="wissen-dosis-macht-das-gift.html">
+        <span class="post-cat">Haltung</span>
+        <h3>Die Dosis macht das Gift</h3>
+        <p>Warum strikte Verbote so oft scheitern – und was stattdessen wirklich hilft.</p>
+        <div class="post-foot"><span>25.09.2026</span><span class="post-more">Weiterlesen →</span></div>
+      </a>
+      <a class="post" href="wissen-eiweiss.html">
+        <span class="post-cat">Ernährung</span>
+        <h3>Eiweiß: Wie viel Du wirklich brauchst</h3>
+        <p>Wie viel Eiweiß ein gesunder Erwachsener wirklich braucht – und ob es den Nieren schadet.</p>
+        <div class="post-foot"><span>24.09.2026</span><span class="post-more">Weiterlesen →</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STIMMEN (neu: editorial) ============ -->
+<section id="stimmen">
+  <div class="wrap reveal">
+    <p class="eyebrow">Was Klienten sagen</p>
+    <h2>Keine Theorie — echte Veränderung</h2>
+
+    <blockquote class="stimmen-feature">
+      <p class="review-lead">„Nach jahrelangen Diäten habe ich dank der alltagstauglichen Beratung meine Ernährung endlich dauerhaft umgestellt.“</p>
+      <p class="review-quote">Keine strengen Verbote, sondern ein nachhaltiges Konzept, das perfekt in den Büroalltag passt. Jeden Cent wert.</p>
+      <cite>Paul, 43 Jahre</cite>
+    </blockquote>
+
+    <blockquote class="stimmen-sub">
+      <p class="review-quote">„Keine Standard-Pläne, keine Verbote: Statt starrer Vorgaben gab es echtes Verständnis für Ernährung. Die Anpassungen kamen ganz automatisch – auf manches verzichte ich heute völlig freiwillig, weil ich weiß, was meinem Körper guttut.“</p>
+      <cite>Laura, 38 Jahre</cite>
+    </blockquote>
+  </div>
+</section>
+
+<section class="call" id="erstgespraech">
+  <div class="wrap reveal">
+    <div class="call-grid">
+      <div>
+        <p class="eyebrow">Noch unsicher?</p>
+        <h2>Lass uns einfach reden</h2>
+        <p style="margin-top:1.3rem">Du weißt noch nicht genau, welcher Weg für Dich der richtige ist? Dann buch Dir Dein kostenloses Erstgespräch. In diesen 30 Minuten:</p>
+        <ul>
+          <li>lernen wir uns gegenseitig kennen</li>
+          <li>sprechen wir über Deine Situation, Deine Ziele und Deine Motivation</li>
+          <li>finden wir gemeinsam den passenden Weg für Dich</li>
+        </ul>
+      </div>
+      <div class="call-box">
+        <div class="dur">30</div>
+        <div class="durlbl">Minuten · kostenlos</div>
+        <a class="btn btn-sand" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Termin buchen</a>
+        <p style="margin-top:1rem;font-size:.8rem;color:rgba(245,243,238,.6)">Unverbindlich. Kein Verkaufsgespräch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap reveal">
+    <p class="eyebrow">Bevor Du fragst</p>
+    <h2>Häufige Fragen</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Muss ich für die Beratung nach Frankfurt kommen?</summary>
+        <p>Nein. Die gesamte Zusammenarbeit läuft online — Strategiegespräch, Auswertung und Live-Calls per Video.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Was genau ist das Blind-Tracking?</summary>
+        <p>In der ersten Woche trackst Du Deine Ernährung ganz normal weiter, aber ohne dass Kalorien- oder Nährstoffwerte angezeigt werden.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Was kostet eine Betreuung bei ASCENSUS?</summary>
+        <p>Die Pakete starten bei 149&nbsp;€ (Das Fundament, 3 Wochen) und reichen bis 357&nbsp;€ für 3 Monate (Die Nachhaltigkeit). Details auf der <a href="pakete.html">Pakete-Seite</a>.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KONTAKT ============ -->
+<section id="kontakt" class="section-tight">
+  <div class="wrap reveal">
+    <p class="eyebrow">Direkter Draht</p>
+    <h2>Du hast eine Frage?</h2>
+    <div class="contact-grid">
+      <ul class="contact-list">
+        <li><span class="lbl">E-Mail</span><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+        <li><span class="lbl">WhatsApp</span><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">+49 156 798 105 56</a></li>
+      </ul>
+      <ul class="contact-list">
+        <li><span class="lbl">Instagram</span><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">@via_ascensus</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Ernährungs- &amp; Laufcoaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Echt · Fundiert · Nachhaltig</div>
+        </div>
+      </div>
+      <div><h4>Kontakt</h4><ul><li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li></ul></div>
+      <div><h4>Rechtliches</h4><ul><li><a href="impressum.html">Impressum</a></li><li><a href="datenschutz.html">Datenschutz</a></li></ul></div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr">2026</span> ASCENSUS · Patrick Spengler — Testseite, nicht die Live-Startseite</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  setTimeout(()=>{document.querySelectorAll('.reveal:not(.in)').forEach(el=>el.classList.add('in'));},1200);
+} else {
+  document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+}
+</script>
+</body>
+</html>
