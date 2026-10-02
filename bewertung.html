@@ -233,19 +233,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
       </div>
 
       <div class="field">
-        <label for="paket">Welches Programm hast Du gemacht? <span class="opt">(optional)</span></label>
-        <select id="paket" name="paket">
-          <option value="">Bitte wählen</option>
-          <option value="Das Fundament">Das Fundament</option>
-          <option value="Der Weg">Der Weg</option>
-          <option value="Die Nachhaltigkeit">Die Nachhaltigkeit</option>
-          <option value="Laufcoaching">Laufcoaching</option>
-          <option value="Erstgespräch">Nur Erstgespräch</option>
-          <option value="Sonstiges">Sonstiges</option>
-        </select>
-      </div>
-
-      <div class="field">
         <label for="name">Dein Vorname <span class="opt">(optional)</span></label>
         <input type="text" id="name" name="name" maxlength="80" autocomplete="given-name">
       </div>
@@ -390,7 +377,6 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     var data = {
       sterne: Number(form.querySelector('input[name=sterne]:checked').value),
       text: document.getElementById('text').value.trim(),
-      paket: document.getElementById('paket').value,
       name: document.getElementById('name').value.trim(),
       email: document.getElementById('email').value.trim(),
       oeffentlich: document.getElementById('oeffentlich').checked,
