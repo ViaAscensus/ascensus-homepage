@@ -87,14 +87,37 @@
     },
     {
       "parameters": {
-        "jsCode": "const post = $json;\nconst plattformen = post.plattformen || [];\nif (plattformen.length === 0) {\n  throw new Error('Post ' + post.id + ' hat keine Plattform ausgewaehlt');\n}\nconst erstesBild = (post.medien && post.medien[0])\n  ? `https://pb.ascensus.fit/api/files/social_posts/${post.id}/${post.medien[0]}`\n  : '';\nreturn plattformen.map(p => ({\n  json: {\n    post_id: post.id,\n    text: post.text || '',\n    bild_url: erstesBild,\n    plattform: p\n  }\n}));"
+        "jsCode": "const post = $json;\nconst MANUELLE_FORMATE = ['reel', 'karussell'];\nconst plattformen = post.plattformen || [];\nconst istManuell = MANUELLE_FORMATE.includes(post.format) || plattformen.includes('linkedin');\nif (istManuell) {\n  const grund = MANUELLE_FORMATE.includes(post.format)\n    ? `Format \"${post.format}\" wird nicht automatisch veroeffentlicht`\n    : 'Beitraege mit LinkedIn werden nicht automatisch veroeffentlicht';\n  return [{ json: { post_id: post.id, manuell: true, grund } }];\n}\nif (plattformen.length === 0) {\n  throw new Error('Post ' + post.id + ' hat keine Plattform ausgewaehlt');\n}\nconst erstesBild = (post.medien && post.medien[0])\n  ? `https://pb.ascensus.fit/api/files/social_posts/${post.id}/${post.medien[0]}`\n  : '';\nreturn plattformen.map(p => ({\n  json: {\n    post_id: post.id,\n    text: post.text || '',\n    bild_url: erstesBild,\n    plattform: p,\n    manuell: false\n  }\n}));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [624, 120],
       "id": "b2c3d4e5-0007-4000-8000-000000000007",
       "name": "Plattformen aufteilen",
-      "notes": "bild_url ist nur erreichbar, wenn die viewRule der Collection social_posts leer (oeffentlich) ist - siehe tools/social-media-setup.md. Nur das erste Bild wird verwendet, Mehrbild-Alben und Videos sind in dieser Vorlage nicht abgedeckt."
+      "notes": "bild_url ist nur erreichbar, wenn die viewRule der Collection social_posts leer (oeffentlich) ist - siehe tools/social-media-setup.md. Nur das erste Bild wird verwendet, Mehrbild-Alben und Videos sind in dieser Vorlage nicht abgedeckt. Reel/Karussell/LinkedIn werden hier bereits als 'manuell' markiert und laufen nicht in die Plattform-Nodes."
+    },
+    {
+      "parameters": {
+        "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [{ "leftValue": "={{ $json.manuell }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true", "singleValue": true } }], "combinator": "and" },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [800, 120],
+      "id": "b2c3d4e5-0023-4000-8000-000000000023",
+      "name": "Nur automatisierte Formate?",
+      "notes": "Fuehrt 'manuell'-Posts (Reel/Karussell/LinkedIn) direkt zum Hinweis-Node statt zum Veroeffentlichen - siehe Abschnitt 3.4 der Uebergabe / tools/social-media-setup.md."
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { post_id: $json.post_id, hinweis: $json.grund, manuell: true } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 20],
+      "id": "b2c3d4e5-0024-4000-8000-000000000024",
+      "name": "Manuell: Hinweis",
+      "notes": "Schreibt bewusst nichts in PocketBase zurueck - der Post bleibt unveraendert (Entwurf/Geplant), bis er manuell veroeffentlicht wird. Ist nur erreichbar, wenn der Webhook trotz deaktiviertem Button in social-planer.html direkt aufgerufen wird."
     },
     {
       "parameters": {
@@ -303,7 +326,13 @@
     "Cron: Faellige Posts": { "main": [[{ "node": "Faellige Posts laden", "type": "main", "index": 0 }]] },
     "Faellige Posts laden": { "main": [[{ "node": "Faellige Posts in Einzelpositionen", "type": "main", "index": 0 }]] },
     "Faellige Posts in Einzelpositionen": { "main": [[{ "node": "Plattformen aufteilen", "type": "main", "index": 0 }]] },
-    "Plattformen aufteilen": { "main": [[{ "node": "Nach Plattform", "type": "main", "index": 0 }]] },
+    "Plattformen aufteilen": { "main": [[{ "node": "Nur automatisierte Formate?", "type": "main", "index": 0 }]] },
+    "Nur automatisierte Formate?": {
+      "main": [
+        [{ "node": "Manuell: Hinweis", "type": "main", "index": 0 }],
+        [{ "node": "Nach Plattform", "type": "main", "index": 0 }]
+      ]
+    },
     "Nach Plattform": {
       "main": [
         [{ "node": "Facebook: Request vorbereiten", "type": "main", "index": 0 }],
