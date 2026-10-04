@@ -138,8 +138,15 @@
 <script>
   const pb = new PocketBase('https://pb.ascensus.fit');
 
+  // Erlaubt nur eine einfache .html-Datei im Wurzelverzeichnis als Rücksprungziel -
+  // kein Protokoll, keine Domain, kein "//", sonst waere ?next= ein offenes Redirect-Ziel.
+  function zielSeite() {
+    const next = new URLSearchParams(window.location.search).get('next');
+    return (next && /^[a-zA-Z0-9_-]+\.html$/.test(next)) ? next : 'mitglieder-dashboard.html';
+  }
+
   if (pb.authStore.isValid) {
-    window.location.href = 'mitglieder-dashboard.html';
+    window.location.href = zielSeite();
   }
 
   const form = document.getElementById('loginForm');
@@ -181,7 +188,7 @@
 
     try {
       await pb.collection('members').authWithPassword(email, pw);
-      window.location.href = 'mitglieder-dashboard.html';
+      window.location.href = zielSeite();
     } catch (err) {
       msg.textContent = 'E-Mail oder Passwort ist nicht korrekt.';
       msg.classList.add('error');

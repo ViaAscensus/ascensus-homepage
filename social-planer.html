@@ -195,7 +195,7 @@
   const pb = new PocketBase('https://pb.ascensus.fit');
 
   if (!pb.authStore.isValid) {
-    window.location.href = 'mitglieder-login.html';
+    window.location.href = 'mitglieder-login.html?next=social-planer.html';
   }
 
   const deniedBox = document.getElementById('deniedBox');
