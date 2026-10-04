@@ -113,7 +113,20 @@ Der Lauf ist idempotent. Details und wie ein neues Rezept veröffentlicht wird:
 `tools/README.md`.
 
 Von Hand gepflegt werden dagegen: `index.html`, `pakete*.html`, `wissen*.html`,
-die Rechtstexte, `anamnese*.html`, `trainingsbuch.html` und die `mitglieder-*.html`.
+die Rechtstexte, `anamnese*.html`, `trainingsbuch.html`, die `mitglieder-*.html`
+und `social-planer.html`.
+
+## Social-Media-Planer
+
+`social-planer.html` ist Patricks eigenes Werkzeug zum Planen und Veröffentlichen
+von Instagram-, Facebook- und LinkedIn-Beiträgen – kein Kundenfeature, deshalb
+nicht in der öffentlichen Navigation oder im Mitglieder-Dashboard verlinkt und
+auf `patrick@ascensus.fit` beschränkt. Die Seite legt Entwürfe in der (noch
+anzulegenden) PocketBase-Collection `social_posts` ab; das tatsächliche
+Veröffentlichen übernimmt n8n über die Meta Graph API (Instagram/Facebook) und,
+mit Einschränkungen, die LinkedIn-API. Einrichtung, PocketBase-Schema, API-Regeln
+und die nötigen Meta-/LinkedIn-Zugänge stehen in `tools/social-media-setup.md`,
+der n8n-Workflow in `tools/n8n-social-publish.json`.
 
 ## PocketBase
 
