@@ -1,0 +1,333 @@
+{
+  "name": "ASCENSUS - Social-Media-Beitrag veroeffentlichen",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "social-publish",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "b2c3d4e5-0001-4000-8000-000000000001",
+      "name": "Webhook: Einzelbeitrag",
+      "webhookId": "social-publish",
+      "notes": "URL nach dem Import aus n8n kopieren und in social-planer.html als N8N_WEBHOOK_URL eintragen. Body: { \"post_id\": \"...\" }"
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 5 }] }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 240],
+      "id": "b2c3d4e5-0002-4000-8000-000000000002",
+      "name": "Cron: Faellige Posts",
+      "notes": "Prueft alle 5 Minuten, ob geplante Posts faellig sind. Intervall nach Bedarf anpassen."
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = ($json.body && $json.body.post_id) || '';\nif (!id) throw new Error('post_id fehlt im Webhook-Body');\nreturn [{ json: { post_id: id } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [208, 0],
+      "id": "b2c3d4e5-0003-4000-8000-000000000003",
+      "name": "Post-ID aus Webhook lesen"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://pb.ascensus.fit/api/collections/social_posts/records/{{ $json.post_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [416, 0],
+      "id": "b2c3d4e5-0004-4000-8000-000000000004",
+      "name": "Post laden (manuell)",
+      "notes": "Credential 'PocketBase Social Token' zuweisen: Header Authorization, Wert = Token aus api_clients/Impersonate, OHNE Bearer-Praefix."
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://pb.ascensus.fit/api/collections/social_posts/records",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "filter", "value": "=status='geplant' && geplant_am <= '{{ $now.toUTC().toISO() }}'" },
+            { "name": "sort", "value": "+geplant_am" },
+            { "name": "perPage", "value": "50" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [208, 240],
+      "id": "b2c3d4e5-0005-4000-8000-000000000005",
+      "name": "Faellige Posts laden",
+      "notes": "Gleiche Credential wie 'Post laden (manuell)'."
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $json.items || [];\nreturn items.map(p => ({ json: p }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [416, 240],
+      "id": "b2c3d4e5-0006-4000-8000-000000000006",
+      "name": "Faellige Posts in Einzelpositionen"
+    },
+    {
+      "parameters": {
+        "jsCode": "const post = $json;\nconst plattformen = post.plattformen || [];\nif (plattformen.length === 0) {\n  throw new Error('Post ' + post.id + ' hat keine Plattform ausgewaehlt');\n}\nconst erstesBild = (post.medien && post.medien[0])\n  ? `https://pb.ascensus.fit/api/files/social_posts/${post.id}/${post.medien[0]}`\n  : '';\nreturn plattformen.map(p => ({\n  json: {\n    post_id: post.id,\n    text: post.text || '',\n    bild_url: erstesBild,\n    plattform: p\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [624, 120],
+      "id": "b2c3d4e5-0007-4000-8000-000000000007",
+      "name": "Plattformen aufteilen",
+      "notes": "bild_url ist nur erreichbar, wenn die viewRule der Collection social_posts leer (oeffentlich) ist - siehe tools/social-media-setup.md. Nur das erste Bild wird verwendet, Mehrbild-Alben und Videos sind in dieser Vorlage nicht abgedeckt."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [{ "leftValue": "={{ $json.plattform }}", "rightValue": "facebook", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "outputKey": "facebook" },
+            { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [{ "leftValue": "={{ $json.plattform }}", "rightValue": "instagram", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "outputKey": "instagram" },
+            { "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [{ "leftValue": "={{ $json.plattform }}", "rightValue": "linkedin", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "outputKey": "linkedin" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [832, 120],
+      "id": "b2c3d4e5-0008-4000-8000-000000000008",
+      "name": "Nach Plattform"
+    },
+    {
+      "parameters": {
+        "jsCode": "const hatBild = !!$json.bild_url;\nconst PAGE_ID = 'FACEBOOK_PAGE_ID';\nreturn [{\n  json: {\n    post_id: $json.post_id,\n    plattform: 'facebook',\n    url: hatBild\n      ? `https://graph.facebook.com/v19.0/${PAGE_ID}/photos`\n      : `https://graph.facebook.com/v19.0/${PAGE_ID}/feed`,\n    body: hatBild\n      ? { url: $json.bild_url, caption: $json.text, published: true }\n      : { message: $json.text }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, -120],
+      "id": "b2c3d4e5-0009-4000-8000-000000000009",
+      "name": "Facebook: Request vorbereiten",
+      "notes": "FACEBOOK_PAGE_ID durch die eigene Facebook-Seiten-ID ersetzen."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1248, -120],
+      "id": "b2c3d4e5-0010-4000-8000-000000000010",
+      "name": "Facebook: Senden",
+      "notes": "Credential 'Meta Graph Access Token' (Query Auth, Parametername access_token) zuweisen."
+    },
+    {
+      "parameters": {
+        "jsCode": "const r = $json;\nconst post_id = $('Facebook: Request vorbereiten').item.json.post_id;\nif (r.error) {\n  return [{ json: { post_id, plattform: 'facebook', ok: false, fehler: r.error.message || JSON.stringify(r.error) } }];\n}\nreturn [{ json: { post_id, plattform: 'facebook', ok: true, url: r.post_id ? ('https://facebook.com/' + r.post_id) : null } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1456, -120],
+      "id": "b2c3d4e5-0011-4000-8000-000000000011",
+      "name": "Facebook: Antwort auswerten"
+    },
+    {
+      "parameters": {
+        "jsCode": "const hatBild = !!$json.bild_url;\nreturn [{ json: { ...$json, hatBild } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, 120],
+      "id": "b2c3d4e5-0012-4000-8000-000000000012",
+      "name": "Instagram: Vorbereiten"
+    },
+    {
+      "parameters": {
+        "conditions": { "options": { "caseSensitive": true, "typeValidation": "strict" }, "conditions": [{ "leftValue": "={{ $json.hatBild }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true", "singleValue": true } }], "combinator": "and" },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1248, 120],
+      "id": "b2c3d4e5-0013-4000-8000-000000000013",
+      "name": "Instagram: Bild vorhanden?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/INSTAGRAM_USER_ID/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ image_url: $json.bild_url, caption: $json.text }) }}",
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1456, 60],
+      "id": "b2c3d4e5-0014-4000-8000-000000000014",
+      "name": "Instagram: Container erstellen",
+      "notes": "INSTAGRAM_USER_ID durch die eigene Instagram-Business-Account-ID ersetzen. Gleiche Credential wie Facebook: Senden."
+    },
+    {
+      "parameters": {
+        "jsCode": "const post_id = $('Instagram: Vorbereiten').item.json.post_id;\nif ($json.error) {\n  return [{ json: { post_id, plattform: 'instagram', ok: false, fehler: $json.error.message || JSON.stringify($json.error), abbrechen: true } }];\n}\nreturn [{ json: { post_id, plattform: 'instagram', creation_id: $json.id, abbrechen: false } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1664, 60],
+      "id": "b2c3d4e5-0015-4000-8000-000000000015",
+      "name": "Instagram: Container-ID lesen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/INSTAGRAM_USER_ID/media_publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ creation_id: $json.creation_id }) }}",
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1872, 60],
+      "id": "b2c3d4e5-0016-4000-8000-000000000016",
+      "name": "Instagram: Veroeffentlichen",
+      "notes": "INSTAGRAM_USER_ID ersetzen. Wird bei abgebrochenem Container trotzdem durchlaufen - Ergebnis-Auswertung danach filtert das ab."
+    },
+    {
+      "parameters": {
+        "jsCode": "const vorher = $('Instagram: Container-ID lesen').item.json;\nif (vorher.abbrechen) {\n  return [{ json: { post_id: vorher.post_id, plattform: 'instagram', ok: false, fehler: vorher.fehler } }];\n}\nif ($json.error) {\n  return [{ json: { post_id: vorher.post_id, plattform: 'instagram', ok: false, fehler: $json.error.message || JSON.stringify($json.error) } }];\n}\nreturn [{ json: { post_id: vorher.post_id, plattform: 'instagram', ok: true, url: null } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2080, 60],
+      "id": "b2c3d4e5-0017-4000-8000-000000000017",
+      "name": "Instagram: Antwort auswerten"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { post_id: $json.post_id, plattform: 'instagram', ok: false, fehler: 'Instagram braucht ein Bild - dieser Post hat keines.' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1456, 200],
+      "id": "b2c3d4e5-0018-4000-8000-000000000018",
+      "name": "Instagram: Fehler (kein Bild)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ author: 'urn:li:organization:LINKEDIN_ORG_ID', lifecycleState: 'PUBLISHED', specificContent: { 'com.linkedin.ugc.ShareContent': { shareCommentary: { text: $json.text }, shareMediaCategory: 'NONE' } }, visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' } }) }}",
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1040, 360],
+      "id": "b2c3d4e5-0019-4000-8000-000000000019",
+      "name": "LinkedIn: Senden",
+      "notes": "LinkedIns Posting-API ist seit 2023 stark eingeschraenkt (Member-Posting braucht i.d.R. Partner-Zugang zur Community Management API, Organisations-Posting die 'w_organization_social'-Berechtigung einer freigeschalteten App). Vor Nutzung pruefen, ob der eigene App-Zugang das erlaubt - sonst bleibt der 'Text kopieren'-Button im Frontend der verlaessliche Weg. LINKEDIN_ORG_ID ersetzen, Credential 'LinkedIn Access Token' (Header Auth, Authorization: Bearer ...) zuweisen."
+      },
+    {
+      "parameters": {
+        "jsCode": "const post_id = $('Plattformen aufteilen').first().json.post_id;\nif ($json.error) {\n  return [{ json: { post_id: $json.__post_id || post_id, plattform: 'linkedin', ok: false, fehler: 'LinkedIn-API nicht verfuegbar oder Berechtigung fehlt - Beitrag manuell posten (Text-kopieren-Button nutzen).' } }];\n}\nreturn [{ json: { post_id, plattform: 'linkedin', ok: true, url: null } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1248, 360],
+      "id": "b2c3d4e5-0020-4000-8000-000000000020",
+      "name": "LinkedIn: Antwort auswerten"
+    },
+    {
+      "parameters": {
+        "jsCode": "const alle = $input.all().map(i => i.json);\nconst gruppen = {};\nfor (const r of alle) {\n  gruppen[r.post_id] = gruppen[r.post_id] || [];\n  gruppen[r.post_id].push(r);\n}\nreturn Object.entries(gruppen).map(([post_id, ergebnisse]) => {\n  const ergebnisObj = {};\n  for (const e of ergebnisse) ergebnisObj[e.plattform] = { ok: e.ok, url: e.url || null, fehler: e.fehler || null };\n  const alleOk = ergebnisse.every(e => e.ok);\n  const keinErfolg = ergebnisse.every(e => !e.ok);\n  const status = alleOk ? 'veroeffentlicht' : (keinErfolg ? 'fehler' : 'teilweise_veroeffentlicht');\n  const fehlerText = ergebnisse.filter(e => !e.ok).map(e => e.plattform + ': ' + e.fehler).join(' | ');\n  return { json: { post_id, status, ergebnis: ergebnisObj, fehler: fehlerText } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2288, 120],
+      "id": "b2c3d4e5-0021-4000-8000-000000000021",
+      "name": "Ergebnis zusammenfuehren"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://pb.ascensus.fit/api/collections/social_posts/records/{{ $json.post_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: $json.status, ergebnis: $json.ergebnis, fehler: $json.fehler }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [2496, 120],
+      "id": "b2c3d4e5-0022-4000-8000-000000000022",
+      "name": "Status in PocketBase speichern",
+      "notes": "Gleiche Credential wie 'Post laden (manuell)'."
+    }
+  ],
+  "connections": {
+    "Webhook: Einzelbeitrag": { "main": [[{ "node": "Post-ID aus Webhook lesen", "type": "main", "index": 0 }]] },
+    "Post-ID aus Webhook lesen": { "main": [[{ "node": "Post laden (manuell)", "type": "main", "index": 0 }]] },
+    "Post laden (manuell)": { "main": [[{ "node": "Plattformen aufteilen", "type": "main", "index": 0 }]] },
+    "Cron: Faellige Posts": { "main": [[{ "node": "Faellige Posts laden", "type": "main", "index": 0 }]] },
+    "Faellige Posts laden": { "main": [[{ "node": "Faellige Posts in Einzelpositionen", "type": "main", "index": 0 }]] },
+    "Faellige Posts in Einzelpositionen": { "main": [[{ "node": "Plattformen aufteilen", "type": "main", "index": 0 }]] },
+    "Plattformen aufteilen": { "main": [[{ "node": "Nach Plattform", "type": "main", "index": 0 }]] },
+    "Nach Plattform": {
+      "main": [
+        [{ "node": "Facebook: Request vorbereiten", "type": "main", "index": 0 }],
+        [{ "node": "Instagram: Vorbereiten", "type": "main", "index": 0 }],
+        [{ "node": "LinkedIn: Senden", "type": "main", "index": 0 }]
+      ]
+    },
+    "Facebook: Request vorbereiten": { "main": [[{ "node": "Facebook: Senden", "type": "main", "index": 0 }]] },
+    "Facebook: Senden": { "main": [[{ "node": "Facebook: Antwort auswerten", "type": "main", "index": 0 }]] },
+    "Facebook: Antwort auswerten": { "main": [[{ "node": "Ergebnis zusammenfuehren", "type": "main", "index": 0 }]] },
+    "Instagram: Vorbereiten": { "main": [[{ "node": "Instagram: Bild vorhanden?", "type": "main", "index": 0 }]] },
+    "Instagram: Bild vorhanden?": {
+      "main": [
+        [{ "node": "Instagram: Container erstellen", "type": "main", "index": 0 }],
+        [{ "node": "Instagram: Fehler (kein Bild)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Instagram: Container erstellen": { "main": [[{ "node": "Instagram: Container-ID lesen", "type": "main", "index": 0 }]] },
+    "Instagram: Container-ID lesen": { "main": [[{ "node": "Instagram: Veroeffentlichen", "type": "main", "index": 0 }]] },
+    "Instagram: Veroeffentlichen": { "main": [[{ "node": "Instagram: Antwort auswerten", "type": "main", "index": 0 }]] },
+    "Instagram: Antwort auswerten": { "main": [[{ "node": "Ergebnis zusammenfuehren", "type": "main", "index": 0 }]] },
+    "Instagram: Fehler (kein Bild)": { "main": [[{ "node": "Ergebnis zusammenfuehren", "type": "main", "index": 0 }]] },
+    "LinkedIn: Senden": { "main": [[{ "node": "LinkedIn: Antwort auswerten", "type": "main", "index": 0 }]] },
+    "LinkedIn: Antwort auswerten": { "main": [[{ "node": "Ergebnis zusammenfuehren", "type": "main", "index": 0 }]] },
+    "Ergebnis zusammenfuehren": { "main": [[{ "node": "Status in PocketBase speichern", "type": "main", "index": 0 }]] }
+  }
+}
