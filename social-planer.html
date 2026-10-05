@@ -64,9 +64,17 @@
   .badge-status-teilweise_veroeffentlicht{ background: var(--sand); color:#fff; }
   .badge-status-fehler{ background: var(--error); color:#fff; }
   .badge-plattform{ border:1px solid rgba(35,35,35,0.15); }
+  .badge-format{ background:#fff; border:1px solid var(--sand); color: var(--sand); }
+  .badge-manuell{
+    font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    padding:6px 10px; border-radius:4px; background: var(--offwhite); color: var(--anthrazit);
+    border:1px dashed rgba(35,35,35,0.3); align-self:flex-start;
+  }
   .post-text{ font-size:0.9rem; line-height:1.5; margin:0 0 6px; white-space:pre-wrap; }
   .post-when{ font-size:0.78rem; opacity:0.6; }
   .post-fehler{ font-size:0.8rem; color: var(--error); margin-top:6px; }
+  .post-bildidee{ font-size:0.8rem; margin-top:6px; cursor:pointer; }
+  .post-bildidee summary{ font-weight:600; color: var(--olive); }
   .post-actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; }
 
   .asc-btn-small{ font-size:11px; padding: var(--space-1) var(--space-2); }
@@ -102,6 +110,15 @@
   .modal-msg{ font-size:0.82rem; color: var(--error); min-height:1.2em; margin-top:10px; }
   .media-preview{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   .media-preview img{ width:56px; height:56px; object-fit:cover; border-radius:4px; }
+
+  .import-row{
+    border:1px solid rgba(35,35,35,0.1); border-radius:6px; padding:10px 12px;
+    margin-bottom:8px; font-size:0.85rem;
+  }
+  .import-row .post-text{ font-size:0.82rem; opacity:0.8; margin-top:4px; }
+  .import-msglist{ font-size:0.82rem; margin:10px 0; line-height:1.5; }
+  .import-msglist.is-fehler{ color: var(--error); }
+  .import-msglist ul{ margin:6px 0 0; padding-left:20px; }
 </style>
 </head>
 <body>
@@ -138,8 +155,12 @@
         <button class="filter-chip" data-filter="veroeffentlicht" type="button">Veröffentlicht</button>
         <button class="filter-chip" data-filter="fehler" type="button">Fehler</button>
       </div>
-      <button class="asc-btn asc-btn-primary" type="button" id="newPostBtn">+ Neuer Beitrag</button>
+      <div style="display:flex; gap:10px;">
+        <button class="asc-btn asc-btn-secondary" type="button" id="importBtn">Wochenplan importieren</button>
+        <button class="asc-btn asc-btn-primary" type="button" id="newPostBtn">+ Neuer Beitrag</button>
+      </div>
     </div>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none;">
 
     <div class="post-list" id="postList"></div>
     <div class="empty-state" id="emptyState" style="display:none;">Noch keine Beiträge angelegt.</div>
@@ -159,6 +180,18 @@
         <label><input type="checkbox" name="plattform" value="facebook"> Facebook</label>
         <label><input type="checkbox" name="plattform" value="linkedin"> LinkedIn</label>
       </div>
+
+      <label for="fFormat">Format</label>
+      <select id="fFormat">
+        <option value="">– kein Format –</option>
+        <option value="kachel">Kachel</option>
+        <option value="karussell">Karussell</option>
+        <option value="reel">Reel</option>
+        <option value="textpost">Textpost</option>
+      </select>
+
+      <label for="fBildidee">Bildidee (optional, wird nie veröffentlicht)</label>
+      <input type="text" id="fBildidee" maxlength="500">
 
       <label for="fMedien">Bilder</label>
       <input type="file" id="fMedien" accept="image/jpeg,image/png,image/webp" multiple>
@@ -183,6 +216,20 @@
         <button type="submit" class="asc-btn asc-btn-primary" id="saveBtn">Speichern</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importOverlay">
+  <div class="modal">
+    <h2>Wochenplan importieren</h2>
+    <div class="import-msglist" id="importErrors" style="display:none;"></div>
+    <div id="importPreview"></div>
+    <div id="importResult" style="display:none;"></div>
+    <div class="modal-actions">
+      <button type="button" class="asc-btn asc-btn-secondary" id="importCancelBtn">Abbrechen</button>
+      <button type="button" class="asc-btn asc-btn-primary" id="importConfirmBtn" style="display:none;">Als Entwürfe anlegen</button>
+      <button type="button" class="asc-btn asc-btn-primary" id="importCloseBtn" style="display:none;">Schließen</button>
+    </div>
   </div>
 </div>
 
@@ -226,25 +273,49 @@
     const modalMsg = document.getElementById('modalMsg');
     const saveBtn = document.getElementById('saveBtn');
     const mediaPreview = document.getElementById('mediaPreview');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+    const importOverlay = document.getElementById('importOverlay');
+    const importErrors = document.getElementById('importErrors');
+    const importPreview = document.getElementById('importPreview');
+    const importResult = document.getElementById('importResult');
+    const importCancelBtn = document.getElementById('importCancelBtn');
+    const importConfirmBtn = document.getElementById('importConfirmBtn');
+    const importCloseBtn = document.getElementById('importCloseBtn');
 
     let alleBeitraege = [];
     let aktuellerFilter = 'alle';
     let bearbeitetId = null;
     let vorhandeneMedien = [];
+    let collectionVerfuegbar = false;
 
     const STATUS_LABEL = {
       entwurf: 'Entwurf', geplant: 'Geplant', veroeffentlicht: 'Veröffentlicht',
       teilweise_veroeffentlicht: 'Teilweise veröffentlicht', fehler: 'Fehler'
     };
+    const FORMAT_LABEL = { kachel: 'Kachel', karussell: 'Karussell', reel: 'Reel', textpost: 'Textpost' };
+    const PLATTFORM_ERLAUBT = ['instagram', 'facebook', 'linkedin'];
+    const FORMAT_ERLAUBT = ['kachel', 'karussell', 'reel', 'textpost'];
+    const MANUELLE_FORMATE = ['reel', 'karussell'];
+
+    // Diese Formate/Plattformen kann der n8n-Workflow nicht automatisch veroeffentlichen
+    // (siehe tools/n8n-social-publish.json und tools/social-media-setup.md) - der
+    // "Jetzt veroeffentlichen"-Button wird dafuer gar nicht erst angeboten.
+    function istManuellerBeitrag(post){
+      return MANUELLE_FORMATE.includes(post.format) || (post.plattformen || []).includes('linkedin');
+    }
 
     async function ladeBeitraege(){
       try {
         alleBeitraege = await pb.collection('social_posts').getFullList({ sort: '-created' });
         setupHint.style.display = 'none';
+        collectionVerfuegbar = true;
       } catch (err) {
         alleBeitraege = [];
         setupHint.style.display = 'block';
+        collectionVerfuegbar = false;
       }
+      importBtn.disabled = !collectionVerfuegbar;
       render();
     }
 
@@ -265,28 +336,36 @@
           ? new Date(post.geplant_am).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' })
           : '–';
 
+        const manuell = istManuellerBeitrag(post);
+
         card.innerHTML = `
           ${thumbUrl ? `<img class="post-thumb" src="${thumbUrl}" alt="">` : ''}
           <div class="post-body">
             <div class="post-meta">
               <span class="badge badge-status-${post.status}">${STATUS_LABEL[post.status] || post.status}</span>
               ${(post.plattformen || []).map(p => `<span class="badge badge-plattform">${p}</span>`).join('')}
+              ${post.format ? `<span class="badge badge-format">${FORMAT_LABEL[post.format] || post.format}</span>` : ''}
               <span class="post-when">${wannText}</span>
             </div>
             <p class="post-text">${escapeHtml(post.text || '').slice(0, 220)}${(post.text || '').length > 220 ? '…' : ''}</p>
+            ${post.bildidee ? `<details class="post-bildidee"><summary>Bildidee</summary>${escapeHtml(post.bildidee)}</details>` : ''}
             ${post.fehler ? `<div class="post-fehler">${escapeHtml(post.fehler)}</div>` : ''}
           </div>
           <div class="post-actions">
             <button class="asc-btn asc-btn-secondary asc-btn-small" data-action="bearbeiten">Bearbeiten</button>
             <button class="asc-btn asc-btn-secondary asc-btn-small" data-action="kopieren">Text kopieren</button>
-            <button class="asc-btn asc-btn-primary asc-btn-small" data-action="veroeffentlichen">Jetzt veröffentlichen</button>
+            ${manuell
+              ? '<span class="badge-manuell" title="Dieses Format/diese Plattform veroeffentlicht n8n nicht automatisch - Text kopieren und manuell posten.">Manuell veröffentlichen</span>'
+              : '<button class="asc-btn asc-btn-primary asc-btn-small" data-action="veroeffentlichen">Jetzt veröffentlichen</button>'}
             <button class="asc-btn asc-btn-secondary asc-btn-small" data-action="loeschen">Löschen</button>
           </div>
         `;
 
         card.querySelector('[data-action="bearbeiten"]').addEventListener('click', () => oeffneModal(post));
         card.querySelector('[data-action="kopieren"]').addEventListener('click', () => kopiereText(post));
-        card.querySelector('[data-action="veroeffentlichen"]').addEventListener('click', (e) => veroeffentliche(post, e.target));
+        if (!manuell) {
+          card.querySelector('[data-action="veroeffentlichen"]').addEventListener('click', (e) => veroeffentliche(post, e.target));
+        }
         card.querySelector('[data-action="loeschen"]').addEventListener('click', () => loesche(post));
 
         postList.appendChild(card);
@@ -354,6 +433,8 @@
       postForm.reset();
       document.getElementById('fText').value = post ? (post.text || '') : '';
       document.getElementById('fNotiz').value = post ? (post.notiz || '') : '';
+      document.getElementById('fFormat').value = post ? (post.format || '') : '';
+      document.getElementById('fBildidee').value = post ? (post.bildidee || '') : '';
       postForm.querySelectorAll('input[name="plattform"]').forEach(cb => {
         cb.checked = post ? (post.plattformen || []).includes(cb.value) : false;
       });
@@ -393,6 +474,8 @@
       const status = postForm.querySelector('input[name="statusRadio"]:checked').value;
       const geplantAmRaw = document.getElementById('fGeplantAm').value;
       const notiz = document.getElementById('fNotiz').value.trim();
+      const format = document.getElementById('fFormat').value;
+      const bildidee = document.getElementById('fBildidee').value.trim();
       const dateien = document.getElementById('fMedien').files;
 
       if (!text) { modalMsg.textContent = 'Text fehlt.'; return; }
@@ -405,6 +488,8 @@
       formData.append('status', status);
       formData.append('geplant_am', status === 'geplant' ? new Date(geplantAmRaw).toISOString() : '');
       formData.append('notiz', notiz);
+      formData.append('format', format);
+      formData.append('bildidee', bildidee);
       Array.from(dateien).forEach(f => formData.append('medien', f));
 
       saveBtn.disabled = true;
@@ -423,6 +508,201 @@
         saveBtn.disabled = false;
         saveBtn.textContent = 'Speichern';
       }
+    });
+
+    // ---------- Wochenplan-Import ----------
+    // Erwartetes Format: siehe Abschnitt 4 der Uebergabe (tools/social-media-setup.md).
+    // Validiert rein im Browser, schreibt erst nach Bestaetigung in PocketBase.
+
+    function pruefeImportDatei(daten){
+      const fehler = [];
+      const warnungen = [];
+      if (!daten || typeof daten !== 'object') {
+        fehler.push('Datei ist kein gültiges JSON-Objekt.');
+        return { fehler, warnungen, beitraege: [] };
+      }
+      if (daten.version !== 1) fehler.push('"version" muss 1 sein.');
+      if (!Array.isArray(daten.beitraege) || daten.beitraege.length === 0) {
+        fehler.push('"beitraege" fehlt oder ist leer.');
+        return { fehler, warnungen, beitraege: [] };
+      }
+
+      const bekannteFelder = ['plattformen', 'format', 'geplant_am', 'text', 'bildidee', 'notiz'];
+      const jetzt = Date.now();
+      const isoMitOffset = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}([+-]\d{2}:\d{2}|Z)$/;
+
+      daten.beitraege.forEach((b, i) => {
+        const nr = i + 1;
+        if (!b || typeof b !== 'object') { fehler.push(`Beitrag ${nr}: ist kein Objekt.`); return; }
+
+        if (!Array.isArray(b.plattformen) || b.plattformen.length === 0) {
+          fehler.push(`Beitrag ${nr}: "plattformen" fehlt oder ist leer.`);
+        } else {
+          b.plattformen.forEach(p => {
+            if (!PLATTFORM_ERLAUBT.includes(p)) fehler.push(`Beitrag ${nr}: unbekannte Plattform "${p}".`);
+          });
+        }
+
+        if (!FORMAT_ERLAUBT.includes(b.format)) {
+          fehler.push(`Beitrag ${nr}: "format" ist "${b.format}", erlaubt sind ${FORMAT_ERLAUBT.join(', ')}.`);
+        }
+
+        if (typeof b.geplant_am !== 'string' || !isoMitOffset.test(b.geplant_am)) {
+          fehler.push(`Beitrag ${nr}: "geplant_am" ist kein gültiger ISO-8601-Zeitstempel mit Offset.`);
+        } else {
+          const d = new Date(b.geplant_am);
+          if (isNaN(d.getTime())) fehler.push(`Beitrag ${nr}: "geplant_am" lässt sich nicht als Datum lesen.`);
+          else if (d.getTime() < jetzt) warnungen.push(`Beitrag ${nr}: "geplant_am" liegt in der Vergangenheit.`);
+        }
+
+        if (typeof b.text !== 'string' || b.text.trim() === '') {
+          fehler.push(`Beitrag ${nr}: "text" fehlt.`);
+        } else {
+          if ((b.plattformen || []).includes('instagram') && b.text.length > 2200) {
+            fehler.push(`Beitrag ${nr}: Text ist für Instagram zu lang (${b.text.length}/2200 Zeichen).`);
+          }
+          if ((b.plattformen || []).includes('linkedin') && b.text.length > 3000) {
+            fehler.push(`Beitrag ${nr}: Text ist für LinkedIn zu lang (${b.text.length}/3000 Zeichen).`);
+          }
+        }
+
+        if (typeof b.bildidee !== 'string' || b.bildidee.trim() === '') {
+          fehler.push(`Beitrag ${nr}: "bildidee" fehlt.`);
+        }
+
+        Object.keys(b).forEach(k => {
+          if (!bekannteFelder.includes(k)) warnungen.push(`Beitrag ${nr}: unbekanntes Feld "${k}" wird ignoriert.`);
+        });
+      });
+
+      return { fehler, warnungen, beitraege: daten.beitraege };
+    }
+
+    function istDuplikat(beitrag){
+      const zielIso = new Date(beitrag.geplant_am).toISOString();
+      return alleBeitraege.some(p => {
+        const pIso = p.geplant_am ? new Date(p.geplant_am).toISOString() : null;
+        const pPlattformen = p.plattformen || [];
+        const gleichePlattformen = pPlattformen.length === beitrag.plattformen.length &&
+          pPlattformen.every(pl => beitrag.plattformen.includes(pl));
+        return gleichePlattformen && pIso === zielIso && (p.text || '') === beitrag.text;
+      });
+    }
+
+    function schliesseImportModal(){
+      importOverlay.classList.remove('is-open');
+    }
+
+    function zeigeImportFehler(fehler){
+      importOverlay.classList.add('is-open');
+      importErrors.style.display = 'block';
+      importErrors.className = 'import-msglist is-fehler';
+      importErrors.innerHTML = '<strong>Import nicht möglich:</strong><ul>' + fehler.map(f => `<li>${escapeHtml(f)}</li>`).join('') + '</ul>';
+      importPreview.innerHTML = '';
+      importResult.style.display = 'none';
+      importConfirmBtn.style.display = 'none';
+      importCloseBtn.style.display = 'none';
+      importCancelBtn.style.display = 'inline-block';
+    }
+
+    let importVorschauDaten = [];
+
+    function zeigeImportVorschau(beitraege, warnungen){
+      importVorschauDaten = beitraege;
+      importOverlay.classList.add('is-open');
+      if (warnungen.length) {
+        importErrors.style.display = 'block';
+        importErrors.className = 'import-msglist';
+        importErrors.innerHTML = '<strong>Hinweise:</strong><ul>' + warnungen.map(w => `<li>${escapeHtml(w)}</li>`).join('') + '</ul>';
+      } else {
+        importErrors.style.display = 'none';
+      }
+      importResult.style.display = 'none';
+      importPreview.innerHTML = beitraege.map(b => `
+        <div class="import-row">
+          <strong>${(b.plattformen || []).join(', ')}</strong> · ${FORMAT_LABEL[b.format] || b.format} ·
+          ${new Date(b.geplant_am).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' })}
+          <div class="post-text">${escapeHtml((b.text || '').slice(0, 160))}${(b.text || '').length > 160 ? '…' : ''}</div>
+        </div>
+      `).join('');
+      importConfirmBtn.style.display = 'inline-block';
+      importConfirmBtn.disabled = false;
+      importConfirmBtn.textContent = 'Als Entwürfe anlegen';
+      importCloseBtn.style.display = 'none';
+      importCancelBtn.style.display = 'inline-block';
+    }
+
+    importBtn.addEventListener('click', () => importFile.click());
+
+    importFile.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+
+      let daten;
+      try {
+        daten = JSON.parse(await file.text());
+      } catch (err) {
+        zeigeImportFehler(['Datei ist kein gültiges JSON: ' + err.message]);
+        return;
+      }
+
+      const { fehler, warnungen, beitraege } = pruefeImportDatei(daten);
+      if (fehler.length > 0) {
+        zeigeImportFehler(fehler);
+        return;
+      }
+      zeigeImportVorschau(beitraege, warnungen);
+    });
+
+    importCancelBtn.addEventListener('click', schliesseImportModal);
+    importCloseBtn.addEventListener('click', async () => {
+      schliesseImportModal();
+      await ladeBeitraege();
+    });
+
+    importConfirmBtn.addEventListener('click', async () => {
+      importConfirmBtn.disabled = true;
+      importConfirmBtn.textContent = 'Lege an …';
+
+      let angelegt = 0;
+      const uebersprungen = [];
+      const fehlgeschlagen = [];
+
+      for (const b of importVorschauDaten) {
+        if (istDuplikat(b)) { uebersprungen.push(b); continue; }
+        try {
+          await pb.collection('social_posts').create({
+            plattformen: b.plattformen,
+            format: b.format,
+            geplant_am: new Date(b.geplant_am).toISOString(),
+            text: b.text,
+            bildidee: b.bildidee,
+            notiz: b.notiz || '',
+            status: 'entwurf'
+          });
+          angelegt++;
+        } catch (err) {
+          fehlgeschlagen.push({ beitrag: b, fehler: err?.message || String(err) });
+        }
+      }
+
+      importPreview.innerHTML = '';
+      importErrors.style.display = 'none';
+      importResult.style.display = 'block';
+      importResult.innerHTML = `
+        <p><strong>${angelegt}</strong> Entwurf/Entwürfe angelegt.</p>
+        ${uebersprungen.length ? `<p>${uebersprungen.length} bereits vorhanden, übersprungen.</p>` : ''}
+        ${fehlgeschlagen.length
+          ? `<p style="color:var(--error)">${fehlgeschlagen.length} fehlgeschlagen:</p>
+             <ul class="import-msglist is-fehler">${fehlgeschlagen.map(f =>
+               `<li>${escapeHtml((f.beitrag.plattformen || []).join('/'))} – ${escapeHtml(f.fehler)}</li>`
+             ).join('')}</ul>`
+          : ''}
+      `;
+      importConfirmBtn.style.display = 'none';
+      importCancelBtn.style.display = 'none';
+      importCloseBtn.style.display = 'inline-block';
     });
 
     ladeBeitraege();

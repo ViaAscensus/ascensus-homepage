@@ -33,6 +33,8 @@ In der PocketBase-Admin-Oberfläche (`pb.ascensus.fit/_/`) eine neue Collection
 | `ergebnis` | JSON | wird von n8n befüllt: `{instagram:{ok,url,fehler}, facebook:{...}, linkedin:{...}}` |
 | `fehler` | Text | letzte Fehlermeldung, von n8n befüllt |
 | `notiz` | Text | optionale interne Notiz, nie veröffentlicht |
+| `format` | Select, einfach | Werte: `kachel`, `karussell`, `reel`, `textpost`; nicht erforderlich |
+| `bildidee` | Text | Freitext-Beschreibung des gewünschten Bildes/Videos, nie veröffentlicht; nicht erforderlich |
 
 **API-Regeln** – nur Patrick darf lesen/schreiben:
 
@@ -77,6 +79,16 @@ eigenen Datei-Proxy – das ist in dieser Vorlage nicht enthalten.
 keine Mehrbild-Alben, keine Videos/Reels (Reels brauchen einen asynchronen
 Verarbeitungsschritt mit Status-Abfrage, der hier fehlt). Reicht für Foto- und
 Text-Posts.
+
+**Deshalb automatisiert der Workflow absichtlich nicht alles:** Beiträge mit
+`format` `reel` oder `karussell`, sowie jeder Beitrag, der `linkedin` unter
+seinen `plattformen` hat, veröffentlicht `tools/n8n-social-publish.json`
+grundsätzlich nicht automatisch – weder über den Cron noch über den Webhook
+(Node „Nur automatisierte Formate?" fängt das ab, bevor irgendeine
+Plattform-API aufgerufen wird). Nur `kachel` auf Instagram/Facebook läuft über
+n8n. `social-planer.html` bietet für alle anderen Beiträge statt „Jetzt
+veröffentlichen" nur noch „Manuell veröffentlichen" an – der verlässliche Weg
+bleibt „Text kopieren" und selbst hochladen.
 
 ## 3. LinkedIn
 
@@ -123,3 +135,28 @@ verlässliche Standardweg – manuell in LinkedIn einfügen, geht in zwei Klicks
   ob der Cron ihn automatisch holt.
 * LinkedIn separat testen und realistisch einschätzen, ob es bei Dir
   funktioniert (siehe Abschnitt 3).
+
+## 6. Wochenplan importieren
+
+Der Skill `ascensus-social-planer` liefert eine JSON-Datei mit den Beiträgen
+einer Woche (Dateiname `social-import-<Jahr>-KW<Woche>.json`). So verarbeitest
+Du sie:
+
+1. Auf `social-planer.html` oben auf „Wochenplan importieren" klicken und die
+   Datei auswählen. Der Button ist erst aktiv, wenn die Collection
+   `social_posts` existiert (siehe Abschnitt 1).
+2. Ist die Datei fehlerhaft (z. B. fehlendes `format`), zeigt die Seite eine
+   deutsche Fehlerliste und legt **nichts** an.
+3. Bei einer gültigen Datei siehst Du eine Vorschau aller Beiträge (Plattform,
+   Format, Termin, Textanfang). Mit „Als Entwürfe anlegen" bestätigen.
+4. Jeder Beitrag landet als `status: entwurf` in `social_posts` – geprüft,
+   freigegeben und terminiert wird weiterhin direkt im Planer. Bereits
+   vorhandene Beiträge (gleiche Plattformen, gleicher Termin, gleicher Text)
+   werden übersprungen, ein erneuter Import derselben Datei legt also nichts
+   doppelt an.
+5. Bilder gehören nicht zum Import – die hängst Du bei Bedarf selbst an
+   (Bearbeiten → Bilder), die `bildidee` aus dem Import steht dafür als
+   eingeklappte Notiz auf der Karte.
+6. Beiträge mit Format „Reel"/„Karussell" oder mit LinkedIn werden nicht
+   automatisch veröffentlicht (siehe Abschnitt 2) – die Karte zeigt dafür
+   „Manuell veröffentlichen" statt „Jetzt veröffentlichen".
