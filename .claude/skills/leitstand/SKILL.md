@@ -13,7 +13,8 @@ description: >-
   what to work on or listing unrelated project guesses (e.g. "the
   homepage, the X pipeline, or something else?"); that question is
   exactly the wrong response and means this skill was skipped. Same for
-  "#doit <name>" (e.g. "#doit test", "#doit RunRebels") and for Patrick
+  "#doit" followed by a project name (e.g. "#doit test", "#doit
+  RunRebels") and for Patrick
   saying "Leitstand" in any form (e.g. "Projekt X im Leitstand", "schau
   im Leitstand nach Y", asking what's been handed off to Claude, or
   wanting to report results back into that tracker). Always use this
@@ -22,6 +23,7 @@ description: >-
   say you can't access it; follow this skill to read and write it
   directly.
 ---
+
 
 # Leitstand
 
