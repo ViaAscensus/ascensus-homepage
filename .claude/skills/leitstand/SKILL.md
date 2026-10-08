@@ -328,14 +328,22 @@ entirely, don't try to open or guess at it.
    first (`search_files` with `title contains` / `fullText contains` the
    topic — not scoped to just the two folders above, the right home might
    be `sport/`, `person/`, etc.) for an existing note on that topic.
-2. **Found one** → read its current content, then `update_file` with the
-   new conclusion merged in (update the relevant section/line, keep
-   everything else) — never blindly overwrite the whole note, and never
-   create a second note for something that already has one.
+2. **Found one** → this connector's `update_file` tool only changes a
+   file's title/parent folder, it **cannot replace a file's content** —
+   there is no content-update call. To "update" a note: `read_file_content`
+   (or `download_file_content`) its current text, merge in the new
+   conclusion (keep everything else, update the relevant section/line),
+   `trash_file` the old one, then `create_file` a new one with the exact
+   same title in the exact same `parentId` holding the merged text. Never
+   create a second note with a different name for something that already
+   has one — same title, same folder, just a fresh file underneath.
 3. **Nothing found** → `create_file` a new note in whichever existing
    folder it actually belongs to, named to match the convention already
    used there (e.g. `ascensus-<topic>.md` in `notes/ascensus/`, bare
-   `<topic>.md` in `notes/projekte/`).
+   `<topic>.md` in `notes/projekte/`). Always pass
+   `contentMimeType: "text/markdown"` and `disableConversionToGoogleType: true`
+   — without that second flag Drive silently converts the upload into a
+   Google Doc, which Obsidian can't read as a vault note.
 4. Content is the **distilled final state only** — what's true now, what
    was decided, where the result lives — never a transcript or a
    blow-by-blow of how the session got there. This is exactly what keeps
