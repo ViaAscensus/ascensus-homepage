@@ -121,6 +121,36 @@ squeezed into existing text and so a step can carry its own attachment):
 | `erstellt` / `aktualisiert` | Timestamps |
 | `antwort_auf` | Self-relation to another `projekt_schritte` record, nullable. When set, the Leitstand UI threads this step as a chat message continuing that step's conversation instead of showing it as an unrelated new one — this is how a task and its answer(s) stay visually and structurally grouped. See "Finishing the task" below: this is the field that makes your result land in the right place |
 | `autor` | `"patrick"` or `"claude"` — who wrote this step. The Leitstand UI renders each branch as a chat (Patrick's messages left, Claude's right), so this is required on every step you create. Always `"claude"` for anything you write — never guess `"patrick"` on his behalf |
+| `position` | Number, only set on top-level steps (no `antwort_auf`). Controls the order of "ideas" in the UI, reorderable there via arrow buttons. Irrelevant for replies — never set it when `antwort_auf` is set |
+
+## Resolving "Schritt N" references
+
+The Leitstand UI numbers every chat box in a project sequentially ("Schritt
+1", "Schritt 2", …) across the *whole* project, not restarting per idea —
+so when Patrick says "Schritt 3" (e.g. "#doit social media Schritt 3"), he
+means one specific branch, distinct from sibling branches of the same idea
+(e.g. one of several post variants that all forked from the same original
+idea). To find which `projekt_schritte` record(s) that is from the raw API
+data, reproduce the same deterministic numbering:
+
+1. Take the project's top-level steps (`antwort_auf` empty), sort by
+   `position` ascending (fall back to `erstellt` when `position` is
+   missing or tied).
+2. Walk each one's `antwort_auf` chain in order. As long as a step has 0 or
+   1 replies, it's the same chat box. The moment a step has 2+ replies,
+   that box ends there, and **each** reply starts a new box that begins
+   with the same branching step as shared context (repeated across every
+   new box).
+3. Number each box that's produced in step 2, in the exact order produced,
+   starting at 1, continuing across all top-level steps (don't restart the
+   counter per idea).
+
+This exactly matches what `buildChatGroups()` in the `leitstand` repo's
+`index.html` computes (documented in its `CLAUDE.md` under "Schritt-
+Nummern") — if in doubt, that's the source of truth. Reordering ideas (the
+arrow buttons) changes `position` and therefore can shift which box a
+given number refers to — if a number seems off, recompute from current
+data rather than trusting an old mention of "Schritt N" in chat history.
 
 ## "#doit" shorthand
 
