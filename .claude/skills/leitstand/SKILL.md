@@ -34,7 +34,9 @@ in there, not just acknowledge the request.
 
 ## Where the data lives
 
-PocketBase instance: `https://pb.ascensus.fit`, collection `projekte`.
+PocketBase instance: `https://pb.ascensus.fit`, two collections:
+`projekte` (the projects themselves) and `projekt_schritte` (their next
+steps — each one its own record, not a line in a text field; see below).
 
 Authenticate as a record in the `api_clients` auth collection (the same
 account used elsewhere for Ascensus automation). The credentials should be
@@ -66,12 +68,23 @@ Each `projekte` record has:
 |---|---|
 | `name` | Project name |
 | `status` | `offen` / `in_arbeit` / `wartet_auf_freigabe` / `erledigt` / `pausiert` |
-| `stand` | Current state — one point per line (`\n`-separated), rendered as bullets in the Leitstand UI |
-| `schritte` | Next steps — same one-point-per-line format. Often the *last* line is a direct instruction to you, not just a note (e.g. "bitte X erledigen") — read it as a task, not as background |
+| `stand` | Current state — one point per line (`\n`-separated), rendered as bullets in the Leitstand UI. Stays a flat text field by design, unlike `schritte` below |
 | `quelle` | Where the record came from (usually `leitstand`) |
 | `erstellt` / `aktualisiert` | Timestamps |
 | `claude_auftrag` | Timestamp, nullable. Set when Patrick clicks "→ An Claude senden" in the UI — his explicit signal that this project is ready for you to work on |
-| `anhaenge` | Array of uploaded filenames (0+), stored by PocketBase's file field. A `schritte` line like "siehe Screenshot im Anhang" means the actual task content is IN that file, not fully spelled out in text — fetch and read it (`GET <PB_URL>/api/files/projekte/<record id>/<filename>`, same `Authorization` header) before doing the work, don't guess at what it shows |
+| `anhaenge` | Array of uploaded filenames (0+), general attachments on the project itself (not tied to one step) |
+
+Each `projekt_schritte` record (one per next-step item, not a line in a
+field — Patrick deliberately split this out so a new step never has to be
+squeezed into existing text and so a step can carry its own attachment):
+
+| Field | Meaning |
+|---|---|
+| `projekt` | Relation to the `projekte` record this step belongs to |
+| `text` | The step itself. Often *is* a direct instruction to you, not just a note (e.g. "bitte X erledigen") — especially the most recently created one — read it as a task, not as background |
+| `erledigt` | Bool — ticked in the UI when done |
+| `anhaenge` | Array of filenames, attachments on THIS step specifically. A `text` like "siehe Screenshot im Anhang" means the actual brief is IN this step's own file, not the project's — fetch it from `GET <PB_URL>/api/files/projekt_schritte/<step id>/<filename>` (same `Authorization` header) before doing the work, don't guess at what it shows |
+| `erstellt` / `aktualisiert` | Timestamps |
 
 ## "#doit" shorthand
 
@@ -107,13 +120,18 @@ inventing unrelated options to choose from is not.
   on his side, and this is how you find it without him having to repeat
   the instruction in chat.
 
+Once you have the project's id, fetch its steps separately:
+```
+GET /api/collections/projekt_schritte/records?filter=projekt="<project id>"&sort=erstellt
+```
+
 ## Doing the work
 
-1. Read `stand` and `schritte` carefully — `schritte` especially often
-   *is* the task, phrased as a note to self rather than a formal request.
-   If it references an attachment, read that file too (see the `anhaenge`
-   row above) before you start — the real brief may be in there, not in
-   the text.
+1. Read `stand` and the project's `projekt_schritte` carefully — the
+   most recent step especially often *is* the task, phrased as a note to
+   self rather than a formal request. If it references an attachment,
+   read that step's own file too (see the `anhaenge` row above) before
+   you start — the real brief may be in there, not in the text.
 2. Actually do what's asked — research, write code, check something,
    whatever it calls for — the same way you would if Patrick had typed
    the instruction directly in this conversation. The record is a stand-in
@@ -129,19 +147,24 @@ a chat he had once. Don't treat the PocketBase write as a courtesy
 afterthought; it's the actual deliverable. The chat reply is just you
 telling him you did it.
 
-1. **Write the result into PocketBase.** Append a new line to `schritte`
-   (don't delete the existing ones — the history matters) and update
-   `status` if the work changes it. Do this *before* writing your chat
-   reply, not after, so you can't skip it under time pressure once the
-   "real" work feels finished.
+1. **Write the result into PocketBase as a new step.** Create a new
+   `projekt_schritte` record linked to the project — don't edit or
+   append to an existing one, each step is its own record now. Update
+   the project's `status` too if the work changes it. Do this *before*
+   writing your chat reply, not after, so you can't skip it under time
+   pressure once the "real" work feels finished.
    ```
-   PATCH /api/collections/projekte/records/<id>
-   Body: {"schritte": "<existing schritte>\n<new line>", "aktualisiert": "<now, ISO 8601>", "status": "..."}
+   POST /api/collections/projekt_schritte/records
+   Body: {"projekt": "<project id>", "text": "...", "erledigt": false,
+          "erstellt": "<now, ISO 8601>", "aktualisiert": "<now>"}
    ```
+   (separately, if needed: `PATCH /api/collections/projekte/records/<id>`
+   with `{"status": "...", "aktualisiert": "<now>"}`)
+
    If the result is long-form content (e.g. drafted posts, a full plan),
-   put the actual content in `schritte`, not just a pointer to it — the
-   whole point is that it's there the next time he opens the project,
-   without needing this chat.
+   put the actual content in this step's `text`, not just a pointer to
+   it — the whole point is that it's there the next time he opens the
+   project, without needing this chat.
 2. **Then summarize in chat too**, so he knows it's done without having
    to go check.
 
