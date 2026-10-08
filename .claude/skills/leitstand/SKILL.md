@@ -44,6 +44,7 @@ Each `projekte` record has:
 | `quelle` | Where the record came from (usually `leitstand`) |
 | `erstellt` / `aktualisiert` | Timestamps |
 | `claude_auftrag` | Timestamp, nullable. Set when Patrick clicks "→ An Claude senden" in the UI — his explicit signal that this project is ready for you to work on |
+| `anhaenge` | Array of uploaded filenames (0+), stored by PocketBase's file field. A `schritte` line like "siehe Screenshot im Anhang" means the actual task content is IN that file, not fully spelled out in text — fetch and read it (`GET <PB_URL>/api/files/projekte/<record id>/<filename>`, same `Authorization` header) before doing the work, don't guess at what it shows |
 
 ## "#doit" shorthand
 
@@ -76,21 +77,41 @@ as the general `claude_auftrag` check below. Don't ask him to rephrase it;
 
 1. Read `stand` and `schritte` carefully — `schritte` especially often
    *is* the task, phrased as a note to self rather than a formal request.
+   If it references an attachment, read that file too (see the `anhaenge`
+   row above) before you start — the real brief may be in there, not in
+   the text.
 2. Actually do what's asked — research, write code, check something,
    whatever it calls for — the same way you would if Patrick had typed
    the instruction directly in this conversation. The record is a stand-in
    for that message, not a ticket to triage.
-3. Report the result back into PocketBase, not just in chat, so it's
-   visible the next time he opens the Leitstand: append a new line to
-   `schritte` (don't delete the existing ones — the history matters) and
-   update `status` if the work changes it.
+
+## Finishing the task — two parts, both required
+
+A request that came in through the Leitstand is only done when **both**
+of these have happened. Producing a great answer and only putting it in
+chat is an *incomplete* response to this kind of request — Patrick opens
+the Leitstand later expecting to find the result there, not a memory of
+a chat he had once. Don't treat the PocketBase write as a courtesy
+afterthought; it's the actual deliverable. The chat reply is just you
+telling him you did it.
+
+1. **Write the result into PocketBase.** Append a new line to `schritte`
+   (don't delete the existing ones — the history matters) and update
+   `status` if the work changes it. Do this *before* writing your chat
+   reply, not after, so you can't skip it under time pressure once the
+   "real" work feels finished.
    ```
    PATCH /api/collections/projekte/records/<id>
    Body: {"schritte": "<existing schritte>\n<new line>", "aktualisiert": "<now, ISO 8601>", "status": "..."}
    ```
-4. Leave `claude_auftrag` as it is. Patrick clears it himself in the UI
-   ("Markierung entfernen") once he's seen the result — that's his
-   acknowledgment step, not yours to take away. Only clear it if he
-   explicitly asks you to.
-5. Still summarize what you did in the chat reply too — PocketBase is the
-   durable record, but he's waiting on a response here as well.
+   If the result is long-form content (e.g. drafted posts, a full plan),
+   put the actual content in `schritte`, not just a pointer to it — the
+   whole point is that it's there the next time he opens the project,
+   without needing this chat.
+2. **Then summarize in chat too**, so he knows it's done without having
+   to go check.
+
+Leave `claude_auftrag` as it is either way. Patrick clears it himself in
+the UI ("Markierung entfernen") once he's seen the result — that's his
+acknowledgment step, not yours to take away. Only clear it if he
+explicitly asks you to.
