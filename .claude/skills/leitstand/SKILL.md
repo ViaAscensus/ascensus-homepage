@@ -21,7 +21,10 @@ description: >-
   skill for such requests even when no matching repo is attached to the
   session — the data lives in PocketBase, not in a git repo, so don't
   say you can't access it; follow this skill to read and write it
-  directly.
+  directly. Also trigger on an explicit end-of-session "bring everything
+  up to date" request (e.g. "bring alles auf Stand", "trag das Offene in
+  den Leitstand und das Fertige ins zweite Gehirn") — see "Second brain"
+  below for the Obsidian-via-Google-Drive half of that.
 ---
 
 # Leitstand
@@ -277,3 +280,68 @@ Leave `claude_auftrag` as it is either way. Patrick clears it himself in
 the UI ("Markierung entfernen") once he's seen the result — that's his
 acknowledgment step, not yours to take away. Only clear it if he
 explicitly asks you to.
+
+## "Second brain" — the other half of an end-of-session update
+
+Patrick's phrase for this is something like *"bring alles auf Stand"* or
+*"trag das Offene in den Leitstand und das Fertige ins zweite Gehirn"* —
+an explicit, deliberate request at the end of a session, not something to
+do automatically on every session end. It has two halves:
+
+1. **Still-open work** → the Leitstand, exactly as described above
+   (write-back via `mcp__Leitstand__*` tools or raw HTTP).
+2. **Finished, distilled conclusions** → Patrick's Obsidian vault, which
+   lives in Google Drive (he shares one computer's vault across devices
+   that way; a *second*, separate vault on that same PC is purely local
+   and not reachable — never touch anything outside the Drive one
+   described here). Use the `mcp__Google_Drive__*` tools (`search_files`,
+   `read_file_content` / `download_file_content`, `update_file`,
+   `create_file`). If those tools aren't in this session's tool list,
+   Google Drive isn't connected here — say so and stop, don't guess at
+   another way to reach it.
+
+**Known vault structure** (confirmed 08.10.2026 — Drive has several
+other folders also named "Ascensus" that are *not* this vault; this is
+the one that actually contains `.obsidian`, so these IDs are safe to use
+directly instead of re-discovering them each time):
+
+| Path | Drive folder ID | What goes there |
+|---|---|---|
+| vault root ("ASCENSUS") | `1wwChbW5jOnRfw7wFFw_YWIk7UQMLuLbI` | — |
+| `notes/` | `1GBs4dsVLpetH_52Abx1coR_Rtz2UwiPz` | parent of the topic folders below |
+| `notes/ascensus/` | `1HVXVsof7RHW8QSNP-kgj0iuew_v2ZuYY` | broad/overview Ascensus docs (`ascensus-uebersicht.md`, `ascensus-produkte.md`, ...) |
+| `notes/projekte/` | `1qkUlgsHSJ8YOkmt4ZEYNR1hqzHNhmu8t` | specific feature/tool docs (`wochen-quiz.md`, `trainingsbuch.md`, ...) — often still Ascensus-related, just narrower |
+| `notes/sport/`, `notes/person/`, `notes/stadt-ffm/`, `notes/finanzen/` | (not yet recorded) | other life areas — a finished topic might belong here instead, don't force everything into the two above |
+| `inbox/`, `mocs/`, `_archiv/` | (not yet recorded) | Obsidian's own organizational folders — leave these alone unless Patrick asks otherwise |
+| `.obsidian/` | `1mcxzcRRl9uivJkX5P7P31kdeiXgpw50X` | Obsidian's own config — never read or write anything in here |
+
+**Never touch a `.mdenc` file** (e.g. `API.mdenc` at the vault root) —
+that extension means a note-encryption plugin is protecting it
+client-side; Drive only ever sees ciphertext, so reading one gets you
+nothing useful and writing one would corrupt it. Skip any `.mdenc` file
+entirely, don't try to open or guess at it.
+
+**Doing the write:**
+
+1. For each distinct finished/concluded thing from this session (not
+   every small step — the durable, distilled outcome), search the vault
+   first (`search_files` with `title contains` / `fullText contains` the
+   topic — not scoped to just the two folders above, the right home might
+   be `sport/`, `person/`, etc.) for an existing note on that topic.
+2. **Found one** → read its current content, then `update_file` with the
+   new conclusion merged in (update the relevant section/line, keep
+   everything else) — never blindly overwrite the whole note, and never
+   create a second note for something that already has one.
+3. **Nothing found** → `create_file` a new note in whichever existing
+   folder it actually belongs to, named to match the convention already
+   used there (e.g. `ascensus-<topic>.md` in `notes/ascensus/`, bare
+   `<topic>.md` in `notes/projekte/`).
+4. Content is the **distilled final state only** — what's true now, what
+   was decided, where the result lives — never a transcript or a
+   blow-by-blow of how the session got there. This is exactly what keeps
+   the vault usable years from now regardless of which LLM or tool reads
+   it next; a note that's really a chat log defeats the point as surely
+   as not writing one at all.
+5. Mention in your chat reply which note(s) you updated or created (with
+   enough of the path to find it), same spirit as confirming a Leitstand
+   write — Patrick shouldn't have to go check Drive to know it happened.
