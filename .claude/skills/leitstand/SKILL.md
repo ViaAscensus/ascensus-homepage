@@ -32,6 +32,40 @@ PocketBase, not in git, specifically so it survives across sessions and
 tools. When he mentions it, he wants you to actually read and act on what's
 in there, not just acknowledge the request.
 
+## Check for the MCP connector first — before anything below
+
+Patrick has a "Leitstand" custom connector (a remote MCP server, repo
+`leitstand-mcp`) that some sessions — especially Chat/Cowork, which has no
+environment secrets at all — have enabled. It exposes tools literally named
+`mcp__Leitstand__leitstand_liste_projekte`,
+`mcp__Leitstand__leitstand_projekt_schritte`,
+`mcp__Leitstand__leitstand_schritt_anlegen`,
+`mcp__Leitstand__leitstand_schritt_aktualisieren`,
+`mcp__Leitstand__leitstand_projekt_aktualisieren`, and
+`mcp__Leitstand__leitstand_anhang_lesen`.
+
+**If those tools are present in this session (check the tool list, or run
+`ToolSearch` for "Leitstand" if tools can be deferred here), use them
+directly for everything below — reading projects, reading steps, writing
+new steps, updating status — instead of raw HTTP calls to PocketBase.**
+They already hold the PocketBase credentials server-side; nothing to
+authenticate, no environment secret to look for or ask Patrick about. Skip
+straight to "Finding the right record(s)" below and call the tools instead
+of the `GET`/`POST`/`PATCH` examples shown there — same filters, same
+field names, just as tool arguments instead of raw requests.
+
+This isn't an edge case to fall back on if HTTP fails — a known real
+failure looked exactly like that: a Chat/Cowork session had the connector
+available and working, but followed the HTTP instructions below anyway,
+hit a blocked network + missing env secrets, and reported the write step
+as impossible even though the write tool was sitting right there in its
+own tool list. Checking for the connector's tools is the first thing to
+do in this skill, before reading any further.
+
+Only when those `mcp__Leitstand__*` tools are *not* present in this
+session's tool list does the rest of this section (raw PocketBase HTTP via
+environment secrets) apply.
+
 ## Where the data lives
 
 PocketBase instance: `https://pb.ascensus.fit`, two collections:
@@ -175,6 +209,15 @@ telling him you did it.
    put the actual content in this step's `text`, not just a pointer to
    it — the whole point is that it's there the next time he opens the
    project, without needing this chat.
+
+   If the work produced a file (a generated image, a PDF) and you're going
+   through the `mcp__Leitstand__*` tools: there is currently no tool to
+   upload an attachment, only `leitstand_anhang_lesen` to read existing
+   ones. Send the file in chat as normal and say so explicitly in the step
+   `text` (e.g. "Grafik als `post1.png` im Chat geschickt, hier nicht
+   anhängbar") — don't silently skip it or claim it's attached when it
+   isn't. Going through raw PocketBase HTTP, uploading is possible
+   (multipart on the `anhaenge` field) and should actually be done.
 2. **Then summarize in chat too**, so he knows it's done without having
    to go check.
 
