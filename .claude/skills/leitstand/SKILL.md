@@ -119,7 +119,8 @@ squeezed into existing text and so a step can carry its own attachment):
 | `erledigt` | Bool — ticked in the UI when done |
 | `anhaenge` | Array of filenames, attachments on THIS step specifically. A `text` like "siehe Screenshot im Anhang" means the actual brief is IN this step's own file, not the project's — fetch it from `GET <PB_URL>/api/files/projekt_schritte/<step id>/<filename>` (same `Authorization` header) before doing the work, don't guess at what it shows |
 | `erstellt` / `aktualisiert` | Timestamps |
-| `antwort_auf` | Self-relation to another `projekt_schritte` record, nullable. When set, the Leitstand UI nests this step inside the box of the one it points to instead of showing it as a separate sibling row — this is how a task and its answer(s) stay visually and structurally grouped. See "Finishing the task" below: this is the field that makes your result land in the right place |
+| `antwort_auf` | Self-relation to another `projekt_schritte` record, nullable. When set, the Leitstand UI threads this step as a chat message continuing that step's conversation instead of showing it as an unrelated new one — this is how a task and its answer(s) stay visually and structurally grouped. See "Finishing the task" below: this is the field that makes your result land in the right place |
+| `autor` | `"patrick"` or `"claude"` — who wrote this step. The Leitstand UI renders each branch as a chat (Patrick's messages left, Claude's right), so this is required on every step you create. Always `"claude"` for anything you write — never guess `"patrick"` on his behalf |
 
 ## "#doit" shorthand
 
@@ -199,9 +200,15 @@ telling him you did it.
    ```
    POST /api/collections/projekt_schritte/records
    Body: {"projekt": "<project id>", "antwort_auf": "<id of the step you're answering, or omit>",
-          "text": "...", "erledigt": false,
+          "text": "...", "erledigt": false, "autor": "claude",
           "erstellt": "<now, ISO 8601>", "aktualisiert": "<now>"}
    ```
+   `"autor": "claude"` is always required on every step you create this
+   way — it's how the Leitstand UI tells your messages apart from
+   Patrick's own (chat-bubble layout, his on the left, yours on the
+   right). Going through the `mcp__Leitstand__*` tools instead, this is
+   set automatically — only relevant for this raw-HTTP fallback path.
+
    (separately, if needed: `PATCH /api/collections/projekte/records/<id>`
    with `{"status": "...", "aktualisiert": "<now>"}`)
 
