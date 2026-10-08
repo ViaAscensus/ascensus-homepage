@@ -218,6 +218,21 @@ telling him you did it.
    anhängbar") — don't silently skip it or claim it's attached when it
    isn't. Going through raw PocketBase HTTP, uploading is possible
    (multipart on the `anhaenge` field) and should actually be done.
+
+   **Exception — correcting your own just-written step, same turn:**
+   "don't edit an existing one" above is about Patrick's steps and about
+   past answers from earlier sessions; it does not mean every small
+   follow-up within the *same* piece of work has to become its own nested
+   reply. If you wrote a step a moment ago in this same turn and now need
+   to fix a typo in it, add a missed detail, or extend it before you're
+   done — `leitstand_schritt_aktualisieren` (or `PATCH`) that same step
+   instead of creating another one nested under it. Deeply nested chains
+   of tiny self-corrections are exactly what made the Leitstand UI
+   unreadable before it got collapse/indent-cap support (see `leitstand`
+   repo's `CLAUDE.md`), so don't reproduce that by habit. This exception
+   stops as soon as the content is a genuinely new answer — to a new
+   instruction from Patrick, or to a different step entirely — that gets
+   its own new step with `antwort_auf` as described above, same as ever.
 2. **Then summarize in chat too**, so he knows it's done without having
    to go check.
 
