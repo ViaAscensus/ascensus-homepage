@@ -1,6 +1,26 @@
 ---
 name: leitstand
-description: Check and work on tasks from Patrick's personal "Leitstand" project cockpit (a PocketBase-backed tracker at pb.ascensus.fit, unrelated to any specific repo). Trigger immediately whenever Patrick's message is, contains, or starts with "#doit" — including when the ENTIRE message is literally just "#doit" and nothing else, with no project name, no other text, no context in the conversation. That bare form is not an incomplete or ambiguous request needing clarification: it's a complete, specific instruction meaning "check PocketBase for anything flagged claude_auftrag and work on it" — never respond to it by asking what to work on or listing unrelated project guesses (e.g. "the homepage, the X pipeline, or something else?"); that question is exactly the wrong response and means this skill was skipped. Same for "#doit <name>" (e.g. "#doit test", "#doit RunRebels") and for Patrick saying "Leitstand" in any form (e.g. "Projekt X im Leitstand", "schau im Leitstand nach Y", asking what's been handed off to Claude, or wanting to report results back into that tracker). Always use this skill for such requests even when no matching repo is attached to the session — the data lives in PocketBase, not in a git repo, so don't say you can't access it; follow this skill to read and write it directly.
+description: >-
+  Check and work on tasks from Patrick's personal "Leitstand" project
+  cockpit (a PocketBase-backed tracker at pb.ascensus.fit, unrelated to
+  any specific repo). Trigger immediately whenever Patrick's message is,
+  contains, or starts with "#doit" — including when the ENTIRE message
+  is literally just "#doit" and nothing else, with no project name, no
+  other text, no context in the conversation. That bare form is not an
+  incomplete or ambiguous request needing clarification. It is a
+  complete, specific instruction meaning "check PocketBase for anything
+  flagged claude_auftrag and work on it" — never respond to it by asking
+  what to work on or listing unrelated project guesses (e.g. "the
+  homepage, the X pipeline, or something else?"); that question is
+  exactly the wrong response and means this skill was skipped. Same for
+  "#doit <name>" (e.g. "#doit test", "#doit RunRebels") and for Patrick
+  saying "Leitstand" in any form (e.g. "Projekt X im Leitstand", "schau
+  im Leitstand nach Y", asking what's been handed off to Claude, or
+  wanting to report results back into that tracker). Always use this
+  skill for such requests even when no matching repo is attached to the
+  session — the data lives in PocketBase, not in a git repo, so don't
+  say you can't access it; follow this skill to read and write it
+  directly.
 ---
 
 # Leitstand
