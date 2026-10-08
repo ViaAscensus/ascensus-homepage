@@ -85,6 +85,7 @@ squeezed into existing text and so a step can carry its own attachment):
 | `erledigt` | Bool — ticked in the UI when done |
 | `anhaenge` | Array of filenames, attachments on THIS step specifically. A `text` like "siehe Screenshot im Anhang" means the actual brief is IN this step's own file, not the project's — fetch it from `GET <PB_URL>/api/files/projekt_schritte/<step id>/<filename>` (same `Authorization` header) before doing the work, don't guess at what it shows |
 | `erstellt` / `aktualisiert` | Timestamps |
+| `antwort_auf` | Self-relation to another `projekt_schritte` record, nullable. When set, the Leitstand UI nests this step inside the box of the one it points to instead of showing it as a separate sibling row — this is how a task and its answer(s) stay visually and structurally grouped. See "Finishing the task" below: this is the field that makes your result land in the right place |
 
 ## "#doit" shorthand
 
@@ -147,15 +148,24 @@ a chat he had once. Don't treat the PocketBase write as a courtesy
 afterthought; it's the actual deliverable. The chat reply is just you
 telling him you did it.
 
-1. **Write the result into PocketBase as a new step.** Create a new
-   `projekt_schritte` record linked to the project — don't edit or
-   append to an existing one, each step is its own record now. Update
-   the project's `status` too if the work changes it. Do this *before*
+1. **Write the result into PocketBase as a new step, nested under the one
+   that asked for it.** Create a new `projekt_schritte` record linked to
+   the project — don't edit or append to an existing one, each step is
+   its own record. If this is a reply to a specific existing step (the
+   normal case — you read a step, did what it asked, now you're writing
+   the result), also set `antwort_auf` to that step's id, so your answer
+   nests inside its box in the UI instead of sitting as a disconnected
+   sibling row below it (Patrick explicitly asked for this after the
+   first version put task and answer side by side with no visible
+   connection). Only omit `antwort_auf` when you're genuinely adding a
+   new, independent next step rather than answering one. Update the
+   project's `status` too if the work changes it. Do this *before*
    writing your chat reply, not after, so you can't skip it under time
    pressure once the "real" work feels finished.
    ```
    POST /api/collections/projekt_schritte/records
-   Body: {"projekt": "<project id>", "text": "...", "erledigt": false,
+   Body: {"projekt": "<project id>", "antwort_auf": "<id of the step you're answering, or omit>",
+          "text": "...", "erledigt": false,
           "erstellt": "<now, ISO 8601>", "aktualisiert": "<now>"}
    ```
    (separately, if needed: `PATCH /api/collections/projekte/records/<id>`
