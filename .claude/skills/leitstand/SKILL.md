@@ -1,6 +1,6 @@
 ---
 name: leitstand
-description: Check and work on tasks from Patrick's personal "Leitstand" project cockpit (a PocketBase-backed tracker at pb.ascensus.fit, unrelated to any specific repo). Use this whenever Patrick writes "#doit" (alone, or followed by a project name, e.g. "#doit test", "#doit RunRebels") or says "Leitstand" in any form (e.g. "Projekt X im Leitstand", "schau im Leitstand nach Y"), asks what's been handed off to Claude, asks about the status or next steps of a personal project that isn't part of the currently attached repository, or wants to report back results into that tracker. "#doit" is his short form for this skill — treat it exactly like a full "check the Leitstand" request, never as a literal hashtag or formatting instruction. Always use this skill for such requests even when no matching repo is attached to the session — the data lives in PocketBase, not in a git repo, so don't say you can't access it; follow this skill to read and write it directly.
+description: Check and work on tasks from Patrick's personal "Leitstand" project cockpit (a PocketBase-backed tracker at pb.ascensus.fit, unrelated to any specific repo). Trigger immediately whenever Patrick's message is, contains, or starts with "#doit" — including when the ENTIRE message is literally just "#doit" and nothing else, with no project name, no other text, no context in the conversation. That bare form is not an incomplete or ambiguous request needing clarification: it's a complete, specific instruction meaning "check PocketBase for anything flagged claude_auftrag and work on it" — never respond to it by asking what to work on or listing unrelated project guesses (e.g. "the homepage, the X pipeline, or something else?"); that question is exactly the wrong response and means this skill was skipped. Same for "#doit <name>" (e.g. "#doit test", "#doit RunRebels") and for Patrick saying "Leitstand" in any form (e.g. "Projekt X im Leitstand", "schau im Leitstand nach Y", asking what's been handed off to Claude, or wanting to report results back into that tracker). Always use this skill for such requests even when no matching repo is attached to the session — the data lives in PocketBase, not in a git repo, so don't say you can't access it; follow this skill to read and write it directly.
 ---
 
 # Leitstand
@@ -52,8 +52,15 @@ Patrick's fast way to invoke this skill: `#doit <name>` means "look up
 project `<name>` in the Leitstand and do what it says" — identical to him
 spelling out "schau im Leitstand nach Projekt `<name>`". Bare `#doit` with
 no name means "check what's been handed off to you generally" — the same
-as the general `claude_auftrag` check below. Don't ask him to rephrase it;
-`#doit` is the point, not a shortcut to question.
+as the general `claude_auftrag` check below, nothing more ambiguous than
+that. It is never a prompt to ask him what to work on, and never a cue to
+guess at other projects (a known failure mode: one session answered bare
+`#doit` with "no task specified in chat yet — want me to work on the
+homepage, the Anamnese pipeline, or the weekly quiz?", which skipped
+PocketBase entirely and defeated the whole point — the task lives there,
+not in this chat's history). If the handoff query comes back empty, say
+that plainly ("nichts im Leitstand markiert") — that's a fine answer;
+inventing unrelated options to choose from is not.
 
 ## Finding the right record(s)
 
