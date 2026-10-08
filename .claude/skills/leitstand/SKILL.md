@@ -24,7 +24,6 @@ description: >-
   directly.
 ---
 
-
 # Leitstand
 
 Patrick's personal project cockpit — a status tracker for everything he's
@@ -39,10 +38,16 @@ PocketBase instance: `https://pb.ascensus.fit`, collection `projekte`.
 
 Authenticate as a record in the `api_clients` auth collection (the same
 account used elsewhere for Ascensus automation). The credentials should be
-available as an environment secret in this session — check environment
-variables for something PocketBase-related first. If nothing is set, ask
-Patrick to add one as an environment secret for this session (never ask him
-to paste a password into chat) rather than guessing or blocking silently.
+available as an environment secret in this session, under these exact
+names — check for them first:
+- `PB_API_CLIENTS_EMAIL`
+- `PB_API_CLIENTS_PASSWORD`
+
+If they're not set (or set under different names in an older session),
+ask Patrick to add them as an environment secret for this session under
+those exact names, via the session's environment settings — never ask
+him to paste a password into chat, and don't guess at other variable
+names or block silently.
 
 Auth call:
 ```
