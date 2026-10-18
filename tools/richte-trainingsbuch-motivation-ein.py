@@ -27,10 +27,14 @@ Aufruf
     python3 tools/richte-trainingsbuch-motivation-ein.py --schreiben  # ausführen
 
 Zugang (Schema anlegen darf nur ein Superuser, das api_clients-Konto reicht nicht)
-    PB_EMAIL=patrick@ascensus.fit PB_PASSWORD=... python3 ... --schreiben
-  Fehlt PB_PASSWORD, wird es verdeckt abgefragt. Alternativ ein Superuser-Token
-  über PB_TOKEN (pur, ohne "Bearer"-Präfix wie bei den anderen Werkzeugen).
-  PB_URL überschreibt die Adresse (Standard https://pb.ascensus.fit).
+  Das Skript fragt beim Start nach E-Mail und Passwort des PocketBase-Superusers:
+    E-Mail [patrick@ascensus.fit]:   Enter übernimmt die Vorgabe
+    Passwort:                        wird verdeckt eingegeben
+  Beim Probelauf genügt ein leeres Passwort: Dann prüft das Skript nichts gegen
+  PocketBase und zeigt nur, was es anlegen würde.
+  Wer es ohne Nachfrage braucht, kann PB_EMAIL und PB_PASSWORD setzen oder ein
+  Superuser-Token über PB_TOKEN (pur, ohne "Bearer"-Präfix wie bei den anderen
+  Werkzeugen). PB_URL überschreibt die Adresse (Standard https://pb.ascensus.fit).
 
 Voraussetzung: PocketBase ab Version 0.23 (Collection `_superusers`, `fields`).
 """
@@ -117,17 +121,38 @@ def api(pfad, methode='GET', body=None):
         raise PBFehler(e.code, e.read().decode('utf-8', 'replace')[:300]) from None
 
 
-def anmelden():
-    """Superuser-Anmeldung, sofern kein PB_TOKEN gesetzt ist."""
+STANDARD_EMAIL = 'patrick@ascensus.fit'
+
+
+def frage(text, verdeckt=False):
+    """Fragt auf dem Terminal nach; ohne Terminal (z. B. Pipe) gilt die Eingabe als leer."""
+    try:
+        return (getpass.getpass(text) if verdeckt else input(text)).strip()
+    except EOFError:
+        return ''
+
+
+def anmelden(pflicht):
+    """Fragt E-Mail und Passwort des Superusers ab und meldet an.
+
+    Mit PB_TOKEN oder PB_EMAIL/PB_PASSWORD in der Umgebung gibt es keine Nachfrage.
+    Gibt False zurück, wenn der Probelauf bewusst ohne Passwort läuft.
+    """
     global token
     if token:
-        return
-    email = os.environ.get('PB_EMAIL', 'patrick@ascensus.fit')
-    passwort = os.environ.get('PB_PASSWORD') or getpass.getpass(f'Passwort für {email}: ')
+        return True
+    email = os.environ.get('PB_EMAIL') or frage(f'E-Mail [{STANDARD_EMAIL}]: ') or STANDARD_EMAIL
+    passwort = os.environ.get('PB_PASSWORD') or frage(f'Passwort für {email}: ', verdeckt=True)
+    if not passwort:
+        if pflicht:
+            sys.exit('Ohne Passwort kann nichts angelegt werden.')
+        print('Kein Passwort eingegeben: Probelauf ohne Zugang.')
+        return False
     antwort = api('api/collections/_superusers/auth-with-password', 'POST',
                   {'identity': email, 'password': passwort})
     token = antwort['token']
     print(f'Angemeldet als {email}')
+    return True
 
 
 def hole_collection():
@@ -150,12 +175,11 @@ def main():
           + f' gegen {PB}')
 
     if schreiben:
-        anmelden()
+        anmelden(pflicht=True)
     else:
         # Der Probelauf liest nur; ohne Zugang meldet er, was zu tun wäre.
         try:
-            if os.environ.get('PB_PASSWORD') or token:
-                anmelden()
+            anmelden(pflicht=False)
         except PBFehler as e:
             print(f'Anmeldung nicht möglich ({e}); Probelauf ohne Zugang.')
 
