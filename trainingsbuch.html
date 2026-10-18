@@ -258,6 +258,47 @@
   .save-confirm-row{ display:flex; gap:8px; }
   .btn-finish{ background: var(--hart); border-color: var(--hart); color: #fff; border-radius: 999px; }
   .set-actions-row{ display:flex; gap:10px; margin-top:4px; }
+  .summary-hero{ text-align:center; padding: 32px 18px 24px; }
+  .summary-kicker{
+    font-family:'Space Grotesk', system-ui, sans-serif; font-size:0.85rem;
+    letter-spacing:0.08em; text-transform:uppercase; color: var(--accent);
+  }
+  .summary-quote{
+    font-family:'Space Grotesk', system-ui, sans-serif; font-size:1.5rem; font-weight:700;
+    line-height:1.25; margin-top:10px; min-height:2.5em;
+  }
+  .summary-h{ font-size:0.95rem; font-weight:600; color: var(--text-dim); margin-bottom:12px; }
+  .summary-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .summary-tile{
+    background: var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius); padding:14px 12px;
+  }
+  .summary-tile-value{ font-family:'Space Grotesk', system-ui, sans-serif; font-size:1.5rem; font-weight:700; }
+  .summary-tile-label{ font-size:0.78rem; color: var(--text-dim); margin-top:2px; }
+  .modal-backdrop{
+    position:fixed; inset:0; background: rgba(0,0,0,0.6); z-index:100;
+    display:flex; align-items:center; justify-content:center; padding:18px;
+  }
+  .modal-box{
+    background: var(--surface); border:1px solid var(--border-strong);
+    border-radius: var(--radius); padding:20px; max-width:380px; width:100%;
+  }
+  .modal-box h2{ font-size:1.1rem; }
+  .modal-box p{ color: var(--text-dim); font-size:0.88rem; margin:8px 0 16px; }
+  .modal-actions{ display:flex; gap:10px; }
+  .clear-wrap{ position:relative; }
+  .clear-wrap input{ padding-right:44px; }
+  .clear-btn{
+    position:absolute; right:4px; top:50%; transform:translateY(-50%);
+    width:36px; height:36px; border:none; background:transparent;
+    color: var(--text-dim); font-size:1.4rem; line-height:1; cursor:pointer; display:none;
+  }
+  .clear-btn.visible{ display:block; }
+  .record-msg{
+    margin-top:10px; padding:10px 12px; border-radius: var(--radius);
+    border:1px solid var(--accent); color: var(--text); font-size:0.9rem; font-weight:600;
+  }
+  .sound-row{ margin-top:12px; margin-bottom:0; }
   .set-actions-row .btn{ padding:17px 0; font-size:1rem; }
   #startSetBtn{ background:#556B4E; border-color:#556B4E; color:#f2f1ed; }
   #saveEntry{ background:#B59A5D; border-color:#B59A5D; color:#232323; }
@@ -536,7 +577,10 @@
     <div id="quickChips"></div>
     <div class="field">
       <label for="fExercise">Übung</label>
-      <input type="text" id="fExercise" list="exerciseList" placeholder="z. B. Armbeuger" autocomplete="off">
+      <div class="clear-wrap">
+        <input type="text" id="fExercise" list="exerciseList" placeholder="z. B. Armbeuger" autocomplete="off">
+        <button type="button" class="clear-btn" id="clearExerciseBtn" aria-label="Übung löschen">×</button>
+      </div>
       <datalist id="exerciseList"></datalist>
     </div>
     <button class="btn btn-primary" id="continueToDetailBtn" style="width:100%;">Weiter</button>
@@ -547,6 +591,7 @@
     <h2 id="detailExerciseName"></h2>
     <div class="hint" id="todayPositionHint" style="margin-top:0; margin-bottom:4px; color: var(--accent);"></div>
     <div class="hint" id="lastHint"></div>
+    <button type="button" class="btn btn-primary" id="startSetBtn" style="width:100%; margin-bottom:14px;">Satz beginnen</button>
     <label class="bw-check">
       <input type="checkbox" id="fBodyweight">
       Nur Körpergewicht (kein Zusatzgewicht)
@@ -583,9 +628,9 @@
       <button type="button" class="btn btn-primary" id="nextExerciseBtn" style="width:100%; margin-top:10px;">Nächste Übung</button>
     </div>
     <div class="set-actions-row">
-      <button type="button" class="btn" id="startSetBtn">Satz beginnen</button>
-      <button type="button" class="btn" id="saveEntry">Satz beenden</button>
+      <button type="button" class="btn btn-primary" id="saveEntry" disabled>Satz beenden</button>
     </div>
+    <div class="record-msg" id="recordMsg" style="display:none;"></div>
     <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Andere Übung</button>
     <div class="formmsg" id="formMsg"></div>
   </section>
@@ -593,14 +638,15 @@
   <details class="timer-wrap" id="timerWrap">
     <summary>
       <span>⏱ Pausen-Timer</span>
-      <span class="timer-summary-value" id="timerSummaryValue">01:30</span>
+      <span class="timer-summary-value" id="timerSummaryValue">02:30</span>
     </summary>
     <section id="timer-section">
-      <div class="timer-display" id="timerDisplay">01:30</div>
+      <div class="timer-display" id="timerDisplay">02:30</div>
       <div class="presets">
         <div class="chip" data-secs="60">60 s</div>
-        <div class="chip active" data-secs="90">90 s</div>
+        <div class="chip" data-secs="90">90 s</div>
         <div class="chip" data-secs="120">120 s</div>
+        <div class="chip active" data-secs="150">150 s</div>
         <div class="chip" data-secs="180">180 s</div>
       </div>
       <div class="custom-row">
@@ -610,11 +656,49 @@
       <div class="timer-controls">
         <button class="btn btn-primary" id="startPause">Start</button>
         <button class="btn" id="resetTimer">Reset</button>
+        <button class="btn" id="skipPause">Pause überspringen</button>
       </div>
+      <label class="bw-check sound-row">
+        <input type="checkbox" id="soundToggle" checked>
+        Ton an
+      </label>
     </section>
   </details>
 
   <button class="btn btn-finish" id="finishDayBtn" style="width: calc(100% - 36px); margin: 0 18px 18px;">Training fertig</button>
+</div>
+
+<!-- Zusammenfassung nach beendetem Training -->
+<div class="screen" id="summary-screen">
+  <section class="summary-hero">
+    <div class="summary-kicker">Training geschafft</div>
+    <div class="summary-quote" id="summaryQuote"></div>
+  </section>
+  <section>
+    <h2 class="summary-h">Dein Training</h2>
+    <div class="summary-grid" id="summaryStats"></div>
+  </section>
+  <section id="summaryRecordsSection" style="display:none;">
+    <h2 class="summary-h">🏆 Neue Rekorde</h2>
+    <div id="summaryRecords"></div>
+  </section>
+  <section>
+    <button type="button" class="btn btn-primary" id="summaryDetailsBtn" style="width:100%;">Alle Sätze ansehen</button>
+    <button type="button" class="btn" id="summaryContinueBtn" style="width:100%; margin-top:10px;">Zurück zum Training</button>
+    <button type="button" class="btn" id="summaryDoneBtn" style="width:100%; margin-top:10px;">Fertig</button>
+  </section>
+</div>
+
+<!-- Sicherheitsabfrage vor dem Beenden -->
+<div class="modal-backdrop" id="finishModal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="finishModalTitle">
+  <div class="modal-box">
+    <h2 id="finishModalTitle">Training heute wirklich beenden?</h2>
+    <p>Du kannst danach jederzeit zurück zum Training und weitere Sätze ergänzen.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="finishCancelBtn">Weiter trainieren</button>
+      <button type="button" class="btn btn-primary" id="finishConfirmBtn">Training beenden</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -658,13 +742,30 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     overview: document.getElementById('overview-screen'),
     day: document.getElementById('day-screen'),
     stats: document.getElementById('stats-screen'),
-    new: document.getElementById('new-screen')
+    new: document.getElementById('new-screen'),
+    summary: document.getElementById('summary-screen')
   };
   const loadingState = document.getElementById('loadingState');
+
+  // Bildschirm bleibt im Training an (Wake Lock), damit Timer und Töne zuverlässig laufen
+  let wakeLock = null;
+  async function acquireWakeLock(){
+    try{
+      if(!('wakeLock' in navigator) || wakeLock) return;
+      if(!screens.new.classList.contains('active')) return;
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    }catch(e){ wakeLock = null; }
+  }
+  function releaseWakeLock(){
+    try{ if(wakeLock) wakeLock.release(); }catch(e){}
+    wakeLock = null;
+  }
 
   function showScreen(name){
     Object.values(screens).forEach(s => s.classList.remove('active'));
     screens[name].classList.add('active');
+    if(name === 'new') acquireWakeLock(); else releaseWakeLock();
   }
 
   async function loadEntries(){
@@ -1217,6 +1318,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     document.getElementById('fDate').value = date || new Date().toISOString().slice(0,10);
     document.getElementById('formMsg').textContent = '';
     fExercise.value = '';
+    updateClearBtn();
     suggestedQueue = null;
     renderQuickChips();
     showSubsection('pick');
@@ -1295,6 +1397,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   });
 
   function showPickStep(){
+    fExercise.value = '';
+    updateClearBtn();
     renderQuickChips();
     showSubsection('pick');
   }
@@ -1347,6 +1451,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     updateRemainingSetsDisplay();
 
     updateLastHint();
+    resetSetState();
     showSubsection('detail');
   }
 
@@ -1501,6 +1606,18 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   }
   fExercise.addEventListener('input', updateLastHint);
 
+  // ---------- Übungsfeld: x zum Leeren ----------
+  const clearExerciseBtn = document.getElementById('clearExerciseBtn');
+  function updateClearBtn(){
+    clearExerciseBtn.classList.toggle('visible', fExercise.value.length > 0);
+  }
+  fExercise.addEventListener('input', updateClearBtn);
+  clearExerciseBtn.addEventListener('click', () => {
+    fExercise.value = '';
+    updateClearBtn();
+    fExercise.focus();
+  });
+
   function formatShort(iso){
     const d = new Date(iso.slice(0,10) + 'T00:00:00');
     return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
@@ -1548,7 +1665,26 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     document.getElementById('setDurationValue').textContent = '00:00';
   }
 
+  // ---------- Satz-Status: Beginnen und Beenden schließen sich gegenseitig aus ----------
+  let setActive = false;
+  let trainingStartMs = null; // Beginn des ersten Satzes seit dem letzten Beenden (nur für die Dauer)
+  function updateSetButtons(){
+    document.getElementById('startSetBtn').disabled = setActive;
+    document.getElementById('saveEntry').disabled = !setActive;
+  }
+  function resetSetState(){
+    setActive = false;
+    stopSetStopwatch();
+    updateSetButtons();
+  }
+
   document.getElementById('startSetBtn').addEventListener('click', () => {
+    if(setActive) return;
+    unlockAudio();
+    setActive = true;
+    if(!trainingStartMs) trainingStartMs = Date.now();
+    updateSetButtons();
+    document.getElementById('recordMsg').style.display = 'none';
     stopTimer();
     remaining = totalSecs;
     renderTimer();
@@ -1561,7 +1697,26 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     setStopwatchInterval = setInterval(tickSetStopwatch, 1000);
   });
 
+  // Rekord: höheres Gewicht als je zuvor in dieser Übung, bei mindestens 7 Wiederholungen.
+  // Verglichen wird mit allen bisher gespeicherten Sätzen (auch früheren vom selben Tag).
+  // Die allererste Ausführung einer Übung zählt nicht, es gibt nichts zu schlagen.
+  const RECORD_MIN_REPS = 7;
+  function checkRecord(exercise, weight, reps){
+    if(reps < RECORD_MIN_REPS) return null;
+    const name = exercise.toLowerCase();
+    const prior = entries.filter(e => e.exercise.toLowerCase() === name);
+    if(prior.length === 0) return null;
+    const prevMax = Math.max(...prior.map(e => getEffectiveWeight(e)));
+    const eff = getEffectiveWeight({ exercise, weight });
+    if(eff > prevMax + 0.0001){
+      return { exercise, weight, reps, label: `${exercise}: ${formatLoad(weight)}${reps}` };
+    }
+    return null;
+  }
+
   document.getElementById('saveEntry').addEventListener('click', async () => {
+    if(!setActive) return;
+    unlockAudio();
     const formMsg = document.getElementById('formMsg');
     formMsg.textContent = '';
     formMsg.classList.remove('error');
@@ -1578,6 +1733,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       return;
     }
 
+    const record = checkRecord(exercise, weight, reps);
     const saveBtn = document.getElementById('saveEntry');
     saveBtn.disabled = true;
 
@@ -1595,6 +1751,14 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       formMsg.classList.remove('error');
       renderQuickChips();
       stopSetStopwatch();
+      setActive = false;
+      const recordMsg = document.getElementById('recordMsg');
+      if(record){
+        recordMsg.textContent = `🏆 Neuer Rekord – ${record.label}`;
+        recordMsg.style.display = 'block';
+      } else {
+        recordMsg.style.display = 'none';
+      }
 
       // Formular bleibt absichtlich mit denselben Werten stehen (schneller nächster Satz),
       // nur Übung/Gewicht/Wdh. werden NICHT geleert.
@@ -1605,29 +1769,212 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       formMsg.classList.add('error');
       console.error(e);
     }finally{
-      saveBtn.disabled = false;
+      updateSetButtons();
     }
   });
 
+  // ---------- Training beenden: Sicherheitsabfrage, Zusammenfassung ----------
+  const MOTIVATION_DEFAULT = {
+    rekord: [
+      'Neuer Bestwert, du Maschine!',
+      'Rekord geknackt, das hat richtig gerumst!',
+      'Mehr Gewicht als je zuvor, das ist Next Level.',
+      'Heute hast du dich selbst überholt, stark!',
+      'Neue Bestmarke, die Hantel hatte keine Chance.',
+      'Boom, Rekord! So macht man das.',
+      'Dein altes Ich schaut gerade neidisch zu.',
+      'Neuer Rekord, gönn dir den Moment!'
+    ],
+    normal: [
+      'Training im Kasten, so wird das gemacht!',
+      'Wieder eins geschafft, einfach dranbleiben.',
+      'Du hast geliefert, wie immer.',
+      'Eisen gestemmt, Haken dran.',
+      'Kein Rekord heute, aber du warst da, und das zählt.',
+      'Stark durchgezogen, Konstanz schlägt alles.',
+      'Schweiß fließt, Fortschritt kommt, weiter so!',
+      'Wieder eine Einheit mehr auf dem Konto.'
+    ],
+    pause: [
+      'Willkommen zurück, die Hanteln haben dich vermisst!',
+      'Comeback geschafft, der schwerste Schritt ist getan.',
+      'Pause vorbei, jetzt geht\'s wieder los!',
+      'Schön, dass du wieder dabei bist, auf geht\'s!',
+      'Der Neustart zählt mehr als die Pause davor.',
+      'Zurück im Spiel, mach da weiter, wo du aufgehört hast.',
+      'Du bist wieder da, und das ist die Hauptsache.',
+      'Starker Wiedereinstieg, jetzt wird\'s wieder rund.'
+    ]
+  };
+
+  // Sätze kommen aus PocketBase (Collection trainingsbuch_motivation, Felder satz + gruppe).
+  // Fehlt die Collection oder ist sie leer, gelten die Standardsätze oben.
+  async function pickMotivation(group){
+    let list = [];
+    try{
+      const recs = await pb.collection('trainingsbuch_motivation').getFullList({ filter: `gruppe = "${group}"` });
+      list = recs.map(r => (r.satz || '').trim()).filter(Boolean);
+    }catch(e){ /* Standardsätze */ }
+    if(list.length === 0) list = MOTIVATION_DEFAULT[group];
+    let last = null;
+    try{ last = localStorage.getItem('tb_last_motivation'); }catch(e){}
+    const pool = list.length > 1 ? list.filter(x => x !== last) : list;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    try{ localStorage.setItem('tb_last_motivation', pick); }catch(e){}
+    return pick;
+  }
+
+  // Rekorde des Tages: pro Übung der beste Satz mit mindestens 7 Wiederholungen,
+  // sofern sein Gewicht über allem liegt, was vor diesem Tag in der Übung bewegt wurde.
+  function computeDayRecords(date){
+    const before = entries.filter(e => e.date.slice(0,10) < date);
+    const today = entries.filter(e => e.date.slice(0,10) === date && e.reps >= RECORD_MIN_REPS);
+    const byExercise = {};
+    today.forEach(e => {
+      const k = e.exercise.toLowerCase();
+      (byExercise[k] = byExercise[k] || []).push(e);
+    });
+    const result = [];
+    Object.keys(byExercise).forEach(k => {
+      const prior = before.filter(e => e.exercise.toLowerCase() === k);
+      if(prior.length === 0) return;
+      const prevMax = Math.max(...prior.map(e => getEffectiveWeight(e)));
+      const top = byExercise[k].reduce((a, b) => getEffectiveWeight(b) > getEffectiveWeight(a) ? b : a);
+      if(getEffectiveWeight(top) > prevMax + 0.0001) result.push(top);
+    });
+    return result;
+  }
+
+  // Gruppe für den Motivationssatz: Rekord vor Pause vor normalem Training.
+  // Pause = mehr als 7 Tage Abstand zum vorherigen Trainingstag (also 7 volle Tage ohne Training).
+  function summaryGroup(date, records){
+    if(records.length) return 'rekord';
+    const previousDates = [...new Set(entries.map(e => e.date.slice(0,10)).filter(d => d < date))].sort();
+    if(previousDates.length){
+      const last = previousDates[previousDates.length - 1];
+      const gapDays = Math.round((new Date(date + 'T00:00:00') - new Date(last + 'T00:00:00')) / 86400000);
+      if(gapDays > 7) return 'pause';
+    }
+    return 'normal';
+  }
+
+  // Dauer: Abstände zwischen gespeicherten Sätzen (bis 20 Minuten) zählen mit,
+  // längere Lücken (Training später fortgesetzt) nicht.
+  function computeDurationMinutes(dayEntries){
+    const times = dayEntries
+      .map(e => e.created ? new Date(String(e.created).replace(' ', 'T')).getTime() : NaN)
+      .filter(t => !isNaN(t))
+      .sort((a, b) => a - b);
+    const LIMIT = 20 * 60000;
+    let total = 0;
+    if(times.length){
+      for(let i = 1; i < times.length; i++){
+        const d = times[i] - times[i-1];
+        if(d <= LIMIT) total += d;
+      }
+      if(trainingStartMs && times[0] > trainingStartMs && times[0] - trainingStartMs <= LIMIT){
+        total += times[0] - trainingStartMs;
+      }
+    } else if(trainingStartMs){
+      total = Date.now() - trainingStartMs;
+    }
+    const minutes = Math.round(total / 60000);
+    return minutes >= 1 ? minutes : null;
+  }
+
+  async function showSummary(date){
+    const dayEntries = entries.filter(e => e.date.slice(0,10) === date);
+    if(dayEntries.length === 0){
+      renderOverview();
+      showScreen('overview');
+      return;
+    }
+    selectedDate = date;
+    const exercises = new Set(dayEntries.map(e => e.exercise)).size;
+    const sets = dayEntries.reduce((n, e) => n + (e.sets || 1), 0);
+    const volume = dayEntries.reduce((n, e) => n + getEffectiveWeight(e) * e.reps * (e.sets || 1), 0);
+    const minutes = computeDurationMinutes(dayEntries);
+
+    const tiles = [];
+    if(minutes !== null) tiles.push([minutes + ' min', 'Dauer']);
+    tiles.push([String(exercises), exercises === 1 ? 'Übung' : 'Übungen']);
+    tiles.push([String(sets), sets === 1 ? 'Satz' : 'Sätze']);
+    if(volume > 0) tiles.push([Math.round(volume).toLocaleString('de-DE') + ' kg', 'Bewegtes Gewicht']);
+    document.getElementById('summaryStats').innerHTML = tiles.map(([v, l]) => `
+      <div class="summary-tile">
+        <div class="summary-tile-value">${v}</div>
+        <div class="summary-tile-label">${l}</div>
+      </div>`).join('');
+
+    const records = computeDayRecords(date);
+    const recSection = document.getElementById('summaryRecordsSection');
+    if(records.length){
+      document.getElementById('summaryRecords').innerHTML = records.map(e => `
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-ex">${escapeHtml(e.exercise)}</div>
+            <div class="entry-detail">${formatLoad(e.weight)}${e.reps}</div>
+          </div>
+        </div>`).join('');
+      recSection.style.display = 'block';
+    } else {
+      recSection.style.display = 'none';
+    }
+
+    const quote = document.getElementById('summaryQuote');
+    quote.textContent = '';
+    showScreen('summary');
+    window.scrollTo(0, 0);
+    quote.textContent = await pickMotivation(summaryGroup(date, records));
+  }
+
+  const finishModal = document.getElementById('finishModal');
+  function closeFinishModal(){ finishModal.style.display = 'none'; }
+
   document.getElementById('finishDayBtn').addEventListener('click', () => {
-    stopSetStopwatch();
-    suggestedQueue = null;
+    finishModal.style.display = 'flex';
+    document.getElementById('finishConfirmBtn').focus();
+  });
+  document.getElementById('finishCancelBtn').addEventListener('click', closeFinishModal);
+  finishModal.addEventListener('click', (ev) => { if(ev.target === finishModal) closeFinishModal(); });
+  document.addEventListener('keydown', (ev) => {
+    if(ev.key === 'Escape' && finishModal.style.display !== 'none') closeFinishModal();
+  });
+
+  document.getElementById('finishConfirmBtn').addEventListener('click', () => {
+    closeFinishModal();
     const date = document.getElementById('fDate').value;
+    resetSetState();
+    stopTimer();
+    document.getElementById('timerWrap').open = false;
+    suggestedQueue = null;
     fExercise.value = '';
+    updateClearBtn();
     document.getElementById('fWeight').value = '';
     fWeight.disabled = false;
     fBodyweight.checked = false;
     document.getElementById('fReps').value = '';
     document.getElementById('fSets').value = '1';
-    openDay(date);
+    showSummary(date);
+    trainingStartMs = null;
+  });
+
+  document.getElementById('summaryDetailsBtn').addEventListener('click', () => openDay(selectedDate));
+  document.getElementById('summaryContinueBtn').addEventListener('click', () => openNew(selectedDate));
+  document.getElementById('summaryDoneBtn').addEventListener('click', () => {
+    renderOverview();
+    showScreen('overview');
   });
 
   // ---------- Timer ----------
-  let totalSecs = 90;
-  let remaining = 90;
+  let totalSecs = 150;
+  let remaining = 150;
+  let endTime = null;
   let timerInterval = null;
   let isRunning = false;
   let audioCtx = null;
+  let soundOn = true;
+  try{ soundOn = localStorage.getItem('tb_sound') !== 'off'; }catch(e){}
 
   const timerDisplay = document.getElementById('timerDisplay');
   const startPauseBtn = document.getElementById('startPause');
@@ -1661,29 +2008,60 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     renderTimer();
   });
 
-  function playBeep(){
+  // Audio muss durch eine Berührung freigeschaltet werden: darum bei Satz beginnen/beenden
+  function unlockAudio(){
     try{
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if(audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.value = 880;
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
     }catch(e){ /* Audio nicht verfügbar */ }
   }
 
+  function playTone(freq, dur, vol){
+    if(!soundOn) return;
+    try{
+      unlockAudio();
+      if(!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const t = audioCtx.currentTime;
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.start(t);
+      osc.stop(t + dur);
+    }catch(e){ /* Audio nicht verfügbar */ }
+  }
+
+  // Bei 10 Sekunden ein Signal, ab 5 Sekunden jede Sekunde, am Ende ein anderer Ton
+  function signalFor(secs){
+    if(secs === 10) playTone(660, 0.30, 0.15);
+    else if(secs >= 1 && secs <= 5) playTone(740, 0.15, 0.15);
+  }
+  function playEndTone(){
+    playTone(988, 0.25, 0.2);
+    setTimeout(() => playTone(1318, 0.7, 0.2), 280);
+  }
+
+  // Die Restzeit wird aus der Endzeit berechnet, nicht heruntergezählt:
+  // so stimmt sie auch, wenn der Browser den Timer im Hintergrund bremst.
   function tick(){
-    remaining -= 1;
-    renderTimer();
-    if(remaining <= 0){
+    if(!isRunning || endTime === null) return;
+    const left = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+    if(left !== remaining){
+      remaining = left;
+      renderTimer();
+      if(left > 0) signalFor(left);
+    }
+    if(left <= 0){
+      const overdue = Date.now() - endTime;
       stopTimer();
       timerDisplay.classList.add('done');
-      playBeep();
-      try{ navigator.vibrate && navigator.vibrate([200,100,200]); }catch(e){}
+      if(overdue < 3000){
+        playEndTone();
+        try{ navigator.vibrate && navigator.vibrate([200,100,200]); }catch(e){}
+      }
       setTimeout(() => timerDisplay.classList.remove('done'), 2800);
     }
   }
@@ -1691,9 +2069,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function startTimer(){
     clearInterval(timerInterval);
     if(remaining <= 0) remaining = totalSecs;
+    endTime = Date.now() + remaining * 1000;
     isRunning = true;
     startPauseBtn.textContent = 'Pause';
-    timerInterval = setInterval(tick, 1000);
+    timerInterval = setInterval(tick, 250);
   }
 
   function restartTimer(){
@@ -1701,9 +2080,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     remaining = totalSecs;
     timerDisplay.classList.remove('done');
     renderTimer();
+    endTime = Date.now() + remaining * 1000;
     isRunning = true;
     startPauseBtn.textContent = 'Pause';
-    timerInterval = setInterval(tick, 1000);
+    timerInterval = setInterval(tick, 250);
   }
 
   function stopTimer(){
@@ -1713,6 +2093,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   }
 
   startPauseBtn.addEventListener('click', () => {
+    unlockAudio();
     if(isRunning) stopTimer();
     else startTimer();
   });
@@ -1723,7 +2104,34 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     renderTimer();
   });
 
+  // Pause abbrechen: Timer zurücksetzen und einklappen
+  document.getElementById('skipPause').addEventListener('click', () => {
+    stopTimer();
+    remaining = totalSecs;
+    timerDisplay.classList.remove('done');
+    renderTimer();
+    document.getElementById('timerWrap').open = false;
+  });
+
+  // Ton an/aus (Einstellung bleibt im Browser gespeichert)
+  const soundToggle = document.getElementById('soundToggle');
+  soundToggle.checked = soundOn;
+  soundToggle.addEventListener('change', () => {
+    soundOn = soundToggle.checked;
+    try{ localStorage.setItem('tb_sound', soundOn ? 'on' : 'off'); }catch(e){}
+  });
+
+  // Zurück in die App (z. B. nach gesperrtem Bildschirm): Restzeit sofort aktualisieren, Bildschirm wieder wach halten
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible'){
+      if(isRunning) tick();
+      acquireWakeLock();
+    }
+  });
+
   // ---------- Init ----------
+  updateSetButtons();
+  updateClearBtn();
   showScreen('overview');
   loadEntries();
 </script>
