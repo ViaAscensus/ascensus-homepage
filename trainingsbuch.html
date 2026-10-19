@@ -112,6 +112,43 @@
   .entry-ex{ font-size:0.95rem; font-weight:500; }
   .entry-detail{ font-size:0.82rem; color: var(--text-dim); margin-top:2px; }
   .entry-right{ display:flex; align-items:center; gap:10px; }
+  /* Übungsgruppen: eine Zeile pro Übung, Sätze per Antippen ausklappbar */
+  .ex-group + .ex-group{ border-top: 1px solid var(--border); }
+  .ex-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    width:100%; padding: 12px 0; background:none; border:none; color:inherit;
+    font-family:inherit; text-align:left; cursor:pointer;
+  }
+  .ex-head .entry-main{ min-width:0; }
+  .ex-num{ color: var(--accent); font-weight:700; width:1.4em; flex-shrink:0; }
+  .ex-head-left{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .ex-count{ font-size:0.82rem; color: var(--text-dim); white-space:nowrap; }
+  .chev{
+    width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent;
+    border-top:7px solid var(--accent); flex-shrink:0; transition: transform 0.15s;
+  }
+  .ex-group.open .chev{ transform: rotate(180deg); }
+  @media (prefers-reduced-motion: reduce){ .chev{ transition:none; } }
+  .ex-sets{ display:none; padding: 0 0 10px; }
+  .ex-group.open .ex-sets{ display:block; }
+  .ex-sets .entry{ padding: 9px 12px; margin-bottom:6px; border-top:none; background: var(--card, rgba(255,255,255,0.04)); border-radius:8px; }
+  .set-line{ font-size:0.88rem; }
+  .last-sets{ margin-top:6px; }
+  .last-sets .set-line{ color: var(--text); padding: 2px 0; }
+  .last-session{
+    border:1px solid var(--accent); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 18px;
+  }
+  .last-session-title{ font-weight:700; color: var(--accent); }
+  .last-session-sub{ font-size:0.82rem; color: var(--text-dim); margin: 2px 0 6px; }
+  .last-session .ex-group .ex-sets{ padding-left: 1.4em; }
+  .last-session .ex-sets .set-line{ padding: 2px 0; }
+  .sound-levels{ display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .sound-levels-label{ font-size:0.85rem; color: var(--text-dim); margin-right:4px; }
+  .lvl-btn{
+    padding: 8px 14px; border-radius: 999px; border:1px solid var(--border);
+    background: transparent; color: var(--text); font-family:inherit; font-size:0.85rem; cursor:pointer;
+  }
+  .lvl-btn.active{ background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
   .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
   .dot.leicht{ background: var(--leicht); }
   .dot.okay{ background: var(--okay); }
@@ -523,6 +560,7 @@
     <button class="stats-tab active" data-tab="uebersicht">Übersicht</button>
     <button class="stats-tab" data-tab="muskeln">Muskeln</button>
     <button class="stats-tab" data-tab="uebungen">Übungen</button>
+    <button class="stats-tab" data-tab="pausen">Pausen</button>
   </div>
 
   <div class="tab-panel active" id="tab-uebersicht">
@@ -542,6 +580,10 @@
 
   <div class="tab-panel" id="tab-uebungen">
     <div class="exercise-history" id="exerciseHistory"></div>
+  </div>
+
+  <div class="tab-panel" id="tab-pausen">
+    <div id="pauseStats"></div>
   </div>
 </div>
 
@@ -574,6 +616,7 @@
       <label for="fDate">Datum</label>
       <input type="date" id="fDate">
     </div>
+    <div id="lastSessionBox"></div>
     <div id="quickChips"></div>
     <div class="field">
       <label for="fExercise">Übung</label>
@@ -631,7 +674,7 @@
       <button type="button" class="btn btn-primary" id="saveEntry" disabled>Satz beenden</button>
     </div>
     <div class="record-msg" id="recordMsg" style="display:none;"></div>
-    <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Andere Übung</button>
+    <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Übung beenden</button>
     <div class="formmsg" id="formMsg"></div>
   </section>
 
@@ -662,6 +705,12 @@
         <input type="checkbox" id="soundToggle" checked>
         Ton an
       </label>
+      <div class="sound-levels" id="soundLevels" role="group" aria-label="Lautstärke">
+        <span class="sound-levels-label">Lautstärke</span>
+        <button type="button" class="lvl-btn" data-lvl="leise">Leise</button>
+        <button type="button" class="lvl-btn" data-lvl="mittel">Mittel</button>
+        <button type="button" class="lvl-btn" data-lvl="laut">Laut</button>
+      </div>
     </section>
   </details>
 
@@ -824,6 +873,50 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     return `${base} · ${e.reps * e.sets} Wdh. gesamt`;
   }
 
+  // ---------- Übungen zu einer Zeile zusammenfassen ----------
+  function fmtKg(n){ return String(n).replace('.', ','); }
+
+  // Einträge nach Übung gruppieren, in der Reihenfolge, in der die Übungen trainiert wurden
+  function groupEntries(list){
+    const sorted = list.slice().sort((a,b) => (a.created || '').localeCompare(b.created || ''));
+    const groups = [];
+    const idx = {};
+    sorted.forEach(e => {
+      const k = e.exercise.toLowerCase();
+      if(!(k in idx)){ idx[k] = groups.length; groups.push({ key:k, name:e.exercise, entries:[] }); }
+      groups[idx[k]].entries.push(e);
+    });
+    return groups;
+  }
+
+  function groupSetCount(g){ return g.entries.reduce((n, e) => n + Math.max(1, e.sets || 1), 0); }
+
+  function groupSummary(g){
+    const n = groupSetCount(g);
+    const ws = g.entries.map(e => e.weight), rs = g.entries.map(e => e.reps);
+    const wMin = Math.min(...ws), wMax = Math.max(...ws);
+    const rMin = Math.min(...rs), rMax = Math.max(...rs);
+    let wTxt;
+    if(wMax === 0) wTxt = 'Körpergewicht';
+    else if(wMin === wMax) wTxt = fmtKg(wMin) + ' kg';
+    else if(wMin === 0) wTxt = 'Körpergewicht – ' + fmtKg(wMax) + ' kg';
+    else wTxt = fmtKg(wMin) + ' – ' + fmtKg(wMax) + ' kg';
+    const rTxt = rMin === rMax ? String(rMin) : rMin + '–' + rMax;
+    return `${n} ${n === 1 ? 'Satz' : 'Sätze'} · ${wTxt} × ${rTxt}`;
+  }
+
+  // Zeilen einer Übung: Satz 1, Satz 2 ... (ein Eintrag mit mehreren Sätzen: Sätze 2–4)
+  function setRows(g){
+    let k = 1;
+    return g.entries.map(e => {
+      const n = Math.max(1, e.sets || 1);
+      const label = n === 1 ? `Satz ${k}` : `Sätze ${k}–${k + n - 1}`;
+      k += n;
+      const w = e.weight > 0 ? fmtKg(e.weight) + ' kg' : 'Körpergewicht';
+      return { e, text: `${label} · ${w} × ${e.reps} · ${e.tendenz}` };
+    });
+  }
+
   function formatDateHeading(iso){
     const d = new Date(iso.slice(0,10) + 'T00:00:00');
     return d.toLocaleDateString('de-DE', {day:'numeric', month:'long', year:'numeric'});
@@ -859,8 +952,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('suggestedTrainingBtn').addEventListener('click', () => openSuggested(null));
 
   // ---------- Tag-Detail ----------
+  let dayExpanded = new Set(); // aufgeklappte Übungen in der Tagesansicht
+
   function openDay(date){
     selectedDate = date;
+    dayExpanded = new Set();
     renderDayDetail();
     showScreen('day');
   }
@@ -875,21 +971,41 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       return;
     }
 
-    container.innerHTML = dayEntries.map(e => `
-      <div class="entry">
-        <div class="entry-main">
-          <div class="entry-ex">${escapeHtml(e.exercise)}</div>
-          <div class="entry-detail">${formatEntryDetail(e)}</div>
-        </div>
-        <div class="entry-right">
-          <span class="tendenz-label ${e.tendenz}">
-            <span class="dot ${e.tendenz}"></span>
-            ${e.tendenz}
+    const groups = groupEntries(dayEntries);
+    container.innerHTML = groups.map(g => `
+      <div class="ex-group${dayExpanded.has(g.key) ? ' open' : ''}" data-key="${escapeHtml(g.key)}">
+        <button type="button" class="ex-head" aria-expanded="${dayExpanded.has(g.key)}">
+          <span class="entry-main">
+            <span class="entry-ex">${escapeHtml(g.name)}</span>
+            <span class="entry-detail">${groupSummary(g)}</span>
           </span>
-          <button class="del" data-id="${e.id}" aria-label="Eintrag löschen">×</button>
+          <span class="chev" aria-hidden="true"></span>
+        </button>
+        <div class="ex-sets">
+          ${setRows(g).map(r => `
+            <div class="entry">
+              <div class="entry-main"><span class="set-line">${escapeHtml(r.text.replace(/ · (leicht|okay|hart)$/, ''))}</span></div>
+              <div class="entry-right">
+                <span class="tendenz-label ${r.e.tendenz}">
+                  <span class="dot ${r.e.tendenz}"></span>
+                  ${r.e.tendenz}
+                </span>
+                <button class="del" data-id="${r.e.id}" aria-label="Eintrag löschen">×</button>
+              </div>
+            </div>`).join('')}
         </div>
       </div>
     `).join('');
+
+    container.querySelectorAll('.ex-head').forEach(head => {
+      head.addEventListener('click', () => {
+        const grp = head.parentElement;
+        const open = !grp.classList.contains('open');
+        grp.classList.toggle('open', open);
+        head.setAttribute('aria-expanded', String(open));
+        if(open) dayExpanded.add(grp.dataset.key); else dayExpanded.delete(grp.dataset.key);
+      });
+    });
 
     container.querySelectorAll('.del').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -952,6 +1068,41 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     showScreen('stats');
   }
 
+  function fmtSec(sec){
+    const a = Math.abs(Math.round(sec));
+    return `${sec < 0 ? '-' : ''}${Math.floor(a / 60)}:${String(a % 60).padStart(2,'0')}`;
+  }
+
+  // Pausen: nur Einträge mit gespeicherter Pause (pause_typ gesetzt). Eingehalten = nicht kürzer als
+  // die Soll-Zeit des Timers (5 Sekunden Toleranz).
+  function buildPauseStats(inRange){
+    const rel = inRange.filter(e => e.pause_typ === 'satz' || e.pause_typ === 'wechsel');
+    if(!rel.length) return '<div class="empty">Noch keine Pausenzeiten erfasst. Sie werden ab jetzt bei jedem Satz mitgeschrieben.</div>';
+    const TOL = 5;
+    const avg = (arr, f) => arr.reduce((n, e) => n + f(e), 0) / arr.length;
+    const satz = rel.filter(e => e.pause_typ === 'satz');
+    const wechsel = rel.filter(e => e.pause_typ === 'wechsel');
+    let html = '';
+    if(satz.length){
+      const ok = satz.filter(e => e.pause_s >= e.pause_soll_s - TOL).length;
+      html += `<div class="stats-summary"><strong>${ok} von ${satz.length}</strong> Satzpausen eingehalten · Ø ${fmtSec(avg(satz, e => e.pause_s))} (Soll Ø ${fmtSec(avg(satz, e => e.pause_soll_s))})</div>`;
+    }
+    if(wechsel.length){
+      html += `<div class="stats-summary">Ø Wechselzeit zwischen Übungen: <strong>${fmtSec(avg(wechsel, e => e.pause_s))}</strong> (${wechsel.length}×)</div>`;
+    }
+    if(satz.length){
+      const byEx = {};
+      satz.forEach(e => { (byEx[e.exercise.toLowerCase()] = byEx[e.exercise.toLowerCase()] || { name:e.exercise, list:[] }).list.push(e); });
+      html += '<div class="dist-heading">Satzpausen pro Übung</div>';
+      html += Object.values(byEx).sort((a,b) => b.list.length - a.list.length).map(g => {
+        const ok = g.list.filter(e => e.pause_s >= e.pause_soll_s - TOL).length;
+        return `<div class="entry"><div class="entry-main"><div class="entry-ex">${escapeHtml(g.name)}</div>` +
+          `<div class="entry-detail">Ø ${fmtSec(avg(g.list, e => e.pause_s))} · Soll Ø ${fmtSec(avg(g.list, e => e.pause_soll_s))} · ${ok} von ${g.list.length} eingehalten</div></div></div>`;
+      }).join('');
+    }
+    return html;
+  }
+
   function renderStats(){
     const from = document.getElementById('rangeFrom').value;
     const to = document.getElementById('rangeTo').value;
@@ -970,6 +1121,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       tendenzDist.innerHTML = '';
       document.getElementById('bodyMap').innerHTML = '';
       document.getElementById('muscleDist').innerHTML = '';
+      document.getElementById('pauseStats').innerHTML = '';
       return;
     }
 
@@ -996,6 +1148,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       row.addEventListener('click', () => highlightMuscle(row.dataset.group, row));
     });
     document.getElementById('exerciseHistory').innerHTML = buildExerciseHistory(inRange);
+    document.getElementById('pauseStats').innerHTML = buildPauseStats(inRange);
   }
 
   function buildTendenzDistribution(inRange){
@@ -1307,7 +1460,46 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   // ---------- Neues Training ----------
   let suggestedQueue = null; // aktive, vom Nutzer angepasste Übungs-Warteschlange (nur im Vorschlags-Modus)
 
+  let lastSessionOpen = new Set();
+
+  function renderLastSession(){
+    const box = document.getElementById('lastSessionBox');
+    const cutoff = document.getElementById('fDate').value || '9999-12-31';
+    const dates = [...new Set(entries.map(e => e.date.slice(0,10)).filter(d => d < cutoff))].sort();
+    if(!dates.length){ box.innerHTML = ''; return; }
+    const last = dates[dates.length - 1];
+    const groups = groupEntries(entries.filter(e => e.date.slice(0,10) === last));
+    box.innerHTML = `
+      <div class="last-session">
+        <div class="last-session-title">Letztes Mal · ${formatShort(last)}</div>
+        <div class="last-session-sub">Deine Übungen in dieser Reihenfolge</div>
+        ${groups.map((g, i) => {
+          const key = last + '|' + g.key;
+          const n = groupSetCount(g);
+          return `
+          <div class="ex-group${lastSessionOpen.has(key) ? ' open' : ''}" data-key="${escapeHtml(key)}">
+            <button type="button" class="ex-head" aria-expanded="${lastSessionOpen.has(key)}">
+              <span class="ex-head-left"><span class="ex-num">${i + 1}</span><span class="entry-ex">${escapeHtml(g.name)}</span></span>
+              <span class="ex-head-left"><span class="ex-count">${n} ${n === 1 ? 'Satz' : 'Sätze'}</span><span class="chev" aria-hidden="true"></span></span>
+            </button>
+            <div class="ex-sets">${setRows(g).map(r => `<div class="set-line">${escapeHtml(r.text)}</div>`).join('')}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    box.querySelectorAll('.ex-head').forEach(head => {
+      head.addEventListener('click', () => {
+        const grp = head.parentElement;
+        const open = !grp.classList.contains('open');
+        grp.classList.toggle('open', open);
+        head.setAttribute('aria-expanded', String(open));
+        if(open) lastSessionOpen.add(grp.dataset.key); else lastSessionOpen.delete(grp.dataset.key);
+      });
+    });
+  }
+  document.getElementById('fDate').addEventListener('change', renderLastSession);
+
   function showSubsection(name){
+    if(name === 'pick') renderLastSession();
     document.getElementById('suggest-count-section').style.display = name === 'count' ? 'block' : 'none';
     document.getElementById('suggest-overview-section').style.display = name === 'overview' ? 'block' : 'none';
     document.getElementById('pick-section').style.display = name === 'pick' ? 'block' : 'none';
@@ -1592,17 +1784,16 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const q = fExercise.value.trim().toLowerCase();
     const hintEl = document.getElementById('lastHint');
     if(!q){ hintEl.textContent = ''; return; }
-    const matches = entries.filter(e => e.exercise.toLowerCase() === q)
-                            .sort((a,b) => b.date.localeCompare(a.date));
-    if(matches.length){
-      const m = matches[0];
-      const mDate = m.date.slice(0,10);
-      const pos = getExercisePosition(mDate, m.exercise);
-      const posText = pos ? `, als ${pos}. Übung` : '';
-      hintEl.textContent = `Letztes Mal (${formatShort(m.date)}${posText}): ${formatLoad(m.weight)}${m.reps} × ${m.sets} · ${m.tendenz}`;
-    } else {
-      hintEl.textContent = '';
-    }
+    // Letztes Mal = der letzte frühere Trainingstag mit dieser Übung, mit allen Sätzen
+    const cutoff = document.getElementById('fDate').value || '9999-12-31';
+    const past = entries.filter(e => e.exercise.toLowerCase() === q && e.date.slice(0,10) < cutoff);
+    if(!past.length){ hintEl.textContent = ''; return; }
+    const lastDate = past.map(e => e.date.slice(0,10)).sort().pop();
+    const g = groupEntries(past.filter(e => e.date.slice(0,10) === lastDate))[0];
+    const pos = getExercisePosition(lastDate, g.name);
+    const posText = pos ? `, als ${pos}. Übung` : '';
+    hintEl.innerHTML = `Letztes Mal (${formatShort(lastDate)}${posText}):` +
+      `<div class="last-sets">${setRows(g).map(r => `<div class="set-line">${escapeHtml(r.text)}</div>`).join('')}</div>`;
   }
   fExercise.addEventListener('input', updateLastHint);
 
@@ -1667,6 +1858,20 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   // ---------- Satz-Status: Beginnen und Beenden schließen sich gegenseitig aus ----------
   let setActive = false;
+  // Pausen: Satzpause (gleiche Übung) und Wechselzeit (andere Übung) laufen von "Satz beenden"
+  // bis zum nächsten "Satz beginnen". Längere Lücken (über 30 Minuten) zählen nicht als Pause.
+  const PAUSE_MAX_MS = 30 * 60000;
+  let lastSetEnd = null;      // { ms, exercise }
+  let pendingPause = null;    // { sek, typ, soll } für den Satz, der gerade läuft
+  try{ lastSetEnd = JSON.parse(localStorage.getItem('tb_last_set_end') || 'null'); }catch(e){}
+  function rememberSetEnd(ms, exercise){
+    lastSetEnd = { ms, exercise: exercise.toLowerCase() };
+    try{ localStorage.setItem('tb_last_set_end', JSON.stringify(lastSetEnd)); }catch(e){}
+  }
+  function forgetSetEnd(){
+    lastSetEnd = null; pendingPause = null;
+    try{ localStorage.removeItem('tb_last_set_end'); }catch(e){}
+  }
   let trainingStartMs = null; // Beginn des ersten Satzes seit dem letzten Beenden (nur für die Dauer)
   function updateSetButtons(){
     document.getElementById('startSetBtn').disabled = setActive;
@@ -1682,7 +1887,16 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     if(setActive) return;
     unlockAudio();
     setActive = true;
-    if(!trainingStartMs) trainingStartMs = Date.now();
+    const startMs = Date.now();
+    if(!trainingStartMs) trainingStartMs = startMs;
+    pendingPause = null;
+    if(lastSetEnd && startMs >= lastSetEnd.ms && startMs - lastSetEnd.ms <= PAUSE_MAX_MS){
+      pendingPause = {
+        sek: Math.round((startMs - lastSetEnd.ms) / 1000),
+        typ: lastSetEnd.exercise === fExercise.value.trim().toLowerCase() ? 'satz' : 'wechsel',
+        soll: totalSecs
+      };
+    }
     updateSetButtons();
     document.getElementById('recordMsg').style.display = 'none';
     stopTimer();
@@ -1717,6 +1931,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('saveEntry').addEventListener('click', async () => {
     if(!setActive) return;
     unlockAudio();
+    const endMs = Date.now();
     const formMsg = document.getElementById('formMsg');
     formMsg.textContent = '';
     formMsg.classList.remove('error');
@@ -1742,8 +1957,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
         member: pb.authStore.model.id,
         date, exercise, weight, reps, sets,
         tendenz: selectedTendenz,
-        gewichtBeiEintrag: memberBodyweight
+        gewichtBeiEintrag: memberBodyweight,
+        // Pausen vor diesem Satz; PocketBase ignoriert die Felder, solange sie nicht angelegt sind
+        ...(pendingPause ? { pause_s: pendingPause.sek, pause_typ: pendingPause.typ, pause_soll_s: pendingPause.soll } : {})
       });
+      rememberSetEnd(endMs, exercise);
+      pendingPause = null;
       await loadEntries();
       updateRemainingSetsDisplay();
 
@@ -1955,6 +2174,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     fBodyweight.checked = false;
     document.getElementById('fReps').value = '';
     document.getElementById('fSets').value = '1';
+    forgetSetEnd();
     showSummary(date);
     trainingStartMs = null;
   });
@@ -1972,18 +2192,25 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   let endTime = null;
   let timerInterval = null;
   let isRunning = false;
+  let endHandled = false; // Ende-Signal für den aktuellen Durchlauf schon gespielt
   let audioCtx = null;
   let soundOn = true;
   try{ soundOn = localStorage.getItem('tb_sound') !== 'off'; }catch(e){}
+  // Drei Stufen; "leise" entspricht der bisherigen Lautstärke, Standard ist "mittel" (deutlich lauter)
+  const SOUND_LEVELS = { leise: 0.15, mittel: 0.4, laut: 0.75 };
+  let soundLevel = 'mittel';
+  try{ const l = localStorage.getItem('tb_sound_level'); if(SOUND_LEVELS[l]) soundLevel = l; }catch(e){}
 
   const timerDisplay = document.getElementById('timerDisplay');
   const startPauseBtn = document.getElementById('startPause');
 
   function renderTimer(){
-    const m = Math.floor(remaining / 60).toString().padStart(2,'0');
-    const s = (remaining % 60).toString().padStart(2,'0');
-    timerDisplay.textContent = `${m}:${s}`;
-    document.getElementById('timerSummaryValue').textContent = `${m}:${s}`;
+    const abs = Math.abs(remaining);
+    const m = Math.floor(abs / 60).toString().padStart(2,'0');
+    const s = (abs % 60).toString().padStart(2,'0');
+    const txt = `${remaining < 0 ? '-' : ''}${m}:${s}`;
+    timerDisplay.textContent = txt;
+    document.getElementById('timerSummaryValue').textContent = txt;
   }
   renderTimer();
 
@@ -2016,13 +2243,15 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     }catch(e){ /* Audio nicht verfügbar */ }
   }
 
-  function playTone(freq, dur, vol){
+  function playTone(freq, dur, rel){
     if(!soundOn) return;
     try{
       unlockAudio();
       if(!audioCtx) return;
+      const vol = Math.min(1, SOUND_LEVELS[soundLevel] * rel);
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
+      osc.type = 'triangle'; // klingt auf Handylautsprechern kräftiger als ein reiner Sinus
       osc.frequency.value = freq;
       osc.connect(gain);
       gain.connect(audioCtx.destination);
@@ -2036,27 +2265,28 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   // Bei 10 Sekunden ein Signal, ab 5 Sekunden jede Sekunde, am Ende ein anderer Ton
   function signalFor(secs){
-    if(secs === 10) playTone(660, 0.30, 0.15);
-    else if(secs >= 1 && secs <= 5) playTone(740, 0.15, 0.15);
+    if(secs === 10) playTone(660, 0.30, 1);
+    else if(secs >= 1 && secs <= 5) playTone(740, 0.15, 1);
   }
   function playEndTone(){
-    playTone(988, 0.25, 0.2);
-    setTimeout(() => playTone(1318, 0.7, 0.2), 280);
+    playTone(988, 0.25, 1.25);
+    setTimeout(() => playTone(1318, 0.7, 1.25), 280);
   }
 
   // Die Restzeit wird aus der Endzeit berechnet, nicht heruntergezählt:
   // so stimmt sie auch, wenn der Browser den Timer im Hintergrund bremst.
+  // Nach Ablauf läuft die Anzeige ins Minus weiter (-00:01, -00:02 ...), ohne weiteren Ton.
   function tick(){
     if(!isRunning || endTime === null) return;
-    const left = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+    const left = Math.ceil((endTime - Date.now()) / 1000);
     if(left !== remaining){
       remaining = left;
       renderTimer();
       if(left > 0) signalFor(left);
     }
-    if(left <= 0){
+    if(left <= 0 && !endHandled){
+      endHandled = true;
       const overdue = Date.now() - endTime;
-      stopTimer();
       timerDisplay.classList.add('done');
       if(overdue < 3000){
         playEndTone();
@@ -2070,6 +2300,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     clearInterval(timerInterval);
     if(remaining <= 0) remaining = totalSecs;
     endTime = Date.now() + remaining * 1000;
+    endHandled = false;
     isRunning = true;
     startPauseBtn.textContent = 'Pause';
     timerInterval = setInterval(tick, 250);
@@ -2081,6 +2312,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     timerDisplay.classList.remove('done');
     renderTimer();
     endTime = Date.now() + remaining * 1000;
+    endHandled = false;
     isRunning = true;
     startPauseBtn.textContent = 'Pause';
     timerInterval = setInterval(tick, 250);
@@ -2119,6 +2351,21 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   soundToggle.addEventListener('change', () => {
     soundOn = soundToggle.checked;
     try{ localStorage.setItem('tb_sound', soundOn ? 'on' : 'off'); }catch(e){}
+  });
+
+  // Lautstärke-Stufen
+  function renderSoundLevels(){
+    document.querySelectorAll('#soundLevels .lvl-btn').forEach(b => b.classList.toggle('active', b.dataset.lvl === soundLevel));
+  }
+  renderSoundLevels();
+  document.getElementById('soundLevels').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.lvl-btn');
+    if(!btn) return;
+    soundLevel = btn.dataset.lvl;
+    try{ localStorage.setItem('tb_sound_level', soundLevel); }catch(e){}
+    renderSoundLevels();
+    unlockAudio();
+    playTone(740, 0.2, 1); // Hörprobe
   });
 
   // Zurück in die App (z. B. nach gesperrtem Bildschirm): Restzeit sofort aktualisieren, Bildschirm wieder wach halten
