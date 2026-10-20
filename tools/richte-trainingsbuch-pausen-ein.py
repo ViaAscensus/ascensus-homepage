@@ -5,6 +5,8 @@ Das Trainingsbuch (trainingsbuch.html) schreibt bei jedem Satz mit, wie lange di
 Pause davor war: von "Satz beenden" bis zum nächsten "Satz beginnen".
 
 Felder (alle optional, alte Einträge bleiben unverändert)
+    training_id   Text     Kennung des Trainings; trennt mehrere Trainings am selben Tag.
+                           Einträge ohne Kennung zählen pro Datum als ein Training.
     pause_s       Zahl     gemessene Pause in Sekunden
     pause_typ     Auswahl  satz (gleiche Übung) | wechsel (Wechselzeit zur nächsten Übung)
     pause_soll_s  Zahl     eingestellte Timer-Zeit in Sekunden, gegen die verglichen wird
@@ -37,6 +39,7 @@ FELDER = [
     {'name': 'pause_s', 'type': 'number', 'required': False, 'min': 0, 'onlyInt': True},
     {'name': 'pause_typ', 'type': 'select', 'required': False, 'maxSelect': 1, 'values': ['satz', 'wechsel']},
     {'name': 'pause_soll_s', 'type': 'number', 'required': False, 'min': 0, 'onlyInt': True},
+    {'name': 'training_id', 'type': 'text', 'required': False, 'max': 40},
 ]
 
 token = os.environ.get('PB_TOKEN')
