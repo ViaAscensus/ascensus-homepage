@@ -1009,13 +1009,15 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   }
 
   // ---------- Übersicht ----------
+  let monthOpen = new Set(); // aufgeklappte frühere Monate
+
   function renderDayList(container){
     if(entries.length === 0){
       container.innerHTML = '<div class="empty">Noch keine Trainings erfasst. Starte oben Dein erstes Training.</div>';
       return;
     }
     const dates = [...new Set(entries.map(e => e.date.slice(0,10)))].sort().reverse();
-    container.innerHTML = dates.map(date => {
+    const dayRow = (date) => {
       const dayEntries = entries.filter(e => e.date.slice(0,10) === date);
       const exCount = new Set(dayEntries.map(e => e.exercise.toLowerCase())).size;
       const tCount = buildSessions(dayEntries).length;
@@ -1026,9 +1028,39 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
             <span class="day-meta">${exCount} Übung${exCount === 1 ? '' : 'en'}${tCount > 1 ? ` · ${tCount} Trainings` : ''}</span>
           </span>
           <span class="day-chevron">›</span>
+        </button>`;
+    };
+    // Der laufende Monat steht einzeln; jeder frühere Monat ist eine eingeklappte Zeile
+    const thisMonth = todayIso().slice(0,7);
+    const months = [];
+    dates.forEach(d => {
+      const m = d.slice(0,7);
+      if(!months.length || months[months.length - 1].key !== m) months.push({ key:m, dates:[] });
+      months[months.length - 1].dates.push(d);
+    });
+    container.innerHTML = months.map(mo => {
+      if(mo.key === thisMonth) return mo.dates.map(dayRow).join('');
+      const open = monthOpen.has(mo.key);
+      const label = new Date(mo.key + '-01T00:00:00').toLocaleDateString('de-DE', {month:'long', year:'numeric'});
+      const n = buildSessions(entries.filter(e => e.date.slice(0,7) === mo.key)).length;
+      return `<div class="ex-group month-group${open ? ' open' : ''}" data-month="${mo.key}">
+        <button type="button" class="ex-head" aria-expanded="${open}">
+          <span class="entry-main"><span class="entry-ex">${label}</span><span class="entry-detail">${n} Training${n === 1 ? '' : 's'}</span></span>
+          <span class="chev" aria-hidden="true"></span>
         </button>
-      `;
+        <div class="ex-sets">${mo.dates.map(dayRow).join('')}</div>
+      </div>`;
     }).join('');
+
+    container.querySelectorAll('.month-group > .ex-head').forEach(head => {
+      head.addEventListener('click', () => {
+        const grp = head.parentElement;
+        const open = !grp.classList.contains('open');
+        grp.classList.toggle('open', open);
+        head.setAttribute('aria-expanded', String(open));
+        if(open) monthOpen.add(grp.dataset.month); else monthOpen.delete(grp.dataset.month);
+      });
+    });
 
     container.querySelectorAll('.day-row').forEach(row => {
       row.addEventListener('click', () => { dayFromSessions = container.id === 'sessionList'; openDay(row.dataset.date); });
