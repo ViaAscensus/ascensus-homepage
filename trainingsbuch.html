@@ -112,6 +112,29 @@
   .entry-ex{ font-size:0.95rem; font-weight:500; }
   .entry-detail{ font-size:0.82rem; color: var(--text-dim); margin-top:2px; }
   .entry-right{ display:flex; align-items:center; gap:10px; }
+  .new-topbar{ display:flex; align-items:center; justify-content:space-between; }
+  .new-topbar .screen-back + .screen-back{ margin-left:0; }
+  .new-training-btn-backfill{ background: transparent; }
+  .timer-bar{
+    position: sticky; top: 0; z-index: 20; background: var(--bg);
+    border-bottom: 1px solid var(--border-strong); padding: 8px 18px; margin-top: 12px;
+  }
+  .timer-row{ display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:8px; }
+  .timer-bar .timer-display{ border:none; padding:0; font-size:2.5rem; line-height:1.1; text-align:center; }
+  .timer-goal{
+    justify-self:start; background:none; border:none; color: var(--text-dim); font-family:inherit;
+    font-size:0.82rem; font-weight:600; cursor:pointer; padding:10px 0;
+  }
+  .timer-goal span{ color: var(--accent); }
+  .timer-play{ flex:none; justify-self:end; padding: 10px 16px; }
+  .timer-panel{ padding: 6px 0 10px; }
+  .custom-row #resetTimer{
+    background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+    color: var(--text-dim); padding:0 16px; font-size:0.9rem; cursor:pointer;
+  }
+  #lastSessionBox{ padding: 12px 18px 0; }
+  #lastSessionBox .last-session{ margin-bottom: 0; }
+  .pause-day{ border-top:1px solid var(--border); }
   /* Übungsgruppen: eine Zeile pro Übung, Sätze per Antippen ausklappbar */
   .ex-group + .ex-group{ border-top: 1px solid var(--border); }
   .ex-head{
@@ -522,6 +545,7 @@
   </div>
   <button class="new-training-btn" id="newTrainingBtn">+ Neues individuelles Training starten</button>
   <button class="new-training-btn new-training-btn-suggest" id="suggestedTrainingBtn">+ Vorgeschlagenes Training starten</button>
+  <button class="new-training-btn new-training-btn-backfill" id="backfillBtn">+ Training nachtragen</button>
   <button class="new-training-btn new-training-btn-plan" disabled>
     Trainingsplan <span class="coming-soon-badge">Bald verfügbar</span>
   </button>
@@ -589,7 +613,54 @@
 
 <!-- ========== Neues Training ========== -->
 <div class="screen" id="new-screen">
-  <button class="screen-back" id="newBackBtn">← Übersicht</button>
+  <div class="new-topbar">
+    <button class="screen-back" id="newBackBtn">← Übersicht</button>
+    <button type="button" class="screen-back" id="lastSessionBtn" aria-expanded="false" style="display:none;">Letztes Training ▾</button>
+  </div>
+  <div id="lastSessionBox" style="display:none;"></div>
+
+  <!-- Feste Timer-Leiste: bleibt beim Scrollen oben sichtbar -->
+  <div class="timer-bar" id="timerBar" style="display:none;">
+    <div class="timer-row">
+      <button type="button" class="timer-goal" id="timerGoalBtn" aria-expanded="false">Ziel <span id="timerGoal">02:30</span> ▾</button>
+      <div class="timer-display" id="timerDisplay">02:30</div>
+      <button class="btn btn-primary timer-play" id="startPause">Start</button>
+    </div>
+    <div class="timer-panel" id="timerPanel" style="display:none;">
+      <div class="presets">
+        <div class="chip" data-secs="60">60 s</div>
+        <div class="chip" data-secs="90">90 s</div>
+        <div class="chip" data-secs="120">120 s</div>
+        <div class="chip active" data-secs="150">150 s</div>
+        <div class="chip" data-secs="180">180 s</div>
+      </div>
+      <div class="custom-row">
+        <input type="number" id="customSecs" placeholder="eigene Zeit (Sek.)" inputmode="numeric">
+        <button id="setCustom">Setzen</button>
+        <button id="resetTimer">Reset</button>
+      </div>
+      <label class="bw-check sound-row">
+        <input type="checkbox" id="soundToggle" checked>
+        Ton an
+      </label>
+      <div class="sound-levels" id="soundLevels" role="group" aria-label="Lautstärke">
+        <span class="sound-levels-label">Lautstärke</span>
+        <button type="button" class="lvl-btn" data-lvl="leise">Leise</button>
+        <button type="button" class="lvl-btn" data-lvl="mittel">Mittel</button>
+        <button type="button" class="lvl-btn" data-lvl="laut">Laut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nachtragen: erst das Datum -->
+  <section id="backfill-section" style="display:none;">
+    <h2>Training nachtragen</h2>
+    <div class="field">
+      <label for="fDate">Datum</label>
+      <input type="date" id="fDate">
+    </div>
+    <button type="button" class="btn btn-primary" id="backfillNextBtn" style="width:100%;">Weiter</button>
+  </section>
 
   <!-- Vorgeschlagenes Training: Schritt A - Anzahl -->
   <section id="suggest-count-section" style="display:none;">
@@ -612,11 +683,7 @@
   <!-- Schritt 1: Übung wählen -->
   <section id="pick-section">
     <h2>Übung wählen</h2>
-    <div class="field">
-      <label for="fDate">Datum</label>
-      <input type="date" id="fDate">
-    </div>
-    <div id="lastSessionBox"></div>
+    <div class="hint" id="pickDateHint" style="margin-top:0;"></div>
     <div id="quickChips"></div>
     <div class="field">
       <label for="fExercise">Übung</label>
@@ -677,42 +744,6 @@
     <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Übung beenden</button>
     <div class="formmsg" id="formMsg"></div>
   </section>
-
-  <details class="timer-wrap" id="timerWrap">
-    <summary>
-      <span>⏱ Pausen-Timer</span>
-      <span class="timer-summary-value" id="timerSummaryValue">02:30</span>
-    </summary>
-    <section id="timer-section">
-      <div class="timer-display" id="timerDisplay">02:30</div>
-      <div class="presets">
-        <div class="chip" data-secs="60">60 s</div>
-        <div class="chip" data-secs="90">90 s</div>
-        <div class="chip" data-secs="120">120 s</div>
-        <div class="chip active" data-secs="150">150 s</div>
-        <div class="chip" data-secs="180">180 s</div>
-      </div>
-      <div class="custom-row">
-        <input type="number" id="customSecs" placeholder="eigene Zeit (Sek.)" inputmode="numeric">
-        <button id="setCustom">Setzen</button>
-      </div>
-      <div class="timer-controls">
-        <button class="btn btn-primary" id="startPause">Start</button>
-        <button class="btn" id="resetTimer">Reset</button>
-        <button class="btn" id="skipPause">Pause überspringen</button>
-      </div>
-      <label class="bw-check sound-row">
-        <input type="checkbox" id="soundToggle" checked>
-        Ton an
-      </label>
-      <div class="sound-levels" id="soundLevels" role="group" aria-label="Lautstärke">
-        <span class="sound-levels-label">Lautstärke</span>
-        <button type="button" class="lvl-btn" data-lvl="leise">Leise</button>
-        <button type="button" class="lvl-btn" data-lvl="mittel">Mittel</button>
-        <button type="button" class="lvl-btn" data-lvl="laut">Laut</button>
-      </div>
-    </section>
-  </details>
 
   <button class="btn btn-finish" id="finishDayBtn" style="width: calc(100% - 36px); margin: 0 18px 18px;">Training fertig</button>
 </div>
@@ -1075,32 +1106,47 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   // Pausen: nur Einträge mit gespeicherter Pause (pause_typ gesetzt). Eingehalten = nicht kürzer als
   // die Soll-Zeit des Timers (5 Sekunden Toleranz).
+  let pauseOpen = new Set();
+
+  function pauseLine(list){
+    const TOL = 5;
+    const avg = f => list.reduce((n, e) => n + f(e), 0) / list.length;
+    const satz = list.filter(e => e.pause_typ === 'satz');
+    const wechsel = list.filter(e => e.pause_typ === 'wechsel');
+    const teile = [];
+    if(satz.length){
+      const ok = satz.filter(e => e.pause_s >= e.pause_soll_s - TOL).length;
+      const a1 = satz.reduce((n, e) => n + e.pause_s, 0) / satz.length;
+      const a2 = satz.reduce((n, e) => n + e.pause_soll_s, 0) / satz.length;
+      teile.push(`Satzpausen Ø ${fmtSec(a1)} (Soll ${fmtSec(a2)}) · ${ok} von ${satz.length} eingehalten`);
+    }
+    if(wechsel.length){
+      teile.push(`Wechselzeit Ø ${fmtSec(wechsel.reduce((n, e) => n + e.pause_s, 0) / wechsel.length)}`);
+    }
+    return teile.join(' · ');
+  }
+
+  // Pausen: pro Trainingseinheit eine Zeile, ausklappbar pro Übung. Nur Einträge mit gespeicherter
+  // Pause (pause_typ gesetzt). Eingehalten = höchstens 5 Sekunden kürzer als die Timer-Zeit.
   function buildPauseStats(inRange){
     const rel = inRange.filter(e => e.pause_typ === 'satz' || e.pause_typ === 'wechsel');
     if(!rel.length) return '<div class="empty">Noch keine Pausenzeiten erfasst. Sie werden ab jetzt bei jedem Satz mitgeschrieben.</div>';
-    const TOL = 5;
-    const avg = (arr, f) => arr.reduce((n, e) => n + f(e), 0) / arr.length;
-    const satz = rel.filter(e => e.pause_typ === 'satz');
-    const wechsel = rel.filter(e => e.pause_typ === 'wechsel');
-    let html = '';
-    if(satz.length){
-      const ok = satz.filter(e => e.pause_s >= e.pause_soll_s - TOL).length;
-      html += `<div class="stats-summary"><strong>${ok} von ${satz.length}</strong> Satzpausen eingehalten · Ø ${fmtSec(avg(satz, e => e.pause_s))} (Soll Ø ${fmtSec(avg(satz, e => e.pause_soll_s))})</div>`;
-    }
-    if(wechsel.length){
-      html += `<div class="stats-summary">Ø Wechselzeit zwischen Übungen: <strong>${fmtSec(avg(wechsel, e => e.pause_s))}</strong> (${wechsel.length}×)</div>`;
-    }
-    if(satz.length){
-      const byEx = {};
-      satz.forEach(e => { (byEx[e.exercise.toLowerCase()] = byEx[e.exercise.toLowerCase()] || { name:e.exercise, list:[] }).list.push(e); });
-      html += '<div class="dist-heading">Satzpausen pro Übung</div>';
-      html += Object.values(byEx).sort((a,b) => b.list.length - a.list.length).map(g => {
-        const ok = g.list.filter(e => e.pause_s >= e.pause_soll_s - TOL).length;
-        return `<div class="entry"><div class="entry-main"><div class="entry-ex">${escapeHtml(g.name)}</div>` +
-          `<div class="entry-detail">Ø ${fmtSec(avg(g.list, e => e.pause_s))} · Soll Ø ${fmtSec(avg(g.list, e => e.pause_soll_s))} · ${ok} von ${g.list.length} eingehalten</div></div></div>`;
+    const days = [...new Set(rel.map(e => e.date.slice(0,10)))].sort().reverse();
+    return days.map(day => {
+      const list = rel.filter(e => e.date.slice(0,10) === day);
+      const open = pauseOpen.has(day);
+      const byEx = groupEntries(list).map(g => {
+        const line = pauseLine(g.entries);
+        return `<div class="entry"><div class="entry-main"><div class="entry-ex">${escapeHtml(g.name)}</div><div class="entry-detail">${line}</div></div></div>`;
       }).join('');
-    }
-    return html;
+      return `<div class="ex-group pause-day${open ? ' open' : ''}" data-day="${day}">
+        <button type="button" class="ex-head" aria-expanded="${open}">
+          <span class="entry-main"><span class="entry-ex">${formatDateHeading(day)}</span><span class="entry-detail">${pauseLine(list)}</span></span>
+          <span class="chev" aria-hidden="true"></span>
+        </button>
+        <div class="ex-sets">${byEx}</div>
+      </div>`;
+    }).join('');
   }
 
   function renderStats(){
@@ -1148,7 +1194,17 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       row.addEventListener('click', () => highlightMuscle(row.dataset.group, row));
     });
     document.getElementById('exerciseHistory').innerHTML = buildExerciseHistory(inRange);
-    document.getElementById('pauseStats').innerHTML = buildPauseStats(inRange);
+    const ps = document.getElementById('pauseStats');
+    ps.innerHTML = buildPauseStats(inRange);
+    ps.querySelectorAll('.ex-head').forEach(head => {
+      head.addEventListener('click', () => {
+        const grp = head.parentElement;
+        const open = !grp.classList.contains('open');
+        grp.classList.toggle('open', open);
+        head.setAttribute('aria-expanded', String(open));
+        if(open) pauseOpen.add(grp.dataset.day); else pauseOpen.delete(grp.dataset.day);
+      });
+    });
   }
 
   function buildTendenzDistribution(inRange){
@@ -1496,18 +1552,48 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       });
     });
   }
-  document.getElementById('fDate').addEventListener('change', renderLastSession);
+  // Nachtragen-Modus: Datum frei gewählt, keine Ansicht vom letzten Training
+  let backfillMode = false;
+  const todayIso = () => new Date().toISOString().slice(0,10);
+
+  function closeLastSession(){
+    document.getElementById('lastSessionBox').style.display = 'none';
+    const btn = document.getElementById('lastSessionBtn');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = 'Letztes Training ▾';
+  }
+
+  document.getElementById('lastSessionBtn').addEventListener('click', () => {
+    const box = document.getElementById('lastSessionBox');
+    const btn = document.getElementById('lastSessionBtn');
+    const open = box.style.display === 'none';
+    if(open) renderLastSession();
+    box.style.display = open ? 'block' : 'none';
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? 'Letztes Training ▴' : 'Letztes Training ▾';
+  });
 
   function showSubsection(name){
-    if(name === 'pick') renderLastSession();
+    closeLastSession();
     document.getElementById('suggest-count-section').style.display = name === 'count' ? 'block' : 'none';
     document.getElementById('suggest-overview-section').style.display = name === 'overview' ? 'block' : 'none';
+    document.getElementById('backfill-section').style.display = name === 'backfill' ? 'block' : 'none';
     document.getElementById('pick-section').style.display = name === 'pick' ? 'block' : 'none';
     document.getElementById('detail-section').style.display = name === 'detail' ? 'block' : 'none';
+    // Timer-Leiste nur, wenn wirklich trainiert wird
+    document.getElementById('timerBar').style.display = (name === 'pick' || name === 'detail') ? 'block' : 'none';
+    // Button "Letztes Training": nur im normalen Training und wenn es ein früheres gibt
+    const cutoff = document.getElementById('fDate').value || '9999-12-31';
+    const hasLast = entries.some(e => e.date.slice(0,10) < cutoff);
+    document.getElementById('lastSessionBtn').style.display =
+      ((name === 'pick' || name === 'detail') && !backfillMode && hasLast) ? 'inline-flex' : 'none';
+    const hint = document.getElementById('pickDateHint');
+    hint.textContent = backfillMode ? `Nachtrag für ${formatShort(document.getElementById('fDate').value)}` : '';
   }
 
   function openNew(date){
-    document.getElementById('fDate').value = date || new Date().toISOString().slice(0,10);
+    backfillMode = !!date && date !== todayIso();
+    document.getElementById('fDate').value = date || todayIso();
     document.getElementById('formMsg').textContent = '';
     fExercise.value = '';
     updateClearBtn();
@@ -1517,8 +1603,29 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     showScreen('new');
   }
 
+  function openBackfill(){
+    backfillMode = true;
+    const d = document.getElementById('fDate');
+    d.max = todayIso();
+    d.value = todayIso();
+    document.getElementById('formMsg').textContent = '';
+    fExercise.value = '';
+    updateClearBtn();
+    suggestedQueue = null;
+    showSubsection('backfill');
+    showScreen('new');
+  }
+
+  document.getElementById('backfillBtn').addEventListener('click', openBackfill);
+  document.getElementById('backfillNextBtn').addEventListener('click', () => {
+    if(!document.getElementById('fDate').value) return;
+    renderQuickChips();
+    showSubsection('pick');
+  });
+
   function openSuggested(date){
-    document.getElementById('fDate').value = date || new Date().toISOString().slice(0,10);
+    backfillMode = false;
+    document.getElementById('fDate').value = date || todayIso();
     document.getElementById('formMsg').textContent = '';
     fExercise.value = '';
     suggestedQueue = null;
@@ -1902,7 +2009,6 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     stopTimer();
     remaining = totalSecs;
     renderTimer();
-    document.getElementById('timerWrap').open = false;
 
     setStartTime = Date.now();
     clearInterval(setStopwatchInterval);
@@ -1981,7 +2087,6 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
       // Formular bleibt absichtlich mit denselben Werten stehen (schneller nächster Satz),
       // nur Übung/Gewicht/Wdh. werden NICHT geleert.
-      document.getElementById('timerWrap').open = true;
       restartTimer();
     }catch(e){
       formMsg.textContent = 'Eintrag konnte nicht gespeichert werden.';
@@ -2165,7 +2270,6 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const date = document.getElementById('fDate').value;
     resetSetState();
     stopTimer();
-    document.getElementById('timerWrap').open = false;
     suggestedQueue = null;
     fExercise.value = '';
     updateClearBtn();
@@ -2210,7 +2314,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const s = (abs % 60).toString().padStart(2,'0');
     const txt = `${remaining < 0 ? '-' : ''}${m}:${s}`;
     timerDisplay.textContent = txt;
-    document.getElementById('timerSummaryValue').textContent = txt;
+    const g = document.getElementById('timerGoal');
+    if(g) g.textContent = `${String(Math.floor(totalSecs / 60)).padStart(2,'0')}:${String(totalSecs % 60).padStart(2,'0')}`;
   }
   renderTimer();
 
@@ -2336,13 +2441,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     renderTimer();
   });
 
-  // Pause abbrechen: Timer zurücksetzen und einklappen
-  document.getElementById('skipPause').addEventListener('click', () => {
-    stopTimer();
-    remaining = totalSecs;
-    timerDisplay.classList.remove('done');
-    renderTimer();
-    document.getElementById('timerWrap').open = false;
+  // Einstellungen der Leiste ein-/ausklappen
+  document.getElementById('timerGoalBtn').addEventListener('click', () => {
+    const panel = document.getElementById('timerPanel');
+    const open = panel.style.display === 'none';
+    panel.style.display = open ? 'block' : 'none';
+    document.getElementById('timerGoalBtn').setAttribute('aria-expanded', String(open));
   });
 
   // Ton an/aus (Einstellung bleibt im Browser gespeichert)
