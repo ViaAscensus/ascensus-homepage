@@ -112,7 +112,8 @@
   .entry-ex{ font-size:0.95rem; font-weight:500; }
   .entry-detail{ font-size:0.82rem; color: var(--text-dim); margin-top:2px; }
   .entry-right{ display:flex; align-items:center; gap:10px; }
-  .new-topbar{ display:flex; align-items:center; justify-content:space-between; }
+  .new-topbar{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+  .sess-head{ margin: 18px 0 2px; font-weight:700; color: var(--accent); font-size:0.95rem; }
   .new-topbar .screen-back + .screen-back{ margin-left:0; }
   .new-training-btn-backfill{ background: transparent; }
   .timer-bar{
@@ -543,6 +544,7 @@
     <h1>Trainingsbuch</h1>
     <p class="sub">Deine bisherigen Trainingseinheiten</p>
   </div>
+  <button class="new-training-btn" id="resumeBtn" style="display:none;">▶ Training fortsetzen</button>
   <button class="new-training-btn" id="newTrainingBtn">+ Neues individuelles Training starten</button>
   <button class="new-training-btn new-training-btn-suggest" id="suggestedTrainingBtn">+ Vorgeschlagenes Training starten</button>
   <button class="new-training-btn new-training-btn-backfill" id="backfillBtn">+ Training nachtragen</button>
@@ -553,13 +555,21 @@
   <div id="dayList"></div>
 </div>
 
+<!-- ========== Alle Trainingseinheiten ========== -->
+<div class="screen" id="sessions-screen">
+  <button class="screen-back" id="sessionsBackBtn">← Übersicht</button>
+  <div class="head">
+    <h2>Alle Trainingseinheiten</h2>
+  </div>
+  <div id="sessionList"></div>
+</div>
+
 <!-- ========== Tag-Detail ========== -->
 <div class="screen" id="day-screen">
   <button class="screen-back" id="dayBackBtn">← Übersicht</button>
   <div class="head">
     <h2 id="dayHeading"></h2>
   </div>
-  <button class="add-to-day-btn" id="addToDayBtn">+ Übung zu diesem Training hinzufügen</button>
   <div id="dayEntries"></div>
 </div>
 
@@ -614,7 +624,7 @@
 <!-- ========== Neues Training ========== -->
 <div class="screen" id="new-screen">
   <div class="new-topbar">
-    <button class="screen-back" id="newBackBtn">← Übersicht</button>
+    <button class="screen-back" id="newBackBtn">← Alle Trainingseinheiten</button>
     <button type="button" class="screen-back" id="lastSessionBtn" aria-expanded="false" style="display:none;">Letztes Training ▾</button>
   </div>
   <div id="lastSessionBox" style="display:none;"></div>
@@ -764,7 +774,6 @@
   </section>
   <section>
     <button type="button" class="btn btn-primary" id="summaryDetailsBtn" style="width:100%;">Alle Sätze ansehen</button>
-    <button type="button" class="btn" id="summaryContinueBtn" style="width:100%; margin-top:10px;">Zurück zum Training</button>
     <button type="button" class="btn" id="summaryDoneBtn" style="width:100%; margin-top:10px;">Fertig</button>
   </section>
 </div>
@@ -820,12 +829,58 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   const screens = {
     overview: document.getElementById('overview-screen'),
+    sessions: document.getElementById('sessions-screen'),
     day: document.getElementById('day-screen'),
     stats: document.getElementById('stats-screen'),
     new: document.getElementById('new-screen'),
     summary: document.getElementById('summary-screen')
   };
   const loadingState = document.getElementById('loadingState');
+
+  // ---------- Trainings: jede Einheit hat eine Kennung ----------
+  // Ein Training beginnt mit "Training starten"/"nachtragen" und endet mit "Training fertig".
+  // Einträge ohne training_id (ältere) zählen pro Datum als ein Training.
+  const ACTIVE_KEY = 'tb_active_training';
+  const ACTIVE_MAX_MS = 3 * 3600000; // so lange lässt sich ein Training nach dem letzten Satz fortsetzen
+  function loadActive(){
+    try{
+      const a = JSON.parse(localStorage.getItem('tb_active_training') || 'null');
+      if(a && a.id && a.date && Date.now() - a.lastMs <= ACTIVE_MAX_MS) return a;
+    }catch(e){}
+    return null;
+  }
+  let activeTraining = loadActive();
+  function saveActive(){
+    try{
+      if(activeTraining) localStorage.setItem(ACTIVE_KEY, JSON.stringify(activeTraining));
+      else localStorage.removeItem(ACTIVE_KEY);
+    }catch(e){}
+  }
+  function refreshActive(){
+    if(activeTraining && Date.now() - activeTraining.lastMs > ACTIVE_MAX_MS){ activeTraining = null; saveActive(); }
+  }
+  function startTraining(date){
+    activeTraining = { id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date, lastMs: Date.now() };
+    saveActive();
+    forgetSetEnd();
+    trainingStartMs = null;
+  }
+  function entryMs(e){
+    const t = e.created ? new Date(String(e.created).replace(' ', 'T')).getTime() : NaN;
+    return isNaN(t) ? new Date(e.date.slice(0,10) + 'T00:00:00').getTime() : t;
+  }
+  function sessionKey(e){ return e.training_id || ('d:' + e.date.slice(0,10)); }
+  // Trainings aus einer Liste von Einträgen, älteste zuerst
+  function buildSessions(list){
+    const map = {};
+    list.forEach(e => {
+      const k = sessionKey(e);
+      const m = map[k] = map[k] || { key:k, date:e.date.slice(0,10), entries:[], startMs: Infinity };
+      m.entries.push(e);
+      m.startMs = Math.min(m.startMs, entryMs(e));
+    });
+    return Object.values(map).sort((a, b) => a.date.localeCompare(b.date) || a.startMs - b.startMs);
+  }
 
   // Bildschirm bleibt im Training an (Wake Lock), damit Timer und Töne zuverlässig laufen
   let wakeLock = null;
@@ -954,8 +1009,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   }
 
   // ---------- Übersicht ----------
-  function renderOverview(){
-    const container = document.getElementById('dayList');
+  function renderDayList(container){
     if(entries.length === 0){
       container.innerHTML = '<div class="empty">Noch keine Trainings erfasst. Starte oben Dein erstes Training.</div>';
       return;
@@ -963,11 +1017,13 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const dates = [...new Set(entries.map(e => e.date.slice(0,10)))].sort().reverse();
     container.innerHTML = dates.map(date => {
       const dayEntries = entries.filter(e => e.date.slice(0,10) === date);
+      const exCount = new Set(dayEntries.map(e => e.exercise.toLowerCase())).size;
+      const tCount = buildSessions(dayEntries).length;
       return `
         <button class="day-row" data-date="${date}">
           <span>
             <span class="day-date">${formatDateHeading(date)}</span>
-            <span class="day-meta">${dayEntries.length} Übung${dayEntries.length === 1 ? '' : 'en'}</span>
+            <span class="day-meta">${exCount} Übung${exCount === 1 ? '' : 'en'}${tCount > 1 ? ` · ${tCount} Trainings` : ''}</span>
           </span>
           <span class="day-chevron">›</span>
         </button>
@@ -975,12 +1031,45 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     }).join('');
 
     container.querySelectorAll('.day-row').forEach(row => {
-      row.addEventListener('click', () => openDay(row.dataset.date));
+      row.addEventListener('click', () => { dayFromSessions = container.id === 'sessionList'; openDay(row.dataset.date); });
     });
   }
 
-  document.getElementById('newTrainingBtn').addEventListener('click', () => openNew(null));
-  document.getElementById('suggestedTrainingBtn').addEventListener('click', () => openSuggested(null));
+  function renderOverview(){
+    refreshActive();
+    document.getElementById('resumeBtn').style.display = activeTraining ? '' : 'none';
+    renderDayList(document.getElementById('dayList'));
+  }
+
+  // Eigene Seite nur mit den Trainingseinheiten; aus einem laufenden Training erreichbar
+  function openSessions(){
+    refreshActive();
+    document.getElementById('sessionsBackBtn').textContent = activeTraining ? '← Zurück zum Training' : '← Übersicht';
+    renderDayList(document.getElementById('sessionList'));
+    showScreen('sessions');
+    window.scrollTo(0, 0);
+  }
+  document.getElementById('sessionsBackBtn').addEventListener('click', () => {
+    refreshActive();
+    if(activeTraining) showScreen('new');
+    else { renderOverview(); showScreen('overview'); }
+  });
+  document.getElementById('resumeBtn').addEventListener('click', () => {
+    refreshActive();
+    if(!activeTraining){ renderOverview(); return; }
+    backfillMode = activeTraining.date !== todayIso();
+    document.getElementById('fDate').value = activeTraining.date;
+    document.getElementById('formMsg').textContent = '';
+    fExercise.value = '';
+    updateClearBtn();
+    suggestedQueue = null;
+    renderQuickChips();
+    showSubsection('pick');
+    showScreen('new');
+  });
+
+  document.getElementById('newTrainingBtn').addEventListener('click', () => openNew());
+  document.getElementById('suggestedTrainingBtn').addEventListener('click', () => openSuggested());
 
   // ---------- Tag-Detail ----------
   let dayExpanded = new Set(); // aufgeklappte Übungen in der Tagesansicht
@@ -990,7 +1079,15 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     dayExpanded = new Set();
     renderDayDetail();
     showScreen('day');
+    window.scrollTo(0, 0);
   }
+
+  function leaveDay(){
+    refreshActive();
+    if(activeTraining && screens.sessions && dayFromSessions){ openSessions(); }
+    else { renderOverview(); showScreen('overview'); }
+  }
+  let dayFromSessions = false;
 
   function renderDayDetail(){
     document.getElementById('dayHeading').textContent = formatDateHeading(selectedDate);
@@ -1002,10 +1099,13 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       return;
     }
 
-    const groups = groupEntries(dayEntries);
-    container.innerHTML = groups.map(g => `
-      <div class="ex-group${dayExpanded.has(g.key) ? ' open' : ''}" data-key="${escapeHtml(g.key)}">
-        <button type="button" class="ex-head" aria-expanded="${dayExpanded.has(g.key)}">
+    const sessions = buildSessions(dayEntries);
+    const multi = sessions.length > 1;
+    const groupsHtml = (sess) => groupEntries(sess.entries).map(g => {
+      const gk = sess.key + '|' + g.key;
+      return `
+      <div class="ex-group${dayExpanded.has(gk) ? ' open' : ''}" data-key="${escapeHtml(gk)}">
+        <button type="button" class="ex-head" aria-expanded="${dayExpanded.has(gk)}">
           <span class="entry-main">
             <span class="entry-ex">${escapeHtml(g.name)}</span>
             <span class="entry-detail">${groupSummary(g)}</span>
@@ -1025,8 +1125,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
               </div>
             </div>`).join('')}
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
+    container.innerHTML = sessions.map((sess, i) => {
+      const time = new Date(sess.startMs).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+      return (multi ? `<div class="sess-head">Training ${i + 1} · ${time} Uhr</div>` : '') + groupsHtml(sess);
+    }).join('');
 
     container.querySelectorAll('.ex-head').forEach(head => {
       head.addEventListener('click', () => {
@@ -1049,8 +1153,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
           if(stillHasEntries){
             renderDayDetail();
           } else {
-            renderOverview();
-            showScreen('overview');
+            leaveDay();
           }
         }catch(e){
           console.error('Löschen fehlgeschlagen', e);
@@ -1059,12 +1162,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     });
   }
 
-  document.getElementById('dayBackBtn').addEventListener('click', () => {
-    renderOverview();
-    showScreen('overview');
-  });
-
-  document.getElementById('addToDayBtn').addEventListener('click', () => openNew(selectedDate));
+  document.getElementById('dayBackBtn').addEventListener('click', leaveDay);
 
   // ---------- Auswertung ----------
   document.getElementById('statsLink').addEventListener('click', openStats);
@@ -1131,17 +1229,19 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function buildPauseStats(inRange){
     const rel = inRange.filter(e => e.pause_typ === 'satz' || e.pause_typ === 'wechsel');
     if(!rel.length) return '<div class="empty">Noch keine Pausenzeiten erfasst. Sie werden ab jetzt bei jedem Satz mitgeschrieben.</div>';
-    const days = [...new Set(rel.map(e => e.date.slice(0,10)))].sort().reverse();
-    return days.map(day => {
-      const list = rel.filter(e => e.date.slice(0,10) === day);
-      const open = pauseOpen.has(day);
-      const byEx = groupEntries(list).map(g => {
-        const line = pauseLine(g.entries);
-        return `<div class="entry"><div class="entry-main"><div class="entry-ex">${escapeHtml(g.name)}</div><div class="entry-detail">${line}</div></div></div>`;
-      }).join('');
-      return `<div class="ex-group pause-day${open ? ' open' : ''}" data-day="${day}">
+    // Nummer des Trainings am jeweiligen Tag (über alle Einträge), damit "Training 2" stimmt
+    const allSess = buildSessions(entries);
+    const perDate = {}, nr = {};
+    allSess.forEach(sx => { perDate[sx.date] = (perDate[sx.date] || 0) + 1; nr[sx.key] = perDate[sx.date]; });
+    return buildSessions(rel).reverse().map(sx => {
+      const open = pauseOpen.has(sx.key);
+      const title = formatDateHeading(sx.date) + (perDate[sx.date] > 1 ? ` · Training ${nr[sx.key]}` : '');
+      const byEx = groupEntries(sx.entries).map(g =>
+        `<div class="entry"><div class="entry-main"><div class="entry-ex">${escapeHtml(g.name)}</div><div class="entry-detail">${pauseLine(g.entries)}</div></div></div>`
+      ).join('');
+      return `<div class="ex-group pause-day${open ? ' open' : ''}" data-day="${escapeHtml(sx.key)}">
         <button type="button" class="ex-head" aria-expanded="${open}">
-          <span class="entry-main"><span class="entry-ex">${formatDateHeading(day)}</span><span class="entry-detail">${pauseLine(list)}</span></span>
+          <span class="entry-main"><span class="entry-ex">${title}</span><span class="entry-detail">${pauseLine(sx.entries)}</span></span>
           <span class="chev" aria-hidden="true"></span>
         </button>
         <div class="ex-sets">${byEx}</div>
@@ -1518,19 +1618,25 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   let lastSessionOpen = new Set();
 
+  // Frühere Trainings (ohne das laufende), die nicht nach dem gewählten Datum liegen
+  function previousSessions(){
+    const cur = activeTraining ? activeTraining.id : null;
+    const cutoff = document.getElementById('fDate').value || '9999-12-31';
+    return buildSessions(entries).filter(sx => sx.key !== cur && sx.date <= cutoff);
+  }
+
   function renderLastSession(){
     const box = document.getElementById('lastSessionBox');
-    const cutoff = document.getElementById('fDate').value || '9999-12-31';
-    const dates = [...new Set(entries.map(e => e.date.slice(0,10)).filter(d => d < cutoff))].sort();
-    if(!dates.length){ box.innerHTML = ''; return; }
-    const last = dates[dates.length - 1];
-    const groups = groupEntries(entries.filter(e => e.date.slice(0,10) === last));
+    const prev = previousSessions();
+    if(!prev.length){ box.innerHTML = ''; return; }
+    const sx = prev[prev.length - 1];
+    const groups = groupEntries(sx.entries);
     box.innerHTML = `
       <div class="last-session">
-        <div class="last-session-title">Letztes Mal · ${formatShort(last)}</div>
+        <div class="last-session-title">Letztes Training · ${formatShort(sx.date)}</div>
         <div class="last-session-sub">Deine Übungen in dieser Reihenfolge</div>
         ${groups.map((g, i) => {
-          const key = last + '|' + g.key;
+          const key = sx.key + '|' + g.key;
           const n = groupSetCount(g);
           return `
           <div class="ex-group${lastSessionOpen.has(key) ? ' open' : ''}" data-key="${escapeHtml(key)}">
@@ -1552,6 +1658,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       });
     });
   }
+
   // Nachtragen-Modus: Datum frei gewählt, keine Ansicht vom letzten Training
   let backfillMode = false;
   const todayIso = () => new Date().toISOString().slice(0,10);
@@ -1583,17 +1690,19 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     // Timer-Leiste nur, wenn wirklich trainiert wird
     document.getElementById('timerBar').style.display = (name === 'pick' || name === 'detail') ? 'block' : 'none';
     // Button "Letztes Training": nur im normalen Training und wenn es ein früheres gibt
-    const cutoff = document.getElementById('fDate').value || '9999-12-31';
-    const hasLast = entries.some(e => e.date.slice(0,10) < cutoff);
+    const hasLast = previousSessions().length > 0;
+    refreshActive();
+    document.getElementById('newBackBtn').textContent = activeTraining ? '← Alle Trainingseinheiten' : '← Übersicht';
     document.getElementById('lastSessionBtn').style.display =
       ((name === 'pick' || name === 'detail') && !backfillMode && hasLast) ? 'inline-flex' : 'none';
     const hint = document.getElementById('pickDateHint');
     hint.textContent = backfillMode ? `Nachtrag für ${formatShort(document.getElementById('fDate').value)}` : '';
   }
 
-  function openNew(date){
-    backfillMode = !!date && date !== todayIso();
-    document.getElementById('fDate').value = date || todayIso();
+  function openNew(){
+    backfillMode = false;
+    startTraining(todayIso());
+    document.getElementById('fDate').value = todayIso();
     document.getElementById('formMsg').textContent = '';
     fExercise.value = '';
     updateClearBtn();
@@ -1605,6 +1714,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   function openBackfill(){
     backfillMode = true;
+    activeTraining = null; saveActive(); // ein laufendes Training ist damit beendet
     const d = document.getElementById('fDate');
     d.max = todayIso();
     d.value = todayIso();
@@ -1619,13 +1729,15 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('backfillBtn').addEventListener('click', openBackfill);
   document.getElementById('backfillNextBtn').addEventListener('click', () => {
     if(!document.getElementById('fDate').value) return;
+    startTraining(document.getElementById('fDate').value);
     renderQuickChips();
     showSubsection('pick');
   });
 
-  function openSuggested(date){
+  function openSuggested(){
     backfillMode = false;
-    document.getElementById('fDate').value = date || todayIso();
+    startTraining(todayIso());
+    document.getElementById('fDate').value = todayIso();
     document.getElementById('formMsg').textContent = '';
     fExercise.value = '';
     suggestedQueue = null;
@@ -1636,7 +1748,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('suggestCountNextBtn').addEventListener('click', () => {
     const n = Math.max(1, parseInt(document.getElementById('suggestCount').value) || 6);
     const currentDate = document.getElementById('fDate').value;
-    const doneToday = new Set(entries.filter(e => e.date.slice(0,10) === currentDate).map(e => e.exercise));
+    const doneToday = doneInCurrent(currentDate);
     const names = computeTopExercises(doneToday, n);
 
     suggestedQueue = names.map(ex => {
@@ -1702,6 +1814,20 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     showSubsection('pick');
   }
 
+  // Übungen, die im laufenden Training schon gemacht wurden
+  function doneInCurrent(date){
+    const key = activeTraining ? activeTraining.id : null;
+    return new Set(entries.filter(e => key ? e.training_id === key : e.date.slice(0,10) === date).map(e => e.exercise));
+  }
+
+  function getExerciseOrderForSession(key){
+    const order = [];
+    entries.filter(e => sessionKey(e) === key)
+      .slice().sort((a,b) => (a.created || '').localeCompare(b.created || ''))
+      .forEach(e => { if(!order.includes(e.exercise)) order.push(e.exercise); });
+    return order;
+  }
+
   function getExerciseOrderForDay(date){
     const dayEntries = entries
       .filter(e => e.date.slice(0,10) === date)
@@ -1724,7 +1850,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     document.getElementById('detailExerciseName').textContent = exerciseName;
 
     const todayDate = document.getElementById('fDate').value;
-    const todayOrder = getExerciseOrderForDay(todayDate);
+    const todayOrder = activeTraining ? getExerciseOrderForSession(activeTraining.id) : getExerciseOrderForDay(todayDate);
     const todayPosition = todayOrder.includes(exerciseName) ? todayOrder.indexOf(exerciseName) + 1 : todayOrder.length + 1;
     document.getElementById('todayPositionHint').textContent = `Heute: ${todayPosition}. Übung dieser Einheit`;
 
@@ -1841,7 +1967,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function renderQuickChips(){
     const container = document.getElementById('quickChips');
     const currentDate = document.getElementById('fDate').value;
-    const doneToday = new Set(entries.filter(e => e.date.slice(0,10) === currentDate).map(e => e.exercise));
+    const doneToday = doneInCurrent(currentDate);
 
     const names = suggestedQueue
       ? suggestedQueue.map(item => item.exercise).filter(ex => !doneToday.has(ex))
@@ -1864,8 +1990,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   }
 
   document.getElementById('newBackBtn').addEventListener('click', () => {
-    renderOverview();
-    showScreen('overview');
+    refreshActive();
+    if(activeTraining) openSessions();
+    else { renderOverview(); showScreen('overview'); }
   });
 
   document.querySelectorAll('.step-btn').forEach(btn => {
@@ -1891,15 +2018,15 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const q = fExercise.value.trim().toLowerCase();
     const hintEl = document.getElementById('lastHint');
     if(!q){ hintEl.textContent = ''; return; }
-    // Letztes Mal = der letzte frühere Trainingstag mit dieser Übung, mit allen Sätzen
-    const cutoff = document.getElementById('fDate').value || '9999-12-31';
-    const past = entries.filter(e => e.exercise.toLowerCase() === q && e.date.slice(0,10) < cutoff);
+    // Letztes Mal = das letzte frühere Training mit dieser Übung, mit allen Sätzen
+    const past = previousSessions().filter(sx => sx.entries.some(e => e.exercise.toLowerCase() === q));
     if(!past.length){ hintEl.textContent = ''; return; }
-    const lastDate = past.map(e => e.date.slice(0,10)).sort().pop();
-    const g = groupEntries(past.filter(e => e.date.slice(0,10) === lastDate))[0];
-    const pos = getExercisePosition(lastDate, g.name);
-    const posText = pos ? `, als ${pos}. Übung` : '';
-    hintEl.innerHTML = `Letztes Mal (${formatShort(lastDate)}${posText}):` +
+    const sx = past[past.length - 1];
+    const g = groupEntries(sx.entries.filter(e => e.exercise.toLowerCase() === q))[0];
+    const order = getExerciseOrderForSession(sx.key);
+    const idx = order.indexOf(g.name);
+    const posText = idx === -1 ? '' : `, als ${idx + 1}. Übung`;
+    hintEl.innerHTML = `Letztes Mal (${formatShort(sx.date)}${posText}):` +
       `<div class="last-sets">${setRows(g).map(r => `<div class="set-line">${escapeHtml(r.text)}</div>`).join('')}</div>`;
   }
   fExercise.addEventListener('input', updateLastHint);
@@ -2058,10 +2185,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const saveBtn = document.getElementById('saveEntry');
     saveBtn.disabled = true;
 
+    if(!activeTraining) startTraining(date);
     try{
       await pb.collection('trainingsbuch_entries').create({
         member: pb.authStore.model.id,
         date, exercise, weight, reps, sets,
+        training_id: activeTraining.id, // PocketBase ignoriert das Feld, solange es nicht angelegt ist
         tendenz: selectedTendenz,
         gewichtBeiEintrag: memberBodyweight,
         // Pausen vor diesem Satz; PocketBase ignoriert die Felder, solange sie nicht angelegt sind
@@ -2069,6 +2198,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       });
       rememberSetEnd(endMs, exercise);
       pendingPause = null;
+      activeTraining.lastMs = Date.now();
+      saveActive();
       await loadEntries();
       updateRemainingSetsDisplay();
 
@@ -2150,9 +2281,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   // Rekorde des Tages: pro Übung der beste Satz mit mindestens 7 Wiederholungen,
   // sofern sein Gewicht über allem liegt, was vor diesem Tag in der Übung bewegt wurde.
-  function computeDayRecords(date){
+  function computeDayRecords(date, key){
     const before = entries.filter(e => e.date.slice(0,10) < date);
-    const today = entries.filter(e => e.date.slice(0,10) === date && e.reps >= RECORD_MIN_REPS);
+    const today = entries.filter(e => (key ? sessionKey(e) === key : e.date.slice(0,10) === date) && e.reps >= RECORD_MIN_REPS);
     const byExercise = {};
     today.forEach(e => {
       const k = e.exercise.toLowerCase();
@@ -2206,8 +2337,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     return minutes >= 1 ? minutes : null;
   }
 
-  async function showSummary(date){
-    const dayEntries = entries.filter(e => e.date.slice(0,10) === date);
+  async function showSummary(date, key){
+    const dayEntries = entries.filter(e => key ? sessionKey(e) === key : e.date.slice(0,10) === date);
     if(dayEntries.length === 0){
       renderOverview();
       showScreen('overview');
@@ -2230,7 +2361,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
         <div class="summary-tile-label">${l}</div>
       </div>`).join('');
 
-    const records = computeDayRecords(date);
+    const records = computeDayRecords(date, key);
     const recSection = document.getElementById('summaryRecordsSection');
     if(records.length){
       document.getElementById('summaryRecords').innerHTML = records.map(e => `
@@ -2279,12 +2410,14 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     document.getElementById('fReps').value = '';
     document.getElementById('fSets').value = '1';
     forgetSetEnd();
-    showSummary(date);
+    const doneKey = activeTraining ? activeTraining.id : null;
+    activeTraining = null; // Training beendet: nicht mehr fortsetzbar
+    saveActive();
+    showSummary(date, doneKey);
     trainingStartMs = null;
   });
 
-  document.getElementById('summaryDetailsBtn').addEventListener('click', () => openDay(selectedDate));
-  document.getElementById('summaryContinueBtn').addEventListener('click', () => openNew(selectedDate));
+  document.getElementById('summaryDetailsBtn').addEventListener('click', () => { dayFromSessions = false; openDay(selectedDate); });
   document.getElementById('summaryDoneBtn').addEventListener('click', () => {
     renderOverview();
     showScreen('overview');
