@@ -127,14 +127,14 @@
     position: sticky; top: 0; z-index: 20; background: var(--bg);
     border-bottom: 1px solid var(--border-strong); padding: 8px 18px; margin-top: 12px;
   }
-  .timer-row{ display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:8px; }
+  .timer-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .timer-title{ font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color: var(--text-dim); }
   .timer-bar .timer-display{ border:none; padding:0; font-size:2.5rem; line-height:1.1; text-align:center; }
   .timer-goal{
-    justify-self:start; background:none; border:none; color: var(--text-dim); font-family:inherit;
+    background:none; border:none; color: var(--text-dim); font-family:inherit;
     font-size:0.82rem; font-weight:600; cursor:pointer; padding:10px 0;
   }
   .timer-goal span{ color: var(--accent); }
-  .timer-play{ flex:none; justify-self:end; padding: 10px 16px; }
   .timer-panel{ padding: 6px 0 10px; }
   .custom-row #resetTimer{
     background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
@@ -644,11 +644,11 @@
 
   <!-- Feste Timer-Leiste: bleibt beim Scrollen oben sichtbar -->
   <div class="timer-bar" id="timerBar" style="display:none;">
-    <div class="timer-row">
+    <div class="timer-head">
+      <span class="timer-title">Pausen-Timer</span>
       <button type="button" class="timer-goal" id="timerGoalBtn" aria-expanded="false">Ziel <span id="timerGoal">02:30</span> ▾</button>
-      <div class="timer-display" id="timerDisplay">02:30</div>
-      <button class="btn btn-primary timer-play" id="startPause">Start</button>
     </div>
+    <div class="timer-display" id="timerDisplay">02:30</div>
     <div class="timer-panel" id="timerPanel" style="display:none;">
       <div class="presets">
         <div class="chip" data-secs="60">60 s</div>
@@ -2513,7 +2513,6 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   try{ const l = localStorage.getItem('tb_sound_level'); if(SOUND_LEVELS[l]) soundLevel = l; }catch(e){}
 
   const timerDisplay = document.getElementById('timerDisplay');
-  const startPauseBtn = document.getElementById('startPause');
 
   function renderTimer(){
     const abs = Math.abs(remaining);
@@ -2614,7 +2613,6 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     endTime = Date.now() + remaining * 1000;
     endHandled = false;
     isRunning = true;
-    startPauseBtn.textContent = 'Pause';
     timerInterval = setInterval(tick, 250);
   }
 
@@ -2626,21 +2624,13 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     endTime = Date.now() + remaining * 1000;
     endHandled = false;
     isRunning = true;
-    startPauseBtn.textContent = 'Pause';
     timerInterval = setInterval(tick, 250);
   }
 
   function stopTimer(){
     isRunning = false;
-    startPauseBtn.textContent = 'Start';
     clearInterval(timerInterval);
   }
-
-  startPauseBtn.addEventListener('click', () => {
-    unlockAudio();
-    if(isRunning) stopTimer();
-    else startTimer();
-  });
 
   document.getElementById('resetTimer').addEventListener('click', () => {
     stopTimer();
