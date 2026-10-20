@@ -112,6 +112,13 @@
   .entry-ex{ font-size:0.95rem; font-weight:500; }
   .entry-detail{ font-size:0.82rem; color: var(--text-dim); margin-top:2px; }
   .entry-right{ display:flex; align-items:center; gap:10px; }
+  .range-presets{ display:flex; gap:8px; flex-wrap:wrap; padding: 0 18px 12px; }
+  .range-chip{
+    flex:1; min-width: 76px; padding:9px 6px; text-align:center; background: var(--surface);
+    border:1px solid var(--border); border-radius: var(--radius); color: var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer;
+  }
+  .range-chip.active{ border-color: var(--accent); color: var(--accent); }
   .new-topbar{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
   .sess-head{ margin: 18px 0 2px; font-weight:700; color: var(--accent); font-size:0.95rem; }
   .new-topbar .screen-back + .screen-back{ margin-left:0; }
@@ -588,6 +595,12 @@
       <label for="rangeTo">Bis</label>
       <input type="date" id="rangeTo">
     </div>
+  </div>
+  <div class="range-presets" id="rangePresets">
+    <button type="button" class="range-chip" data-range="week">Diese Woche</button>
+    <button type="button" class="range-chip" data-range="month">Diesen Monat</button>
+    <button type="button" class="range-chip active" data-range="4weeks">1 Monat</button>
+    <button type="button" class="range-chip" data-range="all">Seit Beginn</button>
   </div>
 
   <div class="stats-tabs">
@@ -1215,12 +1228,40 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   document.getElementById('rangeTo').addEventListener('change', renderStats);
 
-  function openStats(){
-    if(entries.length > 0){
+  // Zeitraum-Voreinstellungen (lokales Datum, nicht UTC)
+  const localIso = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  function applyRange(kind){
+    const now = new Date();
+    const to = localIso(now);
+    let from = to;
+    if(kind === 'week'){
+      const d = new Date(now); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // Montag dieser Woche
+      from = localIso(d);
+    } else if(kind === 'month'){
+      from = localIso(new Date(now.getFullYear(), now.getMonth(), 1));
+    } else if(kind === '4weeks'){
+      const d = new Date(now); d.setDate(d.getDate() - 27); // heute und die 27 Tage davor = 4 Wochen
+      from = localIso(d);
+    } else if(kind === 'all'){
       const dates = entries.map(e => e.date.slice(0,10)).sort();
-      document.getElementById('rangeFrom').value = dates[0];
-      document.getElementById('rangeTo').value = dates[dates.length - 1];
+      from = dates.length ? dates[0] : to;
     }
+    document.getElementById('rangeFrom').value = from;
+    document.getElementById('rangeTo').value = to;
+    document.querySelectorAll('.range-chip').forEach(c => c.classList.toggle('active', c.dataset.range === kind));
+  }
+  document.getElementById('rangePresets').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.range-chip');
+    if(!btn) return;
+    applyRange(btn.dataset.range);
+    renderStats();
+  });
+  // Eigene Daten gewählt: keine Voreinstellung mehr markiert
+  ['rangeFrom','rangeTo'].forEach(id => document.getElementById(id).addEventListener('change',
+    () => document.querySelectorAll('.range-chip').forEach(c => c.classList.remove('active'))));
+
+  function openStats(){
+    applyRange('4weeks');
     document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelector('.stats-tab[data-tab="uebersicht"]').classList.add('active');
@@ -1376,7 +1417,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   const muscleKeywordMap = [
     [['brust','butterfly','fly','bankdrücken','chest','dip'], 'Brust'],
     [['latzug','klimmzug','pull','lat', 'rücken', 'ruder', 'rudern', 'row'], 'Rücken'],
-    [['rückenstrecker','unterer rücken','lower back'], 'Unterer Rücken'],
+    [['rückenstrecker','unterer rücken','lower back','kreuzheben','deadlift','hyperextension'], 'Unterer Rücken'],
     [['trapez','shrug'], 'Trapez'],
     [['neck curl','nackenmuskulatur'], 'Nacken'],
     [['schulter','shoulder','nackendrücken','nackenheben','seitheben','military'], 'Schultern'],
@@ -1386,11 +1427,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     [['bauch','crunch','situp','sit-up','plank','core'], 'Bauch'],
     [['oblique','seitliche bauch','russian twist'], 'Obliques'],
     [['adduktor','adductor','innere oberschenkel'], 'Adduktoren'],
-    [['beinstrecker','quad','kniebeuge','squat'], 'Quadrizeps'],
+    [['beinstrecker','beinpresse','leg press','quad','kniebeuge','squat','ausfallschritt','lunge'], 'Quadrizeps'],
     [['beinbeuger','hamstring','beincurl','leg curl'], 'Beinbeuger'],
     [['wade','calf','waden'], 'Waden'],
     [['schienbein','tibialis','shin'], 'Schienbein'],
-    [['gesäß','glute','hüftstrecker','hip thrust','po '], 'Gesäß']
+    [['gesäß','glute','hüftstrecker','hip thrust','po ','abduktor','abductor'], 'Gesäß']
   ];
   function getMuscleGroup(name){
     const n = name.toLowerCase();
@@ -1426,7 +1467,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     'Arme': ['Bizeps','Trizeps','Unterarme'],
     'Bauch': ['Bauch','Obliques'],
     'Beine': ['Quadrizeps','Adduktoren','Beinbeuger','Waden','Schienbein'],
-    'Gesäß': ['Gesäß']
+    'Gesäß': ['Gesäß'],
+    'Nicht zugeordnet': ['Sonstiges']
   };
 
   function buildMuscleDistribution(inRange){
