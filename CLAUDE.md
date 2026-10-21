@@ -6,7 +6,7 @@ kein Framework, kein Build-Schritt, kein Paketmanager.
 
 ## Deployment
 
-Coolify auf einem Hetzner-Server, Build strategy *Static*, `nginx:alpine`,
+Coolify auf einem Hostinger-VPS (KVM 2, Paris, wie in der Datenschutzerklärung genannt), Build strategy *Static*, `nginx:alpine`,
 Publish directory `/`. Die Quelle ist eine GitHub App, Auto-Deploy ist aktiv:
 
 ```
