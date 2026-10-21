@@ -64,6 +64,41 @@ var klaroConfig = {
           'Misst, ob ein Besuch über eine unserer Google-Anzeigen zustande kam, damit wir unsere Kampagnen sinnvoll einsetzen.',
       },
     },
+    en: {
+      consentModal: {
+        title: 'Privacy settings',
+        description:
+          'Here you can see and decide which services we may use on ascensus.fit. You can change your choice at any time via the “Privacy settings” link in the footer.',
+      },
+      consentNotice: {
+        description:
+          'We use Google Analytics, Microsoft Clarity and Google Ads to understand how our website is used and how our ads perform. You decide whether to allow this.',
+        learnMore: 'Settings',
+      },
+      acceptAll: 'Accept all',
+      acceptSelected: 'Accept selection',
+      decline: 'Decline',
+      ok: 'Okay',
+      close: 'Close',
+      purposes: {
+        analytics: 'Statistics & reach measurement',
+        marketing: 'Marketing & ad performance measurement',
+      },
+      purposeItem: {
+        service: 'Service',
+        services: 'Services',
+      },
+      'google-analytics': {
+        title: 'Google Analytics & Microsoft Clarity',
+        description:
+          'Records in anonymised form how visitors use the website (statistics) and how they move around the page (click and scroll behaviour) so that we can improve it.',
+      },
+      'google-ads': {
+        title: 'Google Ads',
+        description:
+          'Measures whether a visit came about through one of our Google ads, so that we can use our campaigns sensibly.',
+      },
+    },
   },
 
   services: [

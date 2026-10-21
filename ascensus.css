@@ -175,3 +175,7 @@
   .asc-header-inner { gap: var(--space-2); }
   .asc-header-actions .asc-btn { display: none; } /* Erstgespräch steckt in Menü und Schnellleiste unten */
 }
+
+/* Links-Seite (Instagram-Bio): Sprachschalter oben rechts, die Seite hat keine Kopfzeile */
+.lk-lang{display:flex;justify-content:flex-end;margin:calc(var(--space-4) * -1) 0 var(--space-3)}
+.lk-lang .asc-lang{margin-left:0}
