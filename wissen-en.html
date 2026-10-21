@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge – ASCENSUS</title>
+<meta name="description" content="Evidence-based knowledge on nutrition, exercise and everyday life – explained clearly, without dogma and without hype. By nutrition consultant Patrick Spengler.">
+<link rel="canonical" href="https://ascensus.fit/wissen-en.html">
+<link rel="alternate" hreflang="de" href="https://ascensus.fit/wissen.html">
+<link rel="alternate" hreflang="en" href="https://ascensus.fit/wissen-en.html">
+<link rel="alternate" hreflang="x-default" href="https://ascensus.fit/wissen.html">
+<link rel="icon" href="favicon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="Knowledge – ASCENSUS">
+<meta property="og:description" content="Evidence-based knowledge on nutrition, exercise and everyday life – explained clearly, without dogma.">
+<meta property="og:image" content="https://ascensus.fit/logo-wordmark-claim.png">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="ascensus.css">
+<script src="ascensus.js" defer></script>
+<style>
+:root{
+  --olive:#556B4E;
+  --olive-dark:#3E5039;
+  --sand:#B59A5D;
+  --offwhite:#F5F3EE;
+  --paper:#FFFFFF;
+  --ink:#232323;
+  --ink-60:rgba(35,35,35,.68);
+  --ink-40:rgba(35,35,35,.45);
+  --line:rgba(85,107,78,.18);
+  --maxw:1140px;
+  --gut:clamp(1.5rem,5vw,4rem);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--offwhite);
+  color:var(--ink);
+  font-family:'Inter','Inter var',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  font-size:17px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+
+.eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--sand);margin-bottom:1.1rem;
+}
+h1{
+  font-size:clamp(2.1rem,6.2vw,4.15rem);
+  font-weight:200;letter-spacing:.055em;text-transform:uppercase;
+  line-height:1.06;color:var(--olive);
+}
+h2{
+  font-size:clamp(1.4rem,3.4vw,2rem);
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  line-height:1.2;color:var(--olive);
+}
+h3{
+  font-size:1.06rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--olive);
+}
+p{max-width:62ch}
+.lead{font-size:clamp(1.02rem,2vw,1.2rem);line-height:1.6;color:var(--ink-60)}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+section{padding:clamp(4.5rem,10vw,8rem) 0;position:relative}
+
+
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.92rem 1.7rem;border:1px solid var(--olive);
+  background:var(--olive);color:var(--offwhite);
+  font-size:.79rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;transition:background .25s,color .25s,transform .25s;
+}
+.btn:hover{background:var(--olive-dark);border-color:var(--olive-dark);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--olive)}
+.btn-ghost:hover{background:var(--olive);color:var(--offwhite)}
+.btn-sm{padding:.66rem 1.2rem;font-size:.72rem}
+a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offset:3px}
+
+
+.intro{padding-bottom:0}
+
+/* ---------- Beitrags-Kacheln (identisch in index.html) ---------- */
+.post-grid{display:grid;gap:1.5rem;margin-top:3rem}
+@media(min-width:720px){.post-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.post-grid{grid-template-columns:repeat(3,1fr)}}
+.post{
+  background:var(--paper);border:1px solid var(--line);
+  padding:1.8rem 1.7rem 1.6rem;display:flex;flex-direction:column;
+  text-decoration:none;color:var(--ink);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.post:hover{transform:translateY(-4px);box-shadow:0 14px 40px -22px rgba(35,35,35,.35);border-color:rgba(85,107,78,.35)}
+.post[hidden]{display:none}
+.post-cat{font-size:.66rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--sand)}
+.post h3{margin:.8rem 0 .8rem;font-size:1.06rem;line-height:1.35;letter-spacing:.06em}
+.post p{font-size:.93rem;line-height:1.55;color:var(--ink-60);flex-grow:1}
+.post-foot{
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--line);
+  font-size:.78rem;color:var(--ink-40);
+}
+.post-more{font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:.7rem;color:var(--olive)}
+.post-empty{
+  margin-top:3rem;padding:2.4rem 2rem;border:1px dashed var(--line);
+  color:var(--ink-60);font-size:.95rem;max-width:none;
+}
+.post-empty strong{display:block;color:var(--olive);letter-spacing:.08em;text-transform:uppercase;font-size:.85rem;margin-bottom:.4rem}
+
+/* ---------- Erstgespräch-Hinweis ---------- */
+.call-mini{
+  background:var(--olive);color:var(--offwhite);
+  padding:2.4rem 2rem;margin-top:4rem;display:flex;flex-wrap:wrap;gap:1.5rem;
+  align-items:center;justify-content:space-between;
+}
+.call-mini p{color:rgba(245,243,238,.85);margin:0;max-width:44ch}
+.call-mini .btn{background:var(--sand);border-color:var(--sand);color:#fff;flex-shrink:0}
+.call-mini .btn:hover{background:#9c8449;border-color:#9c8449}
+
+/* ---------- Footer ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+
+<!-- 1) Google Consent Mode v2: Standard = alles abgelehnt,
+        BEVOR irgendetwas von Google geladen wird -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<!-- 2) Klaro Consent-Manager (self-hosted) -->
+<link rel="stylesheet" href="klaro.css" />
+<link rel="stylesheet" href="ascensus-klaro-theme.css" />
+<script src="klaro-config.js"></script>
+<script defer src="klaro.js"></script>
+
+<!-- 3) Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+  gtag('config', 'AW-18465350303');
+</script>
+</head>
+<body>
+
+<header class="asc-header" id="hdr" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="index-en.html" aria-label="ASCENSUS home"><img src="logo-wordmark.png" alt="ASCENSUS"></a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Main navigation">
+      <a class="asc-navlink" href="index-en.html#ansatz">Approach</a>
+      <a class="asc-navlink" href="index-en.html#ablauf">Process</a>
+      <a class="asc-navlink" href="pakete-en.html">Packages</a>
+      <a class="asc-navlink is-active" aria-current="page" href="wissen-en.html">Knowledge</a><a class="asc-navlink" href="rezepte.html">Recipes</a>
+      <a class="asc-navlink" href="index-en.html#faq">FAQ</a>
+      <a class="asc-navlink" href="index-en.html#kontakt">Contact</a>
+      <a class="asc-btn asc-btn-primary asc-nav-cta" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event', 'erstgespraech_klick');">Free intro call</a>
+    </nav>
+    <div class="asc-header-actions">
+      <a class="asc-btn asc-btn-primary" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event', 'erstgespraech_klick');">Intro call</a>
+      <div class="asc-lang" role="group" aria-label="Language / Sprache"><a href="wissen.html" hreflang="de" lang="de" aria-label="Diese Seite auf Deutsch lesen">DE</a><span aria-hidden="true">·</span><span aria-current="true">EN</span></div>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Open menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ INTRO ============ -->
+<section class="intro">
+  <div class="wrap reveal">
+    <p class="eyebrow">Knowledge for your everyday life</p>
+    <h1>Evidence-based, not hype</h1>
+    <p class="lead" style="margin-top:1.6rem">
+      A short explanation of what the science really says — and how to put it into practice in everyday life. Without bans, without jargon, without dogma.
+    </p>
+    <p class="lead" style="margin-top:1rem">
+      This knowledge section keeps growing — new content is added every week. It's worth dropping by every now and then.
+    </p>
+  </div>
+</section>
+
+<!-- ============ BEITRÄGE ============ -->
+<section style="padding-top:0">
+  <div class="wrap reveal">
+    <div class="post-grid">
+<!-- BEITRAEGE:START  · always insert the newest article at the top -->
+<a class="post" href="wissen-schlaf-en.html">
+  <span class="post-cat">Everyday life</span>
+  <h3>Sleep: Why It Controls Hunger and Metabolism</h3>
+  <p>Why too little sleep affects hunger, blood sugar and the result of any diet – and how to get a grip on it in everyday life.</p>
+  <div class="post-foot">
+    <span>Oct 21, 2026</span>
+    <span class="post-more">Read more →</span>
+  </div>
+</a>
+<a class="post" href="wissen-genuss-urlaub-restaurant-en.html">
+  <span class="post-cat">Mindset</span>
+  <h3>Enjoy Life and Food Without Losing Sight of Your Goal</h3>
+  <p>Dinner with friends, vacation, Christmas: why restriction often costs more than it gives, how little one generous evening really adds up to, and why enjoyment belongs in a good diet.</p>
+  <div class="post-foot">
+    <span>Oct 4, 2026</span>
+    <span class="post-more">Read more →</span>
+  </div>
+</a>
+<a class="post" href="wissen-kohlenhydrate-en.html" hidden data-visible-from="2026-09-30T00:00:00+02:00">
+  <span class="post-cat">Nutrition</span>
+  <h3>Carbs: Do They Really Make You Fat?</h3>
+  <p>How many carbs a healthy adult actually needs, whether they really make you fat, and what the difference is between sugar and complex carbohydrates.</p>
+  <div class="post-foot">
+    <span>Sep 30, 2026</span>
+    <span class="post-more">Read more →</span>
+  </div>
+</a>
+<a class="post" href="wissen-dosis-macht-das-gift-en.html">
+  <span class="post-cat">Mindset</span>
+  <h3>The Dose Makes the Poison</h3>
+  <p>Why strict bans so often fail – and what actually helps instead.</p>
+  <div class="post-foot">
+    <span>Sep 25, 2026</span>
+    <span class="post-more">Read more →</span>
+  </div>
+</a>
+<a class="post" href="wissen-eiweiss-en.html">
+  <span class="post-cat">Nutrition</span>
+  <h3>Protein: How Much You Actually Need</h3>
+  <p>How much protein a healthy adult actually needs, why it helps you feel full, and whether too much protein harms your kidneys.</p>
+  <div class="post-foot">
+    <span>Sep 24, 2026</span>
+    <span class="post-more">Read more →</span>
+  </div>
+</a>
+<!-- BEITRAEGE:ENDE -->
+    </div>
+
+    <div class="call-mini reveal">
+      <p>Knowledge is the first step. How it fits your everyday life, we clarify in a free 30-minute intro call.</p>
+      <a class="btn" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event', 'erstgespraech_klick');">Book a slot</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Nutrition &amp; running coaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Authentic · Evidence-based · Sustainable</div>
+        </div>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="impressum.html">Legal notice</a></li>
+          <li><a href="datenschutz.html">Privacy policy</a></li>
+          <li><a href="agb.html">Terms &amp; conditions</a></li>
+          <li><a href="widerruf.html">Right of withdrawal</a></li>
+          <li><a href="datenschutz.html" data-asc-consent>Privacy settings</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="mitglieder-login.html">Member login →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Zeitgesteuerte Beiträge: Elemente mit hidden + data-visible-from werden
+   automatisch sichtbar, sobald der angegebene Zeitpunkt erreicht ist. */
+document.querySelectorAll('[data-visible-from]').forEach(function(el){
+  if (new Date(el.dataset.visibleFrom) <= new Date()) el.removeAttribute('hidden');
+});
+document.getElementById('yr').textContent = new Date().getFullYear();
+const hdr = document.getElementById('hdr');
+function onScroll(){ hdr.classList.toggle('scrolled', window.scrollY > 10); }
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+} else {
+  document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+}
+</script>
+<nav class="asc-bottombar" aria-label="Quick access"><a href="pakete-en.html">Packages</a><a href="rezepte.html">Recipes</a><a href="wissen-en.html">Knowledge</a><a class="asc-bottombar-cta" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event','erstgespraech_klick');">Intro call</a></nav></body>
+</html>

@@ -6,7 +6,7 @@
       var btn = hdr.querySelector('.asc-menu-btn');
       function setOpen(o) {
         hdr.classList.toggle('is-open', o);
-        if (btn) { btn.setAttribute('aria-expanded', o ? 'true' : 'false'); btn.setAttribute('aria-label', o ? 'Menü schließen' : 'Menü öffnen'); }
+        if (btn) { var en = document.documentElement.lang === 'en'; btn.setAttribute('aria-expanded', o ? 'true' : 'false'); btn.setAttribute('aria-label', en ? (o ? 'Close menu' : 'Open menu') : (o ? 'Menü schließen' : 'Menü öffnen')); }
       }
       if (btn) btn.addEventListener('click', function () { setOpen(!hdr.classList.contains('is-open')); });
       hdr.querySelectorAll('.asc-header-nav a').forEach(function (a) { a.addEventListener('click', function () { setOpen(false); }); });
