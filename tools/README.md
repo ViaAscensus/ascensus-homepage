@@ -18,6 +18,8 @@ Erzeugt werden:
   `tools/grundrezepte.json` (diese beiden haben keinen PocketBase-Datensatz)
 * das Kachel-Grid in `rezepte.html`
 * der Rezept-Abschnitt in `sitemap.xml`
+* die englischen Gegenstücke `rezept-*-en.html` und das Grid in `rezepte-en.html`
+  (siehe „Englische Fassung“)
 
 Der Lauf ist idempotent: zweimal hintereinander ausgeführt ändert sich nichts.
 
@@ -43,6 +45,7 @@ erzeugt über *Impersonate* in der PocketBase-Oberfläche. PocketBase erwartet d
 | `slug-map.json` | PocketBase-ID → Dateiname. **Nicht ändern**, sonst brechen URLs. |
 | `grundrezepte.json` | die beiden Saucen ohne DB-Datensatz |
 | `reihenfolge.json` | Reihenfolge der Kacheln auf `rezepte.html` |
+| `rezepte-en.json` | englische Texte (Name, Schritte, Wörterbücher). **Von Hand gepflegt**, nicht aus PocketBase. |
 
 ## Ein neues Rezept veröffentlichen
 
@@ -52,3 +55,29 @@ erzeugt über *Impersonate* in der PocketBase-Oberfläche. PocketBase erwartet d
    Fehlt das Foto, wird die Seite ohne Bild gebaut.
 3. ID und Slug in `slug-map.json` eintragen, Slug in `reihenfolge.json` ergänzen.
 4. `python3 tools/build-rezepte.py` ausführen und das Ergebnis committen.
+
+## Englische Fassung
+
+Die englischen Seiten brauchen **keinen Eintrag in PocketBase**. Der Generator nimmt
+Zahlen, Fotos und Zeiten aus PocketBase und die Wörter aus `tools/rezepte-en.json`:
+
+* `rezepte.<slug>` – `name` und `schritte` (eine Übersetzung je Schritt, in der
+  Reihenfolge der DB)
+* `zutaten` – Wörterbuch *deutsche Zutat → englisch*, über alle Rezepte geteilt
+* `einheiten`, `tags`, `allergene`, `kategorien` – kleine Wörterbücher
+
+Schlüssel sind die deutschen Einträge **exakt wie in PocketBase**. Ändert sich dort der
+Name einer Zutat, fehlt im Wörterbuch der Eintrag, und der Generator meldet es.
+
+Fehlt für ein Rezept etwas, schreibt der Generator die englische Seite **nicht**, nennt
+am Ende jede Lücke (`OHNE ENGLISCHE FASSUNG`) und beendet sich mit Exit-Code 2. Die
+deutsche Seite entsteht trotzdem, und sie trägt den DE/EN-Schalter erst, wenn die
+englische Seite existiert.
+
+Ein neues Rezept auf Englisch: in `rezepte-en.json` unter `rezepte` den Slug mit
+`name` und `schritte` ergänzen, fehlende Zutaten ins Wörterbuch `zutaten`, danach
+`python3 tools/build-rezepte.py`.
+
+Bewusste Entscheidungen: Mengen bleiben metrisch; Ofentemperaturen stehen in °C mit
+°F in Klammern; *Stück* wird zu `pcs`, *Hand voll* zu `handful` (unverändert für jede
+Menge, weil der Portionsrechner die Einheit nicht beugt).
