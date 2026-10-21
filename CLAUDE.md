@@ -6,7 +6,7 @@ kein Framework, kein Build-Schritt, kein Paketmanager.
 
 ## Deployment
 
-Coolify auf einem Hetzner-Server, Build strategy *Static*, `nginx:alpine`,
+Coolify auf einem Hostinger-VPS (KVM 2, Paris, wie in der Datenschutzerklärung genannt), Build strategy *Static*, `nginx:alpine`,
 Publish directory `/`. Die Quelle ist eine GitHub App, Auto-Deploy ist aktiv:
 
 ```
@@ -132,6 +132,19 @@ die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` un
 - Die Rezepte (`rezepte.html`, `rezept-*.html`) sind noch nur deutsch;
   `rezepte.html` trägt dafür einen englischen Hinweis im statischen Intro-Teil
   (der Generator berührt nur Grid und Rezeptzahl).
+- Auch `impressum`, `datenschutz`, `agb`, `widerruf`, `bewertung`, `pakete-danke`
+  und `links` haben eine `-en`-Seite. Die vier Rechtstexte sind eine **Lesehilfe**
+  (Hinweis `lang-note` unter der Überschrift): verbindlich ist die deutsche
+  Fassung. **Wer einen Rechtstext ändert, ändert beide Fassungen.** `pakete-danke`
+  und `links` sind `noindex` und tragen deshalb nur den Schalter, kein `hreflang`;
+  auf `links.html` sitzt er oben rechts im Hauptbereich (`lk-lang`), weil die Seite
+  keine Kopfzeile hat. Die Fußzeile der `-en`-Seiten verweist auf die englischen
+  Rechtstexte.
+- Der Cookie-Banner (`klaro-config.js`) hat einen Block `translations.en`; Klaro
+  wählt ihn über `<html lang>`. Ändert sich ein Dienst (Analytics, Clarity, Ads),
+  beide Blöcke und beide Datenschutzerklärungen anpassen.
+- Die englischen Fassungen von Bewertungsformular und Webhook-Daten bleiben
+  unverändert (gleiche Feldnamen, gleicher n8n-Endpunkt).
 - Paketnamen: *Das Fundament* = The Foundation, *Der Weg* = The Path,
   *Die Nachhaltigkeit* = Sustainability. Die Stripe-Links und das Buchungsformular
   sind deutsch.

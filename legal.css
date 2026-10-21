@@ -94,3 +94,6 @@ ol ul li::before{
   font-size:.85rem;color:var(--ink-40);letter-spacing:.02em;
 }
 .form-note{font-size:.82rem;color:var(--ink-40);margin-bottom:0}
+
+/* Hinweis auf den englischen Rechtstexten: Lesehilfe, verbindlich ist die deutsche Fassung */
+.lang-note{font-size:.9rem;line-height:1.5;color:var(--ink-60);background:rgba(181,154,93,.12);border-left:3px solid var(--sand);padding:.75rem 1rem;margin:-1.4rem 0 2rem;border-radius:0 6px 6px 0}
