@@ -116,6 +116,26 @@ Von Hand gepflegt werden dagegen: `index.html`, `pakete*.html`, `wissen*.html`,
 die Rechtstexte, `anamnese*.html`, `trainingsbuch.html`, die `mitglieder-*.html`
 und `social-planer.html`.
 
+## Englische Fassung
+
+Zu `index`, `pakete`, `pakete-ernaehrung`, `wissen`, `wissen-schlaf` und allen
+`wissen-*`-Artikeln gibt es eine englische Seite mit Suffix `-en`
+(`index-en.html`, `pakete-en.html` ...). Sie wird von Hand gepflegt: **Wer die
+deutsche Seite ändert (Preise, Pakete, neue Artikel), überträgt die Änderung auf
+die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` und
+`wissen-en.html`) und in `index.html`/`index-en.html`.
+
+- Der Sprachschalter `DE · EN` sitzt in der Kopfzeile (`<div class="asc-lang">`,
+  Stil in `ascensus.css`, direkt vor dem Menü-Button) und verweist auf die
+  Gegenseite. Beide Seiten tragen `hreflang`-Verweise (`de`, `en`, `x-default`).
+- Es gibt keine automatische Sprachweiterleitung; der Schalter ist der einzige Weg.
+- Die Rezepte (`rezepte.html`, `rezept-*.html`) sind noch nur deutsch;
+  `rezepte.html` trägt dafür einen englischen Hinweis im statischen Intro-Teil
+  (der Generator berührt nur Grid und Rezeptzahl).
+- Paketnamen: *Das Fundament* = The Foundation, *Der Weg* = The Path,
+  *Die Nachhaltigkeit* = Sustainability. Die Stripe-Links und das Buchungsformular
+  sind deutsch.
+
 ## Social-Media-Planer
 
 `social-planer.html` ist Patricks eigenes Werkzeug zum Planen und Veröffentlichen
