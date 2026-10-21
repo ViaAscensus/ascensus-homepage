@@ -163,3 +163,15 @@
 .asc-lang [aria-current="true"] { color: var(--olive); font-weight: 600; }
 .asc-lang a:focus-visible { outline: 2px solid var(--anthrazit); outline-offset: 2px; }
 @media (max-width: 380px) { .asc-lang { margin-left: 0; letter-spacing: .5px; } .asc-lang a, .asc-lang [aria-current="true"] { padding: 0 4px; } }
+
+/* Kopfzeile auf Handys in einer Reihe halten: Logo, Erstgespräch, DE · EN und Menü */
+@media (max-width: 520px) {
+  .asc-header-actions { gap: 4px; }
+  .asc-header-actions .asc-btn { padding: 0 var(--space-2); font-size: 11px; letter-spacing: .6px; }
+  .asc-lang { margin-left: 0; font-size: 12px; letter-spacing: .5px; }
+  .asc-lang a, .asc-lang [aria-current="true"] { padding: 0 3px; min-width: 32px; justify-content: center; }
+}
+@media (max-width: 411px) {
+  .asc-header-inner { gap: var(--space-2); }
+  .asc-header-actions .asc-btn { display: none; } /* Erstgespräch steckt in Menü und Schnellleiste unten */
+}
