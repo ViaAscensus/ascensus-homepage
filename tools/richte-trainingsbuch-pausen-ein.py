@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ergänzt `trainingsbuch_entries` um die Felder für die Pausenzeiten.
+"""Ergänzt `trainingsbuch_entries` um die Felder für Pausenzeiten und Laufband.
 
 Das Trainingsbuch (trainingsbuch.html) schreibt bei jedem Satz mit, wie lange die
 Pause davor war: von "Satz beenden" bis zum nächsten "Satz beginnen".
@@ -10,6 +10,8 @@ Felder (alle optional, alte Einträge bleiben unverändert)
     pause_s       Zahl     gemessene Pause in Sekunden
     pause_typ     Auswahl  satz (gleiche Übung) | wechsel (Wechselzeit zur nächsten Übung)
     pause_soll_s  Zahl     eingestellte Timer-Zeit in Sekunden, gegen die verglichen wird
+    dauer_s       Zahl     Laufband: gemessene Dauer in Sekunden
+    distanz_km    Zahl     Laufband: eingetragene Distanz in km
 
 `pause_typ` dient als Marker: PocketBase liefert für leere Zahlenfelder alter
 Einträge 0, daran ließen sich alte und neue Einträge sonst nicht unterscheiden.
@@ -40,6 +42,8 @@ FELDER = [
     {'name': 'pause_typ', 'type': 'select', 'required': False, 'maxSelect': 1, 'values': ['satz', 'wechsel']},
     {'name': 'pause_soll_s', 'type': 'number', 'required': False, 'min': 0, 'onlyInt': True},
     {'name': 'training_id', 'type': 'text', 'required': False, 'max': 40},
+    {'name': 'dauer_s', 'type': 'number', 'required': False, 'min': 0, 'onlyInt': True},
+    {'name': 'distanz_km', 'type': 'number', 'required': False, 'min': 0},
 ]
 
 token = os.environ.get('PB_TOKEN')
@@ -122,12 +126,12 @@ def main():
     namen = {f['name'] for f in felder}
     neu = [f for f in FELDER if f['name'] not in namen]
     if not neu:
-        print(f'= {NAME} hat die Pausenfelder bereits')
+        print(f'= {NAME} hat alle Felder bereits')
         return
     print(f'+ Felder {"werden" if schreiben else "würden"} ergänzt: ' + ', '.join(f['name'] for f in neu))
     if schreiben:
         api(f'api/collections/{sammlung["id"]}', 'PATCH', {'fields': felder + neu})
-        print('Fertig. Ab jetzt speichert das Trainingsbuch die Pausen.')
+        print('Fertig. Ab jetzt speichert das Trainingsbuch Pausen und Laufband-Daten.')
 
 
 if __name__ == '__main__':

@@ -129,7 +129,7 @@
   }
   .timer-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
   .timer-title{ font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color: var(--text-dim); }
-  .timer-bar .timer-display{ border:none; padding:0; font-size:2.5rem; line-height:1.1; text-align:center; }
+  .timer-bar .timer-display{ border:none; padding:0; font-size:3rem; line-height:1.1; text-align:center; }
   .timer-goal{
     background:none; border:none; color: var(--text-dim); font-family:inherit;
     font-size:0.82rem; font-weight:600; cursor:pointer; padding:10px 0;
@@ -164,6 +164,12 @@
   .ex-group.open .ex-sets{ display:block; }
   .ex-sets .entry{ padding: 9px 12px; margin-bottom:6px; border-top:none; background: var(--card, rgba(255,255,255,0.04)); border-radius:8px; }
   .set-line{ font-size:0.88rem; }
+  body.in-training .asc-header{ display:none; }
+  .last-mal summary{ list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+    gap:8px; padding:8px 0; color: var(--text-dim); font-size:0.9rem; }
+  .last-mal summary::-webkit-details-marker{ display:none; }
+  .last-mal summary::after{ content:'▾'; color: var(--accent); }
+  .last-mal[open] summary::after{ content:'▴'; }
   .last-sets{ margin-top:6px; }
   .last-sets .set-line{ color: var(--text); padding: 2px 0; }
   .last-session{
@@ -725,11 +731,21 @@
     <div class="hint" id="todayPositionHint" style="margin-top:0; margin-bottom:4px; color: var(--accent);"></div>
     <div class="hint" id="lastHint"></div>
     <button type="button" class="btn btn-primary" id="startSetBtn" style="width:100%; margin-bottom:14px;">Satz beginnen</button>
-    <label class="bw-check">
+    <div id="cardioFields" style="display:none;">
+      <div class="field">
+        <label for="fKm">Distanz (km), am Ende eintragen</label>
+        <div class="stepper stepper-large">
+          <button type="button" class="step-btn step-btn-large" data-target="fKm" data-step="-0.1">–</button>
+          <input type="number" id="fKm" step="0.01" min="0" inputmode="decimal" placeholder="0,0">
+          <button type="button" class="step-btn step-btn-large" data-target="fKm" data-step="0.1">+</button>
+        </div>
+      </div>
+    </div>
+    <label class="bw-check" id="bwRow">
       <input type="checkbox" id="fBodyweight">
       Nur Körpergewicht (kein Zusatzgewicht)
     </label>
-    <div class="field">
+    <div class="field" id="weightField">
       <label for="fWeight">Gewicht (kg)</label>
       <div class="stepper stepper-large">
         <button type="button" class="step-btn step-btn-large" data-target="fWeight" data-step="-2.5">–</button>
@@ -737,7 +753,7 @@
         <button type="button" class="step-btn step-btn-large" data-target="fWeight" data-step="2.5">+</button>
       </div>
     </div>
-    <div class="field">
+    <div class="field" id="repsField">
       <label for="fReps">Wiederholungen</label>
       <div class="stepper stepper-large">
         <button type="button" class="step-btn step-btn-large" data-target="fReps" data-step="-1">–</button>
@@ -913,6 +929,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function showScreen(name){
     Object.values(screens).forEach(s => s.classList.remove('active'));
     screens[name].classList.add('active');
+    // Navigation nur ausblenden, solange trainiert wird (Übung wählen oder erfassen)
+    document.body.classList.toggle('in-training', name === 'new' &&
+      (document.getElementById('pick-section').style.display !== 'none' ||
+       document.getElementById('detail-section').style.display === 'block'));
     if(name === 'new') acquireWakeLock(); else releaseWakeLock();
   }
 
@@ -959,11 +979,27 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     return e.weight;
   }
 
+  // ---------- Laufband (Cardio): Dauer und Distanz statt Gewicht und Wiederholungen ----------
+  const CARDIO_RE = /laufband/i;
+  function isCardioName(name){ return CARDIO_RE.test(name || ''); }
+  function isCardioEntry(e){ return (e.dauer_s > 0) || (e.distanz_km > 0) || isCardioName(e.exercise); }
+  function fmtDauer(sek){
+    const s = Math.max(0, Math.round(sek || 0));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    const mm = String(m).padStart(2, '0'), ss = String(r).padStart(2, '0');
+    return h > 0 ? `${h}:${mm}:${ss} h` : `${mm}:${ss} min`;
+  }
+  function cardioText(e){
+    const km = e.distanz_km > 0 ? fmtKg(e.distanz_km) + ' km' : 'ohne km';
+    return e.dauer_s > 0 ? `${km} · ${fmtDauer(e.dauer_s)}` : km;
+  }
+
   function formatLoad(weight){
     return weight > 0 ? weight + ' kg × ' : 'Körpergewicht × ';
   }
 
   function formatEntryDetail(e){
+    if(isCardioEntry(e)) return cardioText(e);
     const base = `${formatLoad(e.weight)}${e.reps} × ${e.sets}`;
     const eff = getEffectiveWeight(e);
     if(eff > 0){
@@ -992,6 +1028,14 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   function groupSummary(g){
     const n = groupSetCount(g);
+    if(g.entries.every(isCardioEntry)){
+      const km = g.entries.reduce((a, e) => a + (e.distanz_km || 0), 0);
+      const sek = g.entries.reduce((a, e) => a + (e.dauer_s || 0), 0);
+      const teile = [];
+      if(km > 0) teile.push(fmtKg(Math.round(km * 100) / 100) + ' km');
+      if(sek > 0) teile.push(fmtDauer(sek));
+      return teile.length ? teile.join(' · ') : `${n} ${n === 1 ? 'Einheit' : 'Einheiten'}`;
+    }
     const ws = g.entries.map(e => e.weight), rs = g.entries.map(e => e.reps);
     const wMin = Math.min(...ws), wMax = Math.max(...ws);
     const rMin = Math.min(...rs), rMax = Math.max(...rs);
@@ -1011,6 +1055,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       const n = Math.max(1, e.sets || 1);
       const label = n === 1 ? `Satz ${k}` : `Sätze ${k}–${k + n - 1}`;
       k += n;
+      if(isCardioEntry(e)) return { e, text: `${n === 1 ? 'Einheit ' + (k - 1) : 'Einheiten ' + (k - n) + '–' + (k - 1)} · ${cardioText(e)}` };
       const w = e.weight > 0 ? fmtKg(e.weight) + ' kg' : 'Körpergewicht';
       return { e, text: `${label} · ${w} × ${e.reps} · ${e.tendenz}` };
     });
@@ -1162,10 +1207,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
             <div class="entry">
               <div class="entry-main"><span class="set-line">${escapeHtml(r.text.replace(/ · (leicht|okay|hart)$/, ''))}</span></div>
               <div class="entry-right">
-                <span class="tendenz-label ${r.e.tendenz}">
+                ${isCardioEntry(r.e) ? '' : `<span class="tendenz-label ${r.e.tendenz}">
                   <span class="dot ${r.e.tendenz}"></span>
                   ${r.e.tendenz}
-                </span>
+                </span>`}
                 <button class="del" data-id="${r.e.id}" aria-label="Eintrag löschen">×</button>
               </div>
             </div>`).join('')}
@@ -1451,7 +1496,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function computeMuscleVolumes(inRange){
     const volume = {}, reps = {};
     muscleGroups.forEach(g => { volume[g] = 0; reps[g] = 0; });
-    inRange.forEach(e => {
+    inRange.filter(e => !isCardioEntry(e)).forEach(e => {
       const g = getMuscleGroup(e.exercise);
       volume[g] += getEffectiveWeight(e) * e.reps * e.sets;
       reps[g] += e.reps * e.sets;
@@ -1582,6 +1627,19 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     return names.map(name => {
       const list = byExercise[name].slice().sort((a,b) => a.date.localeCompare(b.date));
 
+      if(list.every(isCardioEntry)){
+        const km = list.reduce((a, e) => a + (e.distanz_km || 0), 0);
+        const sek = list.reduce((a, e) => a + (e.dauer_s || 0), 0);
+        const label = [km > 0 ? fmtKg(Math.round(km * 100) / 100) + ' km' : '', sek > 0 ? fmtDauer(sek) : ''].filter(Boolean).join(' · ') || `${list.length}×`;
+        return `
+        <details class="exercise-block">
+          <summary>
+            <span class="exercise-name">${escapeHtml(name)}</span>
+            <span class="exercise-total">${label} gesamt <span class="exercise-chevron">›</span></span>
+          </summary>
+          <div class="exercise-entries">${list.slice().reverse().map(e => `<div class="entry"><div class="entry-main"><span class="set-line">${formatShort(e.date)} · ${cardioText(e)}</span></div></div>`).join('')}</div>
+        </details>`;
+      }
       const totalVolume = list.reduce((sum,e) => sum + (getEffectiveWeight(e) * e.reps * e.sets), 0);
       const totalReps = list.reduce((sum,e) => sum + (e.reps * e.sets), 0);
       const totalLabel = totalVolume > 0
@@ -1769,6 +1827,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     document.getElementById('newBackBtn').textContent = activeTraining ? '← Alle Trainingseinheiten' : '← Übersicht';
     document.getElementById('lastSessionBtn').style.display =
       ((name === 'pick' || name === 'detail') && !backfillMode && hasLast) ? 'inline-flex' : 'none';
+    // Obere Navigation nur ausblenden, solange trainiert wird
+    document.body.classList.toggle('in-training', name === 'pick' || name === 'detail');
     const hint = document.getElementById('pickDateHint');
     hint.textContent = backfillMode ? `Nachtrag für ${formatShort(document.getElementById('fDate').value)}` : '';
   }
@@ -1931,12 +1991,28 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const q = exerciseName.toLowerCase();
     const matches = entries.filter(e => e.exercise.toLowerCase() === q)
                             .sort((a,b) => b.date.localeCompare(a.date));
-    if(matches.length){
-      const last = matches[0];
-      fBodyweight.checked = last.weight === 0;
+    const cardio = isCardioName(exerciseName);
+    // Im laufenden Training gilt der letzte Satz dieser Übung; sonst das höchste Gewicht vom letzten Mal
+    const inThisTraining = activeTraining
+      ? groupEntries(entries.filter(e => e.exercise.toLowerCase() === q && sessionKey(e) === activeTraining.id))
+      : [];
+    const pastSessions = previousSessions().filter(sx => sx.entries.some(e => e.exercise.toLowerCase() === q));
+    let start = null;
+    if(inThisTraining.length){
+      const l = inThisTraining[0].entries;
+      start = l[l.length - 1];
+    } else if(pastSessions.length){
+      const l = groupEntries(pastSessions[pastSessions.length - 1].entries.filter(e => e.exercise.toLowerCase() === q))[0].entries;
+      const maxW = Math.max(...l.map(e => e.weight));
+      start = { weight: maxW, reps: l[l.length - 1].reps };
+    } else if(matches.length){
+      start = matches[0];
+    }
+    if(start){
+      fBodyweight.checked = start.weight === 0;
       fWeight.disabled = fBodyweight.checked;
-      document.getElementById('fWeight').value = last.weight || '';
-      document.getElementById('fReps').value = last.reps;
+      document.getElementById('fWeight').value = start.weight || '';
+      document.getElementById('fReps').value = start.reps;
     } else {
       fBodyweight.checked = false;
       fWeight.disabled = false;
@@ -1945,6 +2021,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     }
 
     document.getElementById('fSets').value = 1;
+    applyCardioMode(cardio);
 
     document.getElementById('exerciseCompleteBanner').style.display = 'none';
     updateRemainingSetsDisplay();
@@ -1952,6 +2029,17 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     updateLastHint();
     resetSetState();
     showSubsection('detail');
+  }
+
+  // Laufband: Gewicht, Wiederholungen und Tendenz weg, dafür Distanz
+  function applyCardioMode(cardio){
+    ['weightField','repsField','bwRow','tendenzPicker'].forEach(id => {
+      document.getElementById(id).style.display = cardio ? 'none' : '';
+    });
+    document.getElementById('cardioFields').style.display = cardio ? 'block' : 'none';
+    document.getElementById('startSetBtn').textContent = cardio ? 'Laufband starten' : 'Satz beginnen';
+    document.getElementById('saveEntry').textContent = cardio ? 'Laufband beenden' : 'Satz beenden';
+    if(cardio) document.getElementById('fKm').value = '';
   }
 
   function computeRemainingSets(exerciseName){
@@ -2081,6 +2169,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   function updateExerciseList(){
     const names = [...new Set(entries.map(e => e.exercise))].sort();
+    if(!names.some(n => isCardioName(n))) names.push('Laufband');
     document.getElementById('exerciseList').innerHTML =
       names.map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
   }
@@ -2100,8 +2189,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const order = getExerciseOrderForSession(sx.key);
     const idx = order.indexOf(g.name);
     const posText = idx === -1 ? '' : `, als ${idx + 1}. Übung`;
-    hintEl.innerHTML = `Letztes Mal (${formatShort(sx.date)}${posText}):` +
-      `<div class="last-sets">${setRows(g).map(r => `<div class="set-line">${escapeHtml(r.text)}</div>`).join('')}</div>`;
+    hintEl.innerHTML = `<details class="last-mal"><summary>Letztes Mal (${formatShort(sx.date)}${posText})</summary>` +
+      `<div class="last-sets">${setRows(g).map(r => `<div class="set-line">${escapeHtml(r.text)}</div>`).join('')}</div></details>`;
   }
   fExercise.addEventListener('input', updateLastHint);
 
@@ -2246,29 +2335,38 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const date = document.getElementById('fDate').value;
     const exercise = fExercise.value.trim();
     const weight = fBodyweight.checked ? 0 : (parseFloat(document.getElementById('fWeight').value) || 0);
-    const reps = parseInt(document.getElementById('fReps').value) || 0;
+    const cardio = isCardioName(exercise);
+    const km = cardio ? (parseFloat(String(document.getElementById('fKm').value).replace(',', '.')) || 0) : 0;
+    const dauer = cardio && setStartTime ? Math.round((endMs - setStartTime) / 1000) : 0;
+    const reps = cardio ? 1 : (parseInt(document.getElementById('fReps').value) || 0);
     const sets = 1; // jeder Speichern-Tap entspricht genau einem Satz
 
+    if(cardio && !(km > 0)){
+      formMsg.textContent = 'Bitte die Distanz in km eintragen.';
+      formMsg.classList.add('error');
+      return;
+    }
     if(!date || !exercise || !reps){
       formMsg.textContent = 'Bitte Datum, Übung und Wiederholungen ausfüllen.';
       formMsg.classList.add('error');
       return;
     }
 
-    const record = checkRecord(exercise, weight, reps);
+    const record = cardio ? null : checkRecord(exercise, weight, reps);
     const saveBtn = document.getElementById('saveEntry');
     saveBtn.disabled = true;
 
     if(!activeTraining) startTraining(date);
     try{
-      await pb.collection('trainingsbuch_entries').create({
+      const saved = await pb.collection('trainingsbuch_entries').create({
         member: pb.authStore.model.id,
         date, exercise, weight, reps, sets,
         training_id: activeTraining.id, // PocketBase ignoriert das Feld, solange es nicht angelegt ist
         tendenz: selectedTendenz,
         gewichtBeiEintrag: memberBodyweight,
         // Pausen vor diesem Satz; PocketBase ignoriert die Felder, solange sie nicht angelegt sind
-        ...(pendingPause ? { pause_s: pendingPause.sek, pause_typ: pendingPause.typ, pause_soll_s: pendingPause.soll } : {})
+        ...(cardio ? { dauer_s: dauer, distanz_km: km } : {}),
+        ...(pendingPause && !cardio ? { pause_s: pendingPause.sek, pause_typ: pendingPause.typ, pause_soll_s: pendingPause.soll } : {})
       });
       rememberSetEnd(endMs, exercise);
       pendingPause = null;
@@ -2277,8 +2375,16 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       await loadEntries();
       updateRemainingSetsDisplay();
 
-      formMsg.textContent = '✓ Satz gespeichert – Pause läuft.';
       formMsg.classList.remove('error');
+      if(cardio){
+        const fehlt = !('distanz_km' in saved);
+        formMsg.textContent = fehlt
+          ? '⚠ Gespeichert, aber ohne km und Dauer: In PocketBase fehlen die Felder. Bitte das Einrichtungsskript ausführen.'
+          : `✓ Laufband gespeichert – ${fmtKg(km)} km in ${fmtDauer(dauer)}.`;
+        if(fehlt) formMsg.classList.add('error');
+      } else {
+        formMsg.textContent = '✓ Satz gespeichert – Pause läuft.';
+      }
       renderQuickChips();
       stopSetStopwatch();
       setActive = false;
@@ -2292,7 +2398,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
       // Formular bleibt absichtlich mit denselben Werten stehen (schneller nächster Satz),
       // nur Übung/Gewicht/Wdh. werden NICHT geleert.
-      restartTimer();
+      if(cardio) stopTimer(); else restartTimer();
     }catch(e){
       formMsg.textContent = 'Eintrag konnte nicht gespeichert werden.';
       formMsg.classList.add('error');
@@ -2428,6 +2534,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     if(minutes !== null) tiles.push([minutes + ' min', 'Dauer']);
     tiles.push([String(exercises), exercises === 1 ? 'Übung' : 'Übungen']);
     tiles.push([String(sets), sets === 1 ? 'Satz' : 'Sätze']);
+    const kmSumme = dayEntries.reduce((n, e) => n + (e.distanz_km || 0), 0);
+    if(kmSumme > 0) tiles.push([fmtKg(Math.round(kmSumme * 100) / 100) + ' km', 'Laufband']);
     if(volume > 0) tiles.push([Math.round(volume).toLocaleString('de-DE') + ' kg', 'Bewegtes Gewicht']);
     document.getElementById('summaryStats').innerHTML = tiles.map(([v, l]) => `
       <div class="summary-tile">
