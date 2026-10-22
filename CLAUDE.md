@@ -170,6 +170,13 @@ die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` un
   `pakete-danke-en.html`); die deutsche Seite behält ihre vier Links mit
   `pakete-danke.html`. Wer einen Preis oder ein Paket ändert, ändert in Stripe
   **beide** Links. Das Buchungsformular ist deutsch.
+- Die Visitenkarte hat zwei Seiten: `karte/index.html` (Deutsch; wählt ohne
+  Vorgabe nach Browsersprache) und `karte/en/index.html` (immer Englisch, mit
+  englischer Linkvorschau). Das ist der Link für englischsprachige Kontakte:
+  `https://ascensus.fit/karte/en/`. Der DE/EN-Schalter wechselt zwischen den
+  Adressen, in englischer Sprache zeigen Website, Impressum und Datenschutz auf die
+  `-en`-Seiten. **Änderungen an Telefonnummer, Buttons oder Texten in beiden Dateien
+  machen** (das Skript ist identisch, die englischen Texte stehen zusätzlich fest im HTML).
 - Das Coaching selbst ist auf Deutsch und Englisch möglich (FAQ-Eintrag auf
   `index.html` und `index-en.html`, auch im JSON-LD).
 
