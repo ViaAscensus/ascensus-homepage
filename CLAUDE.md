@@ -161,8 +161,11 @@ die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` un
 - Die englischen Fassungen von Bewertungsformular und Webhook-Daten bleiben
   unverändert (gleiche Feldnamen, gleicher n8n-Endpunkt).
 - Paketnamen: *Das Fundament* = The Foundation, *Der Weg* = The Path,
-  *Die Nachhaltigkeit* = Sustainability. Die Stripe-Links und das Buchungsformular
-  sind deutsch.
+  *Die Nachhaltigkeit* = Sustainability. Die englische Paketseite hat eigene
+  Stripe-Payment-Links (Adresse mit `?locale=en`, Erfolgsseite
+  `pakete-danke-en.html`); die deutsche Seite behält ihre vier Links mit
+  `pakete-danke.html`. Wer einen Preis oder ein Paket ändert, ändert in Stripe
+  **beide** Links. Das Buchungsformular ist deutsch.
 - Das Coaching selbst ist auf Deutsch und Englisch möglich (FAQ-Eintrag auf
   `index.html` und `index-en.html`, auch im JSON-LD).
 
