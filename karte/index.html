@@ -9,6 +9,8 @@
 <meta property="og:description" content="Ernährungsberater aus Frankfurt. Essen ohne Verbote und ohne Diät.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ascensus.fit/karte/">
+<link rel="alternate" hreflang="de" href="https://ascensus.fit/karte/">
+<link rel="alternate" hreflang="en" href="https://ascensus.fit/karte/en/">
 <meta property="og:image" content="https://ascensus.fit/karte-vorschau.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="noindex">
@@ -94,7 +96,7 @@ h1{font-size:40px;font-weight:300;line-height:1.1;letter-spacing:1px;text-wrap:b
   <nav class="links" aria-label="Links">
     <a class="btn primary" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener"><b data-i="book"></b><span data-i="book2"></span></a>
     <a class="btn" href="https://wa.me/4915679810556" target="_blank" rel="noopener"><b data-i="wa"></b><span>wa.me/4915679810556</span></a>
-    <a class="btn" href="https://ascensus.fit" target="_blank" rel="noopener"><b data-i="web"></b><span>ascensus.fit</span></a>
+    <a class="btn" id="web" href="https://ascensus.fit" data-hd="https://ascensus.fit" data-he="https://ascensus.fit/index-en.html" target="_blank" rel="noopener"><b data-i="web"></b><span>ascensus.fit</span></a>
   </nav>
 
   <nav class="social" aria-label="Social media">
@@ -104,7 +106,7 @@ h1{font-size:40px;font-weight:300;line-height:1.1;letter-spacing:1px;text-wrap:b
   </nav>
 
   <p class="foot" data-i="foot"></p>
-  <div class="legal"><a href="https://ascensus.fit/impressum.html" target="_blank" rel="noopener" data-i="imp"></a><a href="https://ascensus.fit/datenschutz.html" target="_blank" rel="noopener" data-i="priv"></a></div>
+  <div class="legal"><a href="https://ascensus.fit/impressum.html" data-hd="https://ascensus.fit/impressum.html" data-he="https://ascensus.fit/impressum-en.html" target="_blank" rel="noopener" data-i="imp"></a><a href="https://ascensus.fit/datenschutz.html" data-hd="https://ascensus.fit/datenschutz.html" data-he="https://ascensus.fit/datenschutz-en.html" target="_blank" rel="noopener" data-i="priv"></a></div>
 </main>
 <script>
 var T={
@@ -115,14 +117,20 @@ var T={
   save:'Save contact',book:'Book a free intro call',book2:'30 minutes, no obligation',wa:'Message me on WhatsApp',web:'Visit my website',fb:'Share your feedback',fb2:'A short note, just for me',
   g:'Review on Google',g2:'Helps others find me',foot:'Know someone with similar goals? Feel free to pass this page on.',imp:'Legal notice',priv:'Privacy policy'}
 };
+var PAGE=document.documentElement.dataset.page||'auto';
 var lang='en';
+if(PAGE==='en'){lang='en'}else if(PAGE==='de'){lang='de'}else
 try{var s=localStorage.getItem('lang');if(s==='de'||s==='en')lang=s;else if((navigator.language||'').slice(0,2)==='de')lang='de'}catch(e){if((navigator.language||'').slice(0,2)==='de')lang='de'}
 function apply(){
   document.documentElement.lang=lang;
   document.querySelectorAll('[data-i]').forEach(function(e){e.textContent=T[lang][e.dataset.i]});
   document.querySelectorAll('.lang button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.l===lang)});
+  document.querySelectorAll('[data-hd]').forEach(function(e){e.href=lang==='en'?e.dataset.he:e.dataset.hd});
 }
-document.querySelectorAll('.lang button').forEach(function(b){b.addEventListener('click',function(){lang=b.dataset.l;try{localStorage.setItem('lang',lang)}catch(e){};apply()})});
+document.querySelectorAll('.lang button').forEach(function(b){b.addEventListener('click',function(){var l=b.dataset.l;try{localStorage.setItem('lang',l)}catch(e){}
+  if(l==='en'&&PAGE!=='en'){location.href='/karte/en/';return}
+  if(l==='de'&&PAGE==='en'){location.href='/karte/';return}
+  lang=l;apply()})});
 apply();
 document.querySelectorAll('.copy').forEach(function(b){
   var a=document.getElementById(b.dataset.t);
