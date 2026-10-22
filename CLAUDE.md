@@ -136,6 +136,10 @@ deutsche Seite ändert (Preise, Pakete, neue Artikel), überträgt die Änderung
 die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` und
 `wissen-en.html`) und in `index.html`/`index-en.html`.
 
+- **Hinweispflicht (Vorgabe von Patrick):** Bei jeder Änderung an der Homepage
+  und bei jeder neuen Seite weist Claude ihn ausdrücklich darauf hin, dass die
+  englische Fassung mitgezogen bzw. übersetzt werden muss, und nennt die
+  betroffene `-en`-Seite. Das gilt auch, wenn die Änderung selbst klein ist.
 - Der Sprachschalter `DE · EN` sitzt in der Kopfzeile (`<div class="asc-lang">`,
   Stil in `ascensus.css`, direkt vor dem Menü-Button) und verweist auf die
   Gegenseite. Beide Seiten tragen `hreflang`-Verweise (`de`, `en`, `x-default`).
