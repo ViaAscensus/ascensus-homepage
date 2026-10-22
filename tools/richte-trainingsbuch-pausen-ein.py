@@ -12,6 +12,8 @@ Felder (alle optional, alte Einträge bleiben unverändert)
     pause_soll_s  Zahl     eingestellte Timer-Zeit in Sekunden, gegen die verglichen wird
     dauer_s       Zahl     Laufband: gemessene Dauer in Sekunden
     distanz_km    Zahl     Laufband: eingetragene Distanz in km
+    phasen        JSON     Laufband: optionale Phasen [{typ, dauer_s, km}] mit typ
+                           aufwaermen | hauptlauf | cooldown
 
 `pause_typ` dient als Marker: PocketBase liefert für leere Zahlenfelder alter
 Einträge 0, daran ließen sich alte und neue Einträge sonst nicht unterscheiden.
@@ -44,6 +46,7 @@ FELDER = [
     {'name': 'training_id', 'type': 'text', 'required': False, 'max': 40},
     {'name': 'dauer_s', 'type': 'number', 'required': False, 'min': 0, 'onlyInt': True},
     {'name': 'distanz_km', 'type': 'number', 'required': False, 'min': 0},
+    {'name': 'phasen', 'type': 'json', 'required': False, 'maxSize': 20000},
 ]
 
 token = os.environ.get('PB_TOKEN')

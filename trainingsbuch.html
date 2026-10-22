@@ -326,7 +326,14 @@
   .bw-check input{ width:auto; margin:0; accent-color: var(--accent); }
   .field input:disabled{ opacity:0.4; }
   .formmsg{ font-size:0.82rem; margin-top:8px; min-height:1.1em; }
-  .formmsg.error{ color: var(--hart); }
+  .formmsg.error{ color: var(--hart); font-size:1.15rem; font-weight:700; line-height:1.35; padding:6px 0; }
+  .phase-row{ display:none; gap:8px; margin-bottom:14px; }
+  .phase-btn{
+    flex:1; padding:12px 0; text-align:center; border-radius: var(--radius);
+    border:1px solid var(--border); background: var(--surface); color: var(--text-dim);
+    font-family:inherit; font-weight:600; font-size:0.85rem; cursor:pointer;
+  }
+  .phase-btn.active{ border-color: var(--accent); color: var(--accent); }
   .save-confirm{ display:none; margin-top:14px; }
   .save-confirm-msg{ color: var(--leicht); font-size:0.88rem; font-weight:600; margin-bottom:10px; }
   .save-confirm-row{ display:flex; gap:8px; }
@@ -731,15 +738,21 @@
     <div class="hint" id="todayPositionHint" style="margin-top:0; margin-bottom:4px; color: var(--accent);"></div>
     <div class="hint" id="lastHint"></div>
     <button type="button" class="btn btn-primary" id="startSetBtn" style="width:100%; margin-bottom:14px;">Satz beginnen</button>
+    <div class="phase-row" id="phaseRow" role="group" aria-label="Phase">
+      <button type="button" class="phase-btn" data-typ="aufwaermen">Aufwärmen</button>
+      <button type="button" class="phase-btn" data-typ="hauptlauf">Hauptlauf</button>
+      <button type="button" class="phase-btn" data-typ="cooldown">Cooldown</button>
+    </div>
     <div id="cardioFields" style="display:none;">
       <div class="field">
-        <label for="fKm">Distanz (km), am Ende eintragen</label>
+        <label for="fKm">Distanz gesamt (km)</label>
         <div class="stepper stepper-large">
           <button type="button" class="step-btn step-btn-large" data-target="fKm" data-step="-0.1">–</button>
           <input type="number" id="fKm" step="0.01" min="0" inputmode="decimal" placeholder="0,0">
           <button type="button" class="step-btn step-btn-large" data-target="fKm" data-step="0.1">+</button>
         </div>
       </div>
+      <div id="cardioPhaseKm"></div>
     </div>
     <label class="bw-check" id="bwRow">
       <input type="checkbox" id="fBodyweight">
@@ -767,7 +780,7 @@
       <div class="tendenz-btn active" data-val="okay">Okay</div>
       <div class="tendenz-btn" data-val="hart">Hart</div>
     </div>
-    <div class="set-duration" id="setDuration" style="display:none;">Satzdauer: <span id="setDurationValue">00:00</span></div>
+    <div class="set-duration" id="setDuration" style="display:none;"><span id="setDurationLabel">Satzdauer</span>: <span id="setDurationValue">00:00</span></div>
     <div class="remaining-sets" id="remainingSetsWrap" style="display:none;">
       Verbleibende Sätze: <span id="remainingSetsValue">0</span>
     </div>
@@ -989,9 +1002,14 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const mm = String(m).padStart(2, '0'), ss = String(r).padStart(2, '0');
     return h > 0 ? `${h}:${mm}:${ss} h` : `${mm}:${ss} min`;
   }
+  const PHASE_NAMEN = { aufwaermen: 'Aufwärmen', hauptlauf: 'Hauptlauf', cooldown: 'Cooldown' };
   function cardioText(e){
     const km = e.distanz_km > 0 ? fmtKg(e.distanz_km) + ' km' : 'ohne km';
-    return e.dauer_s > 0 ? `${km} · ${fmtDauer(e.dauer_s)}` : km;
+    let t = e.dauer_s > 0 ? `${km} · ${fmtDauer(e.dauer_s)}` : km;
+    if(Array.isArray(e.phasen) && e.phasen.length){
+      t += ' (' + e.phasen.map(ph => `${PHASE_NAMEN[ph.typ] || ph.typ} ${fmtDauer(ph.dauer_s).replace(' min', '')}${ph.km > 0 ? ' ' + fmtKg(ph.km) + ' km' : ''}`).join(', ') + ')';
+    }
+    return t;
   }
 
   function formatLoad(weight){
@@ -2036,10 +2054,67 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     ['weightField','repsField','bwRow','tendenzPicker'].forEach(id => {
       document.getElementById(id).style.display = cardio ? 'none' : '';
     });
-    document.getElementById('cardioFields').style.display = cardio ? 'block' : 'none';
+    // Distanz und Phasen-km erscheinen erst nach dem Stoppen
+    document.getElementById('cardioFields').style.display = 'none';
+    document.getElementById('phaseRow').style.display = 'none';
+    document.getElementById('cardioPhaseKm').innerHTML = '';
     document.getElementById('startSetBtn').textContent = cardio ? 'Laufband starten' : 'Satz beginnen';
     document.getElementById('saveEntry').textContent = cardio ? 'Laufband beenden' : 'Satz beenden';
+    document.getElementById('setDurationLabel').textContent = cardio ? 'Dauer' : 'Satzdauer';
+    cardioStage = 'idle'; cardioPhases = []; cardioStopMs = null;
     if(cardio) document.getElementById('fKm').value = '';
+  }
+
+  // Laufband-Ablauf: idle -> running (Start) -> stopped (Beenden, Zeit steht) -> gespeichert
+  let cardioStage = 'idle';
+  let cardioPhases = [];   // { typ, startMs, endMs }
+  let cardioStopMs = null;
+
+  function renderPhaseRow(){
+    const aktiv = cardioPhases.length ? cardioPhases[cardioPhases.length - 1].typ : null;
+    document.querySelectorAll('#phaseRow .phase-btn').forEach(b => b.classList.toggle('active', b.dataset.typ === aktiv));
+  }
+  document.getElementById('phaseRow').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.phase-btn');
+    if(!btn || cardioStage !== 'running') return;
+    const now = Date.now();
+    const last = cardioPhases[cardioPhases.length - 1];
+    if(last && last.typ === btn.dataset.typ) return;
+    if(last) last.endMs = now;
+    cardioPhases.push({ typ: btn.dataset.typ, startMs: now, endMs: null });
+    renderPhaseRow();
+  });
+
+  // Phasen mit ihrer Dauer, gleiche Phasen zusammengezählt, in der Reihenfolge des ersten Auftretens
+  function cardioPhaseSummary(){
+    const out = [];
+    cardioPhases.forEach(ph => {
+      const sek = Math.round(((ph.endMs || cardioStopMs || Date.now()) - ph.startMs) / 1000);
+      const hit = out.find(o => o.typ === ph.typ);
+      if(hit) hit.dauer_s += sek; else out.push({ typ: ph.typ, dauer_s: sek });
+    });
+    return out.filter(o => o.dauer_s > 0);
+  }
+
+  // "Laufband beenden": die Zeit steht sofort, danach werden die km eingetragen
+  function cardioFreeze(){
+    cardioStopMs = Date.now();
+    clearInterval(setStopwatchInterval);
+    const el = Math.max(0, Math.floor((cardioStopMs - setStartTime) / 1000));
+    document.getElementById('setDurationValue').textContent =
+      String(Math.floor(el / 60)).padStart(2, '0') + ':' + String(el % 60).padStart(2, '0');
+    cardioStage = 'stopped';
+    document.getElementById('phaseRow').style.display = 'none';
+    const phasen = cardioPhaseSummary();
+    document.getElementById('cardioPhaseKm').innerHTML = phasen.map((ph, i) => `
+      <div class="field">
+        <label for="phKm${i}">${PHASE_NAMEN[ph.typ]} (${fmtDauer(ph.dauer_s)}), km (optional)</label>
+        <input type="number" id="phKm${i}" class="phase-km" data-i="${i}" step="0.01" min="0" inputmode="decimal" placeholder="0,0">
+      </div>`).join('');
+    document.getElementById('cardioFields').style.display = 'block';
+    document.getElementById('saveEntry').textContent = 'Speichern';
+    const m = document.getElementById('formMsg'); m.textContent = ''; m.classList.remove('error');
+    document.getElementById('fKm').focus();
   }
 
   function computeRemainingSets(exerciseName){
@@ -2276,6 +2351,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   }
   function resetSetState(){
     setActive = false;
+    cardioStage = 'idle'; cardioPhases = []; cardioStopMs = null;
     stopSetStopwatch();
     updateSetButtons();
   }
@@ -2301,6 +2377,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     renderTimer();
 
     setStartTime = Date.now();
+    cardioStage = 'idle'; cardioPhases = []; cardioStopMs = null;
+    if(isCardioName(fExercise.value.trim())){
+      cardioStage = 'running';
+      renderPhaseRow();
+      document.getElementById('phaseRow').style.display = 'flex';
+    }
     clearInterval(setStopwatchInterval);
     document.getElementById('setDurationValue').textContent = '00:00';
     document.getElementById('setDuration').style.display = 'block';
@@ -2327,7 +2409,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('saveEntry').addEventListener('click', async () => {
     if(!setActive) return;
     unlockAudio();
-    const endMs = Date.now();
+    if(isCardioName(fExercise.value.trim()) && cardioStage === 'running'){ cardioFreeze(); return; }
+    const endMs = (isCardioName(fExercise.value.trim()) && cardioStage === 'stopped' && cardioStopMs) ? cardioStopMs : Date.now();
     const formMsg = document.getElementById('formMsg');
     formMsg.textContent = '';
     formMsg.classList.remove('error');
@@ -2336,8 +2419,16 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const exercise = fExercise.value.trim();
     const weight = fBodyweight.checked ? 0 : (parseFloat(document.getElementById('fWeight').value) || 0);
     const cardio = isCardioName(exercise);
-    const km = cardio ? (parseFloat(String(document.getElementById('fKm').value).replace(',', '.')) || 0) : 0;
-    const dauer = cardio && setStartTime ? Math.round((endMs - setStartTime) / 1000) : 0;
+    const num = v => parseFloat(String(v).replace(',', '.')) || 0;
+    let km = cardio ? num(document.getElementById('fKm').value) : 0;
+    const phasen = cardio ? cardioPhaseSummary().map((ph, i) => {
+      const pk = document.querySelector(`.phase-km[data-i="${i}"]`);
+      const k = pk ? num(pk.value) : 0;
+      return k > 0 ? { ...ph, km: k } : ph;
+    }) : [];
+    if(cardio && !(km > 0)) km = phasen.reduce((a, ph) => a + (ph.km || 0), 0);
+    km = Math.round(km * 100) / 100;
+    const dauer = cardio && setStartTime ? Math.floor((endMs - setStartTime) / 1000) : 0;
     const reps = cardio ? 1 : (parseInt(document.getElementById('fReps').value) || 0);
     const sets = 1; // jeder Speichern-Tap entspricht genau einem Satz
 
@@ -2365,7 +2456,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
         tendenz: selectedTendenz,
         gewichtBeiEintrag: memberBodyweight,
         // Pausen vor diesem Satz; PocketBase ignoriert die Felder, solange sie nicht angelegt sind
-        ...(cardio ? { dauer_s: dauer, distanz_km: km } : {}),
+        ...(cardio ? { dauer_s: dauer, distanz_km: km, ...(phasen.length ? { phasen } : {}) } : {}),
         ...(pendingPause && !cardio ? { pause_s: pendingPause.sek, pause_typ: pendingPause.typ, pause_soll_s: pendingPause.soll } : {})
       });
       rememberSetEnd(endMs, exercise);
@@ -2377,9 +2468,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
       formMsg.classList.remove('error');
       if(cardio){
-        const fehlt = !('distanz_km' in saved);
+        const fehlt = !('distanz_km' in saved) || (phasen.length > 0 && !('phasen' in saved));
         formMsg.textContent = fehlt
-          ? '⚠ Gespeichert, aber ohne km und Dauer: In PocketBase fehlen die Felder. Bitte das Einrichtungsskript ausführen.'
+          ? '⚠ Gespeichert, aber ohne km, Dauer oder Phasen: In PocketBase fehlen Felder. Bitte das Einrichtungsskript ausführen.'
           : `✓ Laufband gespeichert – ${fmtKg(km)} km in ${fmtDauer(dauer)}.`;
         if(fehlt) formMsg.classList.add('error');
       } else {
@@ -2398,7 +2489,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
       // Formular bleibt absichtlich mit denselben Werten stehen (schneller nächster Satz),
       // nur Übung/Gewicht/Wdh. werden NICHT geleert.
-      if(cardio) stopTimer(); else restartTimer();
+      if(cardio){ stopTimer(); applyCardioMode(true); } else restartTimer();
     }catch(e){
       formMsg.textContent = 'Eintrag konnte nicht gespeichert werden.';
       formMsg.classList.add('error');
