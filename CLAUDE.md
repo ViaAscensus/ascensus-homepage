@@ -31,6 +31,12 @@ server {
     # der ganzen Seite. Gilt damit auch fuer / und fuer URLs ohne Endung.
     add_header Cache-Control "no-cache" always;
 
+    # Interne Dateien nicht ausliefern: Coolify liefert das ganze Repo aus,
+    # also waeren tools/ (Skripte, n8n-Workflow, Berichte), .claude/ und
+    # CLAUDE.md sonst oeffentlich abrufbar.
+    location ~ ^/(tools|\.claude|\.git)(/|$) { return 404; }
+    location = /CLAUDE.md { return 404; }
+
     location / {
         root /usr/share/nginx/html;
         index index.html index.htm;
@@ -70,8 +76,12 @@ server {
 }
 ```
 
-Drei Entscheidungen darin sind nicht beliebig:
+Vier Entscheidungen darin sind nicht beliebig:
 
+- **`tools/`, `.claude/`, `.git` und `CLAUDE.md` liefern 404.** Die Publish
+  directory ist `/`, also würde nginx sonst das ganze Repo ausliefern
+  (seit 22.10.2026 gesperrt; vorher war z. B. `/tools/README.md` abrufbar).
+  Neue interne Ordner gehören in dieselbe Regel.
 - **`no-cache` auf Server-Ebene, nicht je `location`.** In nginx *ersetzt* ein
   `add_header` im Block den geerbten, statt ihn zu ergänzen. Die drei
   Asset-Blöcke überschreiben also gezielt; alles übrige — HTML, `/`, URLs ohne
@@ -93,6 +103,7 @@ Nachprüfen lässt sich der Zustand mit:
 ```bash
 curl -sSI https://ascensus.fit/index.html | grep -i cache-control   # no-cache
 curl -sSI https://ascensus.fit/ascensus.css | grep -i cache-control # max-age=3600
+curl -sSI https://ascensus.fit/tools/README.md | head -1             # 404
 ```
 
 ## Rezeptseiten werden generiert
