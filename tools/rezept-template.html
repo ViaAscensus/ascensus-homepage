@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{TITLE}} – ASCENSUS Rezepte</title>
   <meta name="description" content="{{DESC}}">
-  <link rel="canonical" href="https://ascensus.fit/{{SLUG}}.html">
+  <link rel="canonical" href="https://ascensus.fit/{{SLUG}}.html">{{HREFLANG}}
   <link rel="icon" href="https://ascensus.fit/favicon-512.png">
   <link rel="apple-touch-icon" href="https://ascensus.fit/apple-touch-icon.png">
   
@@ -152,7 +152,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-
     </nav>
     <div class="asc-header-actions">
       <a class="asc-btn asc-btn-primary" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Erstgespräch</a>
-      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen">
+      {{LANGSWITCH}}<button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Menü öffnen">
         <span></span><span></span><span></span>
       </button>
     </div>

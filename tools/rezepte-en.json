@@ -1,0 +1,567 @@
+{
+ "_hinweis": "Englische Texte fuer tools/build-rezepte.py. Zahlen, Allergene-Zuordnung und Fotos kommen weiter aus PocketBase; hier stehen nur Woerter. Schluessel der Woerterbuecher sind die deutschen Eintraege aus PocketBase. Fehlt etwas, bricht der Generator mit einer Meldung ab und laesst die englische Seite aus.",
+ "kategorien": {
+  "Frühstück": "Breakfast",
+  "Hauptgericht": "Main course",
+  "Snack & Süßes": "Snacks & sweets",
+  "Vor dem Training": "Pre-workout",
+  "Nach dem Training": "Post-workout",
+  "Grundrezept": "Basic recipe"
+ },
+ "einheiten": {
+  "g": "g",
+  "ml": "ml",
+  "l": "l",
+  "EL": "tbsp",
+  "TL": "tsp",
+  "Stück": "pcs",
+  "Stk": "pcs",
+  "Hand voll": "handful",
+  "Stängel": "stalk",
+  "Stange": "stalk",
+  "Fäden": "threads",
+  "Zweig": "sprig",
+  "große": "large",
+  "kleine": "small",
+  "Grundrezept": "basic recipe"
+ },
+ "tags": {
+  "Vegan": "Vegan",
+  "Vegetarisch": "Vegetarian",
+  "Fisch": "Fish",
+  "High-Protein": "High-protein",
+  "Low-Carb": "Low-carb",
+  "High-Carb": "High-carb",
+  "Ballaststoffreich": "High-fibre",
+  "Kalorienarm": "Low-calorie",
+  "Glutenfrei": "Gluten-free",
+  "Laktosefrei": "Lactose-free",
+  "Zuckerfrei": "Sugar-free",
+  "Pasta": "Pasta",
+  "Salat": "Salad",
+  "One Pot": "One-pot",
+  "Mealprep": "Meal prep",
+  "Post Workout": "Post-workout",
+  "Pre Workout": "Pre-workout",
+  "Schnell und einfach": "Quick and easy",
+  "Süß": "Sweet",
+  "Herzhaft": "Savoury",
+  "Frühstück": "Breakfast",
+  "Grundrezept": "Basic recipe",
+  "Airfryer": "Air fryer",
+  "Backofen": "Oven",
+  "EggFree": "Egg-free",
+  "Fruehstueck": "Breakfast",
+  "Getränk": "Drink",
+  "Histaminarm": "Low-histamine",
+  "Low-Fat": "Low-fat",
+  "Midday-Snack": "Midday snack",
+  "Nachtisch": "Dessert",
+  "Obst": "Fruit",
+  "Snack": "Snack",
+  "Soja": "Soya",
+  "Suess": "Sweet",
+  "Vitamin-Bombe": "Vitamin bomb",
+  "Weihnachtlich": "Christmassy",
+  "ketogen": "Ketogenic",
+  "lockerflockig": "Light and fluffy",
+  "pescetarisch": "Pescatarian"
+ },
+ "allergene": {
+  "Milch": "Milk",
+  "Gluten": "Gluten",
+  "Schalenfrüchte (Mandeln)": "Tree nuts (almonds)",
+  "Eier": "Eggs",
+  "Ei": "Egg",
+  "Sellerie": "Celery",
+  "Fisch": "Fish",
+  "Weizen": "Wheat",
+  "Schwefeldioxid und Sulfite": "Sulphur dioxide and sulphites",
+  "Sojabohnen": "Soya",
+  "Soja": "Soya",
+  "Sesam": "Sesame",
+  "Erdnüsse": "Peanuts",
+  "Senf": "Mustard",
+  "Gluten (Haferflocken)": "Gluten (oats)"
+ },
+ "zutaten": {
+  "Apfelmark": "Apple purée",
+  "Buchweizenmehl": "Buckwheat flour",
+  "Eier roh": "Eggs, raw",
+  "Erythrit": "Erythritol",
+  "Himbeere tiefgefroren": "Raspberries, frozen",
+  "Kokosfett": "Coconut fat",
+  "Apfel": "Apple",
+  "Bio Hafermilch, ohne Zucker": "Organic oat milk, unsweetened",
+  "Haferflocken": "Rolled oats",
+  "Honig": "Honey",
+  "Salz": "Salt",
+  "Zimt": "Cinnamon",
+  "Ahornsirup": "Maple syrup",
+  "Dinkel Crunchy Müsli": "Spelt crunchy muesli",
+  "Joghurt": "Yoghurt",
+  "Mandeln, gehackt": "Almonds, chopped",
+  "Mandeln, gehobelt (Topping)": "Almonds, flaked (topping)",
+  "Milch 1,5% Fett": "Milk, 1.5% fat",
+  "Milch zum Verdünnen": "Milk, for thinning",
+  "Rosinen": "Raisins",
+  "Sonnenblumenkern geröstet": "Sunflower seeds, roasted",
+  "Zitrone Konzentrat": "Lemon concentrate",
+  "Avocado": "Avocado",
+  "Basilikum frisch": "Basil, fresh",
+  "Couscous roh": "Couscous, dry",
+  "Gemüsebrühe (zubereitet)": "Vegetable stock (prepared)",
+  "Olivenöl": "Olive oil",
+  "Pfeffer": "Pepper",
+  "Thunfisch Konserve, abgetropft": "Tuna, canned, drained",
+  "Tomate": "Tomato",
+  "Zitronensaft": "Lemon juice",
+  "Baby-Spinat, frisch": "Baby spinach, fresh",
+  "Gemüsebrühe": "Vegetable stock",
+  "Hähnchenbrust roh": "Chicken breast, raw",
+  "Knoblauch": "Garlic",
+  "kritharaki, Orzo": "Kritharaki (orzo)",
+  "Light Frischkäse": "Light cream cheese",
+  "Milch, 1,5%": "Milk, 1.5%",
+  "Parmesan": "Parmesan",
+  "Zwiebel": "Onion",
+  "Brokkoli tiefgefroren": "Broccoli, frozen",
+  "Currypulver": "Curry powder",
+  "Hähnchenstreifen / Geschnetzeltes": "Chicken strips / sliced chicken",
+  "Kokosmilch, fettreduziert": "Coconut milk, reduced-fat",
+  "Kurkuma": "Turmeric",
+  "Lauch": "Leek",
+  "Reis roh": "Rice, dry",
+  "Rote Curry Paste": "Red curry paste",
+  "Sesamöl": "Sesame oil",
+  "Spinat tiefgefroren": "Spinach, frozen",
+  "Süßkartoffel": "Sweet potato",
+  "Birne": "Pear",
+  "Hanfsamen, geschält": "Hemp seeds, hulled",
+  "Hirseflocken": "Millet flakes",
+  "Reismilch": "Rice milk",
+  "Eiswürfel": "Ice cubes",
+  "Kaffee, kalt": "Coffee, cold",
+  "Magerquark": "Low-fat quark",
+  "Wasser": "Water",
+  "Dattel": "Dates",
+  "Kakaopulver": "Cocoa powder",
+  "Kakaopulver, zum Wälzen": "Cocoa powder, for rolling",
+  "Kokosöl": "Coconut oil",
+  "Mandelmus": "Almond butter",
+  "Butter": "Butter",
+  "Geriebener Käse (Gruyère o. ä.)": "Grated cheese (Gruyère or similar)",
+  "Knoblauchzehe": "Garlic clove",
+  "Milch": "Milk",
+  "Muskatnuss": "Nutmeg",
+  "Schlagsahne": "Whipping cream",
+  "vorwiegend festkochende Kartoffeln": "Mostly waxy potatoes",
+  "Cocktailtomaten": "Cherry tomatoes",
+  "frische Kräuter": "Fresh herbs",
+  "Lachs": "Salmon",
+  "Béchamelsauce": "Béchamel sauce",
+  "Feta": "Feta",
+  "Gouda": "Gouda",
+  "Lasagne-Nudelplatten": "Lasagne sheets",
+  "Mangold": "Swiss chard",
+  "Eier": "Eggs",
+  "gemahlener Kreuzkümmel": "Ground cumin",
+  "Kokosmilch oder Milch": "Coconut milk or milk",
+  "Kurkumapulver": "Turmeric powder",
+  "Limettensaft": "Lime juice",
+  "Paksoi": "Pak choi",
+  "Reis": "Rice",
+  "rote Paprikaschote": "Red bell pepper",
+  "Röstzwiebeln": "Crispy fried onions",
+  "süß-saure Asia-Sauce": "Sweet-and-sour Asian sauce",
+  "süße Sojasauce (Ketjap manis)": "Sweet soy sauce (kecap manis)",
+  "ungesüßte Erdnusscreme": "Unsweetened peanut butter",
+  "Öl": "Oil",
+  "Tomaten-Gemüse-Sauce": "Tomato and vegetable sauce",
+  "Champignons": "Button mushrooms",
+  "Erbsen (TK)": "Peas (frozen)",
+  "Fadennudeln mit Ei": "Egg vermicelli",
+  "Gemüsezwiebel": "Spanish onion",
+  "Knoblauchzehen": "Garlic cloves",
+  "Petersilie": "Parsley",
+  "Safran": "Saffron",
+  "Sambal Oelek": "Sambal oelek",
+  "Ciabatta": "Ciabatta",
+  "Crème fraîche": "Crème fraîche",
+  "edelsüßes Paprikapulver": "Sweet paprika",
+  "festkochende Kartoffeln": "Waxy potatoes",
+  "frischer Rosmarin": "Fresh rosemary",
+  "Knollensellerie": "Celeriac",
+  "Möhren": "Carrots",
+  "Feta-Käse": "Feta cheese",
+  "grünes oder rotes Basilikum": "Green or red basil",
+  "Kichererbsen (Abtropfgewicht)": "Chickpeas (drained weight)",
+  "Meersalz": "Sea salt",
+  "Minze": "Mint",
+  "reife rote oder gelbe Tomaten": "Ripe red or yellow tomatoes",
+  "rote Chilischoten": "Red chilli peppers",
+  "rote Zwiebel": "Red onion",
+  "schwarzer Pfeffer": "Black pepper",
+  "Zitronen": "Lemons",
+  "Bio-Zitrone": "Organic lemon",
+  "Blattspinat": "Leaf spinach",
+  "Erbsen": "Peas",
+  "Pasta nach Wahl": "Pasta of your choice",
+  "Basilikum": "Basil",
+  "kernige Haferflocken": "Hearty rolled oats",
+  "körniger Frischkäse": "Cottage cheese",
+  "Leinöl": "Linseed oil",
+  "Mandelstifte": "Slivered almonds",
+  "Skyr": "Skyr",
+  "Zimtpulver": "Ground cinnamon",
+  "Bio-Kokosflocken": "Organic desiccated coconut",
+  "Heidelbeere": "Blueberries",
+  "Hirse": "Millet",
+  "Mandelmilch, ungesüßt": "Almond milk, unsweetened",
+  "Veganes Protein, Schokolade": "Vegan protein powder, chocolate",
+  "Backpulver": "Baking powder",
+  "Banane": "Banana",
+  "Butternuss-Kürbis, roh": "Butternut squash, raw",
+  "Veganes Proteinpulver, Banane": "Vegan protein powder, banana",
+  "Heidelbeeren, tiefgefroren": "Blueberries, frozen",
+  "Kokoswasser": "Coconut water",
+  "Veganes Proteinpulver, Vanille": "Vegan protein powder, vanilla",
+  "Wasser/ Mineralwasser": "Water / mineral water",
+  "Harzer Käse": "Harzer cheese",
+  "Knoblauch Pulver": "Garlic powder",
+  "Paprikapulver": "Paprika powder",
+  "Kakaopulver stark entölt": "Cocoa powder, strongly de-oiled",
+  "Mandeldrink, ohne Zucker": "Almond drink, unsweetened",
+  "Mandelmehl": "Almond flour",
+  "Whey-Proteinpulver, Schoko": "Whey protein powder, chocolate",
+  "Blattsalat": "Salad leaves",
+  "Feta (Schafskäse)": "Feta (sheep's cheese)",
+  "Frischkäse mit Kräutern < 10% Fett i. Tr.": "Herb cream cheese, under 10% fat in dry matter",
+  "Kochschinken": "Cooked ham",
+  "Senf": "Mustard",
+  "Tortilla Wrap, Vollkorn": "Tortilla wrap, wholemeal",
+  "Blattspinat roh": "Leaf spinach, raw",
+  "Kalbfleisch geschnetzelt": "Veal, sliced",
+  "Rapsöl": "Rapeseed oil",
+  "Schafskäse light": "Sheep's cheese, light",
+  "Aubergine": "Aubergine",
+  "Hähnchenbrustfilet-Teilstück": "Chicken breast fillet portion",
+  "Kartoffeln roh": "Potatoes, raw",
+  "Zucchini roh": "Courgette, raw",
+  "gehackte Tomaten": "Chopped tomatoes",
+  "Gemüsebrühe, unzubereitet": "Vegetable stock, unprepared",
+  "Kidney-Bohnen Konserve abgetropft": "Kidney beans, canned, drained",
+  "Paprika": "Bell pepper",
+  "Passierte Tomaten": "Passata",
+  "Rote Linsen, roh": "Red lentils, dry",
+  "Schwarze Bohnen": "Black beans",
+  "Soja Granulat": "Soya granules",
+  "Fusilli Rote Linsen": "Red lentil fusilli",
+  "Schafskäse, Light": "Sheep's cheese, light",
+  "Weizen- oder Dinkelmehl (Type 405 / 630)": "Wheat or spelt flour (type 405 / 630)",
+  "Milch (1,5 % oder 3,5 % Fett, zimmerwarm)": "Milk (1.5% or 3.5% fat, room temperature)",
+  "Salz und weißer Pfeffer": "Salt and white pepper",
+  "Muskatnuss (frisch gerieben)": "Nutmeg (freshly grated)",
+  "Zwiebel (mittelgroß)": "Onion (medium)",
+  "Karotte": "Carrot",
+  "Stange Sellerie (oder Knollensellerie)": "Celery stalk (or celeriac)",
+  "Tomatenmark": "Tomato paste",
+  "Passierte oder stückige Tomaten": "Passata or chopped tomatoes",
+  "Oregano (getrocknet)": "Oregano (dried)",
+  "Thymian (getrocknet)": "Thyme (dried)",
+  "Salz und Pfeffer": "Salt and pepper",
+  "Brokkoli": "Broccoli"
+ },
+ "rezepte": {
+  "rezept-apfel-buchweizen-pancakes": {
+   "name": "Apple Buckwheat Pancakes",
+   "schritte": [
+    "Crack the eggs into a bowl.",
+    "Add the buckwheat flour, erythritol and two thirds of the apple purée, and stir everything into a batter.",
+    "Heat a little coconut oil in a pan and cook the batter in batches to make small pancakes.",
+    "Arrange the pancakes and serve them with the remaining apple purée and the frozen raspberries."
+   ]
+  },
+  "rezept-apfel-zimt-porridge": {
+   "name": "Apple Cinnamon Porridge",
+   "schritte": [
+    "Wash the apple, core it and cut it into small cubes or thin slices.",
+    "Put the oats, oat milk, salt and some of the apple pieces in a pot. Simmer over medium heat for 5–7 minutes until creamy.",
+    "Spoon the porridge into a bowl, garnish it with the remaining apple pieces and top with honey and cinnamon to taste."
+   ]
+  },
+  "rezept-bircher-musli": {
+   "name": "Bircher Muesli",
+   "schritte": [
+    "Toast the sunflower seeds and flaked almonds in a pan until golden brown and let them cool. They become the topping later.",
+    "Cut the apple into small cubes and mix it with the lemon concentrate.",
+    "Mix the apple with all the other ingredients in a large bowl; the order does not matter.",
+    "Put the bowl in the fridge overnight.",
+    "The next morning, stir in some of the milk for thinning if needed, until the muesli is as creamy as you like it.",
+    "Sprinkle the toasted topping over it before serving."
+   ]
+  },
+  "rezept-couscous-salat-mit-thunfisch": {
+   "name": "Couscous Salad with Tuna",
+   "schritte": [
+    "Put the couscous in a heatproof bowl, pour boiling hot vegetable stock over it and let it swell for 10–15 minutes.",
+    "In the meantime, hard-boil the eggs and drain the can of tuna.",
+    "Dice the tomato and avocado, tear the basil, and mix everything into the couscous together with the tuna.",
+    "Whisk olive oil, lemon juice, salt and pepper into a dressing and mix it in well.",
+    "Slice the eggs and place them on top."
+   ]
+  },
+  "rezept-cremige-one-pot-hahnchen-orzo-pfanne": {
+   "name": "Creamy One-Pot Chicken Orzo Skillet",
+   "schritte": [
+    "Cut the chicken breast fillet into bite-sized pieces. Finely chop the onion and garlic.",
+    "Heat the olive oil in a pot and sear the chicken in it.",
+    "Add the onion and garlic, then the orzo, and sauté everything briefly.",
+    "Pour in the vegetable stock and milk and let everything simmer.",
+    "Fold in the baby spinach and let it wilt.",
+    "Stir in the cream cheese and let the sauce become creamy. Finally, stir in the Parmesan and season with salt and pepper."
+   ]
+  },
+  "rezept-curry-hahnchen-mit-reis": {
+   "name": "Chicken Curry with Rice",
+   "schritte": [
+    "Cook the rice according to the package instructions.",
+    "Chop the onion, dice the sweet potato and fry both together in sesame oil. Season with salt and curry powder.",
+    "Add the chicken strips and fry them.",
+    "After a few minutes, pour in the coconut milk, stir in the red curry paste and let everything simmer.",
+    "Slice the leek and add it to the curry together with the spinach and broccoli.",
+    "Adjust the seasoning with curry powder, curry paste, turmeric, salt and pepper and serve the curry with the rice."
+   ]
+  },
+  "rezept-hirse-porridge-mit-birne": {
+   "name": "Millet Porridge with Pear",
+   "schritte": [
+    "Bring the millet flakes to the boil in the rice milk.",
+    "Dice the pear small and fold it into the porridge.",
+    "Sprinkle the hemp seeds over it and serve the porridge with cinnamon."
+   ]
+  },
+  "rezept-iced-protein-coffee": {
+   "name": "Iced Protein Coffee",
+   "schritte": [
+    "Stir the low-fat quark with the water until creamy.",
+    "Stir in the cold coffee.",
+    "Add the ice cubes and stir or blend everything well."
+   ]
+  },
+  "rezept-kakao-energy-balls": {
+   "name": "Cocoa Energy Balls",
+   "schritte": [
+    "Put the dates, oats, cocoa powder, almond butter, coconut oil, honey and salt in a blender or food processor and process everything into a sticky mixture. If the dates are too dry, soak them in warm water for about 10 minutes beforehand and drain them well.",
+    "Shape the mixture into walnut-sized balls of about 20 g.",
+    "Roll the balls in cocoa powder.",
+    "Put the balls in the fridge for at least 30 minutes."
+   ]
+  },
+  "rezept-klassisches-kartoffelgratin": {
+   "name": "Classic Potato Gratin",
+   "schritte": [
+    "Preheat the oven to 200 °C (390 °F) top and bottom heat; please do not use fan. Grease a large baking dish with 10 g of butter.",
+    "Peel the potatoes and let them sit briefly in cold water. Then cut them into thin slices, but so that each potato keeps its shape. Press the slices gently apart into a fan shape and place them in the dish.",
+    "Halve the garlic and heat it with the cream, milk and the remaining 40 g of butter until it comes to a boil. Season with freshly grated nutmeg (about 1 pinch) and plenty of salt. Take the garlic out again and pour the cream-milk mixture over the potatoes.",
+    "Spread the grated cheese (150 g, e.g. Gruyère) evenly over the top.",
+    "Bake the gratin on the second shelf from the bottom for 40 minutes, until golden brown."
+   ]
+  },
+  "rezept-lachsfilet-mit-gebackener-sukartoffel-und-avocado-creme": {
+   "name": "Salmon Fillet with Baked Sweet Potato and Avocado Cream",
+   "schritte": [
+    "Preheat the oven to 180 °C (355 °F) fan.",
+    "Wash the sweet potatoes, halve them and bake them on a baking tray for about 35 minutes.",
+    "In the meantime, make the avocado cream: quarter the cherry tomatoes. Scoop out the avocado and mash it with a fork in a small bowl. Stir in the low-fat quark and the tomatoes and season with salt, pepper and fresh herbs.",
+    "Heat a little olive oil in a pan and fry the salmon fillet over medium heat on both sides.",
+    "Take the sweet potatoes out of the oven and arrange them on a plate. Add the salmon and spread avocado cream over it to taste."
+   ]
+  },
+  "rezept-mangold-lasagne-mit-feta": {
+   "name": "Swiss Chard Lasagne with Feta",
+   "schritte": [
+    "First prepare the béchamel sauce and the tomato and vegetable sauce and let both simmer gently until you layer them.",
+    "Wash and trim the chard. Dice the stems small and roughly chop the leaves. Finely chop the garlic and briefly sauté it in olive oil. Add the chard stems and cook them for 3 minutes over medium heat. Then add the chard leaves and cook for another 5 minutes. Season generously with salt, pepper and nutmeg.",
+    "Preheat the oven to 200 °C (390 °F) top and bottom heat (180 °C / 355 °F fan) and dice the feta.",
+    "Layer béchamel, lasagne sheets, tomato and vegetable sauce, chard and feta alternately in a baking dish. Sprinkle the Gouda on top and dot with flakes of butter.",
+    "Bake the lasagne for 40 minutes in the middle of the oven."
+   ]
+  },
+  "rezept-nasi-goreng-mit-ei-und-erdnusssauce": {
+   "name": "Nasi Goreng with Egg and Peanut Sauce",
+   "schritte": [
+    "Cook the rice in salted water according to the package instructions. Spread it on a baking tray and let it cool.",
+    "For the sauce, stir together the peanut butter, coconut milk and Asian sauce and heat gently while stirring, without letting it boil. Season with lime juice and a little soy sauce and keep it warm.",
+    "Halve the leek lengthways, wash it thoroughly between the leaves and cut it into narrow strips. Halve the bell pepper, remove the seeds and white membranes, wash it and dice it. Wash the pak choi, cut the leaves from the stems, roughly chop the leaves and cut the stems small.",
+    "Heat 1 tbsp of oil in a large pan. Sauté the leek, bell pepper and pak choi stems in it for 3–4 minutes, stirring, and briefly add the pak choi leaves. Stir in the turmeric, cumin and 4 tbsp of soy sauce and let everything simmer briefly.",
+    "Mix in the cooled rice and fry everything for 5 minutes over high heat, stirring.",
+    "In a second pan, fry the eggs in 1 tbsp of oil into fried eggs and season them with salt and pepper.",
+    "Season the nasi goreng with salt, pepper and a little soy sauce if needed. Place the eggs on top, sprinkle the crispy fried onions over it and serve the sauce on the side."
+   ]
+  },
+  "rezept-nudel-paella": {
+   "name": "Noodle Paella",
+   "schritte": [
+    "Wash the bell pepper, quarter and deseed it and cut it into strips. Dice the onion, clean the mushrooms and slice them, and chop the garlic. Let the peas thaw.",
+    "Bring the vegetable stock to the boil with the saffron threads.",
+    "Fry the bell pepper, onion, mushrooms and garlic in the hot olive oil for 5 minutes and then take them out of the pan.",
+    "Toast the noodles in the same pan until light brown, add the vegetables back and pour in some saffron stock. Stir and cook until the noodles are soft, adding a little more stock again and again.",
+    "Chop the parsley and stir it in together with the peas. Season with salt and sambal oelek (1 tsp, more to taste)."
+   ]
+  },
+  "rezept-ofengemuse-mit-creme-fraiche": {
+   "name": "Oven-Roasted Vegetables with Crème Fraîche",
+   "schritte": [
+    "Preheat the oven to 200 °C (390 °F). Wash the potatoes and carrots, peel the celeriac and cut everything into wedges. Finely chop the garlic.",
+    "Put the vegetables in a bowl with the paprika, salt, pepper, garlic and 2 tbsp of olive oil and mix everything well.",
+    "Spread the vegetables on a baking tray lined with aluminium foil and bake them for 20 minutes in the middle of the oven. Turn them with a spatula and bake for another 15 minutes.",
+    "In the meantime, cut the ciabatta into bite-sized pieces. Reduce the oven temperature to 175 °C (350 °F), mix the bread into the vegetables, drizzle the remaining oil over it and finish everything in 10 minutes.",
+    "Pluck the rosemary needles from the sprig and sprinkle them over the finished vegetables. Serve with the crème fraîche."
+   ]
+  },
+  "rezept-sommerlicher-kichererbsensalat-mit-schafkase": {
+   "name": "Summer Chickpea Salad with Sheep's Cheese",
+   "schritte": [
+    "Cut the onion into fine slices and the chilli (1 pepper, more to taste) very finely. Roughly chop the tomatoes.",
+    "Put the onion, chilli and tomatoes, including their juice, in a bowl. Mix them with the juice of 1½ lemons and 3 tbsp of olive oil and season with salt and pepper.",
+    "Warm the chickpeas in a pot. Add 90% of them to the tomatoes. Purée the rest and stir it in as well; this makes the sauce nice and creamy.",
+    "Let the salad sit for a while at room temperature.",
+    "Shortly before serving, fold in the mint and basil and adjust the seasoning again. If it lacks acidity, use the remaining half lemon. Finally, crumble the feta over it."
+   ]
+  },
+  "rezept-brokkoli-pasta": {
+   "name": "Broccoli Pasta",
+   "schritte": [
+    "Cut the broccoli into fine florets. Clean and wash the leaf spinach, spin it dry and roughly chop it. Finely dice the garlic.",
+    "Cook the pasta in salted water according to the package instructions.",
+    "Heat the olive oil in a large pot and fry the broccoli in it for 3 minutes. Add the garlic after 2 minutes. Then add the peas and spinach and let the spinach wilt.",
+    "Pour in the vegetable stock and cream, bring everything to the boil and season with salt and pepper. Boil the sauce for 2 minutes without a lid.",
+    "Drain the pasta, let it drip off and mix it in hot with the sauce. Continue cooking everything for another 1–2 minutes without a lid.",
+    "Finely grate the lemon zest, finely cut 8 basil leaves and stir both in with the butter. Season with salt, pepper and a squeeze of lemon juice and sprinkle the pasta with the remaining basil."
+   ]
+  },
+  "rezept-zimtige-skyr-creme-mit-knusperflocken": {
+   "name": "Cinnamon Skyr Cream with Crunchy Oat Flakes",
+   "schritte": [
+    "Toast the oats and slivered almonds in a small non-stick pan without fat until golden, stirring from time to time. Take them out and let them cool completely.",
+    "Wash the apple, core it and cut it into fine cubes.",
+    "Stir the skyr, cottage cheese, cinnamon and linseed oil until smooth.",
+    "Spoon the cream into two bowls, top with the apple cubes and sprinkle the crunchy flakes over it."
+   ]
+  },
+  "rezept-hirse-porridge-mit-apfel-und-heidelbeeren": {
+   "name": "Millet Porridge with Apple and Blueberries",
+   "schritte": [
+    "Bring the millet to the boil in a pot with the almond milk and water.",
+    "Stir in the protein powder.",
+    "Cut the apple into pieces.",
+    "Put the finished millet porridge in a bowl and top it with blueberries, apple and desiccated coconut."
+   ]
+  },
+  "rezept-pumpkin-pancakes": {
+   "name": "Pumpkin Pancakes",
+   "schritte": [
+    "Mash the banana with a fork until no large lumps remain and the mixture resembles pudding (or purée it with a hand blender). Finely grate the squash.",
+    "Add the eggs, baking powder, protein powder, squash and cinnamon and mix everything well.",
+    "Heat a pan, grease it with oil and cook the batter in batches into small pancakes. Stack them on top of each other and serve with a little maple syrup and apple purée to taste."
+   ]
+  },
+  "rezept-blaubeere-banane-shake-vegan": {
+   "name": "Blueberry Banana Shake",
+   "schritte": [
+    "Peel the banana and put it in the blender.",
+    "Add the frozen blueberries and, if you like, a few ice cubes.",
+    "Pour in the water and coconut water and add the protein powder.",
+    "Blend everything until smooth. Alternatively, you can make the shake with a hand blender.",
+    "Pour it into a glass and serve with more ice cubes and a straw if you like."
+   ]
+  },
+  "rezept-harzer-kase-chips": {
+   "name": "Harzer Cheese Chips",
+   "schritte": [
+    "Preheat the air fryer to about 180 °C (355 °F).",
+    "Cut the Harzer cheese into thin slices, place them on baking paper and sprinkle them with garlic powder, paprika and pepper.",
+    "Place the slices in the basket, not on top of each other but with a little space between them. Bake them for 8–15 minutes until golden brown and crispy.",
+    "Put the chips on kitchen paper to cool. They get even crispier as they cool."
+   ]
+  },
+  "rezept-schoko-mug-cake": {
+   "name": "Chocolate Mug Cake",
+   "schritte": [
+    "Whisk the eggs with the almond drink.",
+    "Add the almond flour, protein powder, cocoa powder, erythritol and baking powder and stir everything into a smooth batter.",
+    "Melt the butter and stir it into the batter.",
+    "Pour the batter evenly into a mug.",
+    "Heat the mug in the microwave until the batter has risen and is firm.",
+    "Let the mug cake cool briefly and enjoy it right away."
+   ]
+  },
+  "rezept-wrap-mit-schinken-feta-und-gemuse": {
+   "name": "Wrap with Ham, Feta and Vegetables",
+   "schritte": [
+    "Spread the cream cheese on the tortilla wrap.",
+    "Top it with feta, ham, salad leaves and tomato.",
+    "Whisk honey and mustard into a dressing and spread it on the wrap.",
+    "Roll or fold the wrap. Tip: briefly fry it on both sides."
+   ]
+  },
+  "rezept-kalbsfilet-mit-blattspinat-und-fetakase": {
+   "name": "Sliced Veal with Leaf Spinach and Feta",
+   "schritte": [
+    "Wash the leaf spinach and let it drain.",
+    "Heat the rapeseed oil in a pan, sear the meat in it and season to taste.",
+    "Arrange the spinach on a plate and crumble the sheep's cheese over it.",
+    "Add the meat and serve everything together."
+   ]
+  },
+  "rezept-hahnchenbrustfilet-mit-ofengemuse": {
+   "name": "Chicken Breast Fillet with Oven-Roasted Vegetables",
+   "schritte": [
+    "Preheat the oven to 180 °C (355 °F) fan.",
+    "Wash the vegetables, cut them into bite-sized pieces, spread them on a baking tray lined with baking paper and season with salt and pepper. Bake them for 30 minutes.",
+    "If the chicken breast fillet is not yet marinated, marinate it with a little olive oil, salt, pepper and curry powder. Put it in the oven for the last 25 minutes."
+   ]
+  },
+  "rezept-chili-sin-carne": {
+   "name": "Chili sin Carne",
+   "schritte": [
+    "Stir the vegetable stock into hot water and let the soya granules swell in it. The amount of water is given on the package. In the meantime, you can prepare the rest.",
+    "Finely dice the onion and bell pepper. Heat a little olive oil in a large pan and fry both in it.",
+    "Add the swollen granules and the lentils and stir once.",
+    "Rinse the kidney beans and black beans, let them drain and add them to the pan together with the passata and chopped tomatoes.",
+    "Season to taste with pepper, chilli powder, cumin, basil and a dash of soy sauce.",
+    "Let the chili simmer with the lid on over low heat for 15 minutes."
+   ]
+  },
+  "rezept-linsennudeln-mit-feta-und-zucchini": {
+   "name": "Lentil Pasta with Feta and Courgette",
+   "schritte": [
+    "Finely dice the onion. Cut the courgette and feta into cubes of about 1 cm.",
+    "Heat a little olive oil in a large pan, fry the onion in it first and add the courgette after a few minutes.",
+    "In the meantime, cook the lentil pasta in salted water according to the package instructions.",
+    "Add a dash of pasta water to the pan, drain the pasta and add it to the pan together with the feta cubes.",
+    "Season with salt, pepper and fresh basil and serve."
+   ]
+  },
+  "rezept-bechamelsauce": {
+   "name": "Creamy Béchamel Sauce",
+   "schritte": [
+    "Make the roux: melt the butter in a small pot over medium heat (careful: it should not turn brown). Stir the flour into the liquid butter all at once with a whisk until a smooth paste forms. Lightly sweat it for about 1–2 minutes, stirring.",
+    "Add the milk: first pour in about a third of the milk while whisking vigorously to avoid lumps. As soon as the mixture thickens, quickly stir in the rest of the milk bit by bit.",
+    "Let it thicken: bring the sauce to the boil once, stirring constantly. Then reduce the heat a lot and let it simmer gently for about 5–10 minutes. This is important so that the floury taste disappears. Stir really often, as béchamel sauce burns very easily on the bottom of the pot.",
+    "Season: take the sauce off the heat and season generously with salt, pepper and a good pinch of freshly grated nutmeg."
+   ]
+  },
+  "rezept-tomaten-gemuese-sauce": {
+   "name": "Tomato and Vegetable Sauce",
+   "schritte": [
+    "Prepare the vegetables: peel or clean the onion, garlic, carrot and celery and cut them into very fine cubes.",
+    "Fry: heat the olive oil in a large pan or a wide pot. Fry the vegetable cubes in it for about 8 minutes until golden yellow – the more roasted flavour, the stronger the sauce.",
+    "Add the tomato: stir in the tomato paste and roast it for 1–2 minutes. This gives a more intense, slightly sweet taste.",
+    "Deglaze: deglaze with the vegetable stock. Add the tomatoes and the dried herbs (oregano, thyme).",
+    "Give it time: let the sauce simmer gently over low heat with the lid slightly open for at least 30 minutes so that it becomes nice and thick. Finally, season generously with salt and pepper."
+   ]
+  }
+ }
+}

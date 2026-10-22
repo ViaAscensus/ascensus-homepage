@@ -112,7 +112,7 @@ python3 tools/build-rezepte.py           # schreibt die Seiten
 Der Lauf ist idempotent. Details und wie ein neues Rezept veröffentlicht wird:
 `tools/README.md`.
 
-Von Hand gepflegt werden dagegen: `index.html`, `pakete*.html`, `wissen*.html`,
+Von Hand gepflegt werden dagegen: `tools/rezepte-en.json` (Rezepttexte auf Englisch), `index.html`, `pakete*.html`, `wissen*.html`,
 die Rechtstexte, `anamnese*.html`, `trainingsbuch.html`, die `mitglieder-*.html`
 und `social-planer.html`.
 
@@ -129,9 +129,13 @@ die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` un
   Stil in `ascensus.css`, direkt vor dem Menü-Button) und verweist auf die
   Gegenseite. Beide Seiten tragen `hreflang`-Verweise (`de`, `en`, `x-default`).
 - Es gibt keine automatische Sprachweiterleitung; der Schalter ist der einzige Weg.
-- Die Rezepte (`rezepte.html`, `rezept-*.html`) sind noch nur deutsch;
-  `rezepte.html` trägt dafür einen englischen Hinweis im statischen Intro-Teil
-  (der Generator berührt nur Grid und Rezeptzahl).
+- Die Rezepte gibt es ebenfalls auf Englisch (`rezept-*-en.html`, `rezepte-en.html`).
+  Sie werden **vom Generator** erzeugt, nicht von Hand: Zahlen kommen aus PocketBase,
+  die englischen Wörter aus `tools/rezepte-en.json` (kein PocketBase-Eintrag nötig).
+  Ein neues Rezept braucht dort `name` und `schritte`, fehlende Zutaten ins
+  Wörterbuch; fehlt etwas, meldet `build-rezepte.py` es und lässt die englische Seite
+  aus. Das statische Intro von `rezepte-en.html` ist von Hand gepflegt, der Generator
+  ersetzt nur Grid und Rezeptzahl.
 - Auch `impressum`, `datenschutz`, `agb`, `widerruf`, `bewertung`, `pakete-danke`
   und `links` haben eine `-en`-Seite. Die vier Rechtstexte sind eine **Lesehilfe**
   (Hinweis `lang-note` unter der Überschrift): verbindlich ist die deutsche
@@ -148,6 +152,8 @@ die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` un
 - Paketnamen: *Das Fundament* = The Foundation, *Der Weg* = The Path,
   *Die Nachhaltigkeit* = Sustainability. Die Stripe-Links und das Buchungsformular
   sind deutsch.
+- Das Coaching selbst ist auf Deutsch und Englisch möglich (FAQ-Eintrag auf
+  `index.html` und `index-en.html`, auch im JSON-LD).
 
 ## Social-Media-Planer
 

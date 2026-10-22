@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipes – Everyday-friendly &amp; nutrient-rich | ASCENSUS</title>
+  <meta name="description" content="Balanced, everyday-friendly recipes from nutrition consultant Patrick Spengler – with transparent nutritional values and a serving calculator.">
+  <link rel="canonical" href="https://ascensus.fit/rezepte-en.html">
+<link rel="alternate" hreflang="de" href="https://ascensus.fit/rezepte.html">
+<link rel="alternate" hreflang="en" href="https://ascensus.fit/rezepte-en.html">
+<link rel="alternate" hreflang="x-default" href="https://ascensus.fit/rezepte.html">
+  <link rel="icon" href="https://ascensus.fit/favicon-512.png">
+  <link rel="apple-touch-icon" href="https://ascensus.fit/apple-touch-icon.png">
+  
+  <meta property="og:title" content="Recipes – Everyday-friendly &amp; nutrient-rich | ASCENSUS">
+  <meta property="og:description" content="Balanced, everyday-friendly recipes from nutrition consultant Patrick Spengler.">
+  <meta property="og:image" content="https://ascensus.fit/logo-wordmark-claim.png">
+  <meta property="og:url" content="https://ascensus.fit/rezepte-en.html">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="https://ascensus.fit/ascensus.css">
+  <link rel="stylesheet" href="https://ascensus.fit/klaro.css">
+  <link rel="stylesheet" href="https://ascensus.fit/ascensus-klaro-theme.css">
+  <script src="https://ascensus.fit/ascensus.js" defer></script>
+
+<style>
+:root { 
+  --olive: #556B4E; 
+  --olive-dark: #3E5039; 
+  --sand: #B59A5D; 
+  --offwhite: #F5F3EE; 
+  --paper: #FFFFFF; 
+  --ink: #232323; 
+  --ink-60: rgba(35,35,35,.68); 
+  --ink-40: rgba(35,35,35,.45); 
+  --line: rgba(85,107,78,.18); 
+  --maxw: 1140px; 
+  --gut: clamp(1.5rem,5vw,4rem); 
+}
+
+* { box-sizing: border-box; margin: 0px; padding: 0px; }
+html { scroll-behavior: smooth; text-size-adjust: 100%; }
+body { 
+  background: var(--offwhite); 
+  color: var(--ink); 
+  font-family: Inter, "Inter var", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+  font-size: 17px; 
+  line-height: 1.55; 
+  font-weight: 400; 
+  -webkit-font-smoothing: antialiased; 
+  overflow-x: hidden; 
+}
+img { max-width: 100%; display: block; height: auto; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--sand); outline-offset: 3px; }
+
+/* Typografie */
+.eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--sand); margin-bottom: 1.1rem; }
+h1 { font-size: clamp(2.1rem, 6.2vw, 4.15rem); font-weight: 300; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.08; color: var(--olive); }
+h3 { font-size: 1.12rem; font-weight: 600; line-height: 1.35; color: var(--ink); transition: color 0.2s; }
+.lead { font-size: clamp(1.02rem, 2vw, 1.2rem); line-height: 1.6; color: var(--ink-60); max-width: 62ch; }
+.wrap { max-width: var(--maxw); margin: 0px auto; padding: 0 var(--gut); }
+
+/* Header, Navigation & Footer: siehe ascensus.css (gleiches Design wie index.html) */
+
+/* Page Intro & Sections */
+section { padding: clamp(3.5rem, 7vw, 5.5rem) 0px; position: relative; }
+.intro { padding-bottom: 1rem; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Suchfeld */
+.search-bar { margin-top: 2.6rem; }
+.search-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+.search-input:focus { outline: none; border-color: var(--olive); }
+.search-input::placeholder { color: var(--ink-40); }
+
+/* Filter Bar */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.3rem; }
+.filter-btn { 
+  padding: 0.6rem 1.3rem; 
+  border: 1px solid var(--line); 
+  background: var(--paper); 
+  color: var(--ink-60); 
+  font-size: 0.78rem; 
+  font-weight: 600; 
+  letter-spacing: 0.08em; 
+  text-transform: uppercase; 
+  cursor: pointer; 
+  border-radius: 20px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s; 
+}
+.filter-btn:hover { border-color: var(--olive); color: var(--olive); }
+.filter-btn.is-active { background: var(--olive); border-color: var(--olive); color: var(--offwhite); }
+
+/* Rezept Grid */
+.post-grid { 
+  display: grid; 
+  gap: 1.8rem; 
+  margin-top: 2.8rem; 
+}
+@media (min-width: 680px) {
+  .post-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1020px) {
+  .post-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Rezept Karte */
+.post { 
+  background: var(--paper); 
+  border: 1px solid var(--line); 
+  border-radius: 8px;
+  display: flex; 
+  flex-direction: column; 
+  overflow: hidden; 
+  color: var(--ink); 
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; 
+}
+.post:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 30px rgba(35, 35, 35, 0.08); 
+  border-color: rgba(85, 107, 78, 0.4); 
+}
+.post:hover h3 { color: var(--olive); }
+.post-bild { aspect-ratio: 4 / 3; overflow: hidden; background: #EFECE6; }
+.post-bild img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.post:hover .post-bild img { transform: scale(1.03); }
+
+.post-body { padding: 1.5rem 1.6rem 1.4rem; display: flex; flex-direction: column; flex-grow: 1; }
+.post-cat { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--sand); }
+.post h3 { margin: 0.6rem 0px 0.8rem; }
+.post-badges { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.4rem; }
+.post-badge { 
+  font-size: 0.70rem; 
+  font-weight: 600; 
+  letter-spacing: 0.04em; 
+  color: var(--olive); 
+  background: rgba(85, 107, 78, 0.08); 
+  border: 1px solid var(--line); 
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem; 
+}
+.post-foot { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  gap: 1rem; 
+  margin-top: auto; 
+  padding-top: 1rem; 
+  border-top: 1px solid var(--line); 
+  font-size: 0.80rem; 
+  color: var(--ink-60); 
+  font-weight: 500;
+}
+.post-more { font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.72rem; color: var(--olive); }
+
+/* Leere Liste */
+.post-empty { 
+  margin-top: 3rem; 
+  padding: 2.8rem 2rem; 
+  border: 1px dashed var(--line); 
+  border-radius: 8px;
+  color: var(--ink-60); 
+  font-size: 0.95rem; 
+  text-align: center;
+  display: none; 
+}
+.post-empty strong { display: block; color: var(--olive); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 0.5rem; }
+
+/* Call-to-Action */
+.call-mini { 
+  background: var(--paper); 
+  border: 1px solid var(--line);
+  color: var(--ink); 
+  padding: 2.6rem 2.2rem; 
+  margin-top: 4.5rem; 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 1.6rem; 
+  align-items: center; 
+  justify-content: space-between; 
+  border-radius: 8px;
+}
+.call-mini p { color: var(--ink-60); margin: 0px; max-width: 50ch; line-height: 1.6; }
+.call-mini strong { display: block; color: var(--olive); font-size: 1.15rem; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.35rem; }
+
+/* Animations & Reduced Motion */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+<!-- Consent & Analytics -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'wait_for_update': 500
+  });
+</script>
+
+<link rel="stylesheet" href="https://ascensus.fit/klaro.css" />
+<link rel="stylesheet" href="https://ascensus.fit/ascensus-klaro-theme.css" />
+<script src="https://ascensus.fit/klaro-config.js"></script>
+<script defer src="https://ascensus.fit/klaro.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1LWRZXTMS"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-P1LWRZXTMS');
+  gtag('config', 'AW-18465350303');
+</script>
+
+</head>
+<body>
+
+<!-- Standardisierter Header (gleiches Design wie index.html) -->
+<header class="asc-header" id="hdr" data-asc-header>
+  <div class="asc-header-inner">
+    <a class="asc-header-logo" href="https://ascensus.fit/index-en.html" aria-label="ASCENSUS home">
+      <img src="https://ascensus.fit/logo-wordmark.png" alt="ASCENSUS">
+    </a>
+    <nav class="asc-header-nav" id="asc-nav" aria-label="Main navigation">
+      <a class="asc-navlink" href="https://ascensus.fit/index-en.html#ansatz">Approach</a>
+      <a class="asc-navlink" href="https://ascensus.fit/index-en.html#ablauf">Process</a>
+      <a class="asc-navlink" href="https://ascensus.fit/pakete-en.html">Packages</a>
+      <a class="asc-navlink" href="https://ascensus.fit/wissen-en.html">Knowledge</a>
+      <a class="asc-navlink is-active" aria-current="page" href="https://ascensus.fit/rezepte-en.html">Recipes</a>
+      <a class="asc-navlink" href="https://ascensus.fit/index-en.html#faq">FAQ</a>
+      <a class="asc-navlink" href="https://ascensus.fit/index-en.html#kontakt">Contact</a>
+      <a class="asc-btn asc-btn-primary asc-nav-cta" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Free intro call</a>
+    </nav>
+    <div class="asc-header-actions">
+      <a class="asc-btn asc-btn-primary" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Intro call</a>
+      <div class="asc-lang" role="group" aria-label="Language / Sprache"><a href="rezepte.html" hreflang="de" lang="de" aria-label="Diese Seite auf Deutsch lesen">DE</a><span aria-hidden="true">·</span><span aria-current="true">EN</span></div>
+      <button class="asc-menu-btn" type="button" aria-expanded="false" aria-controls="asc-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Intro Section -->
+  <section class="intro">
+    <div class="wrap reveal in">
+      <p class="eyebrow">Recipes for your everyday life</p>
+      <h1>Authentic. Everyday-friendly.</h1>
+      <p class="lead" style="margin-top:1.4rem">
+        Balanced dishes with nutritional values — actually cooked, not just nicely photographed. Adjust the servings directly to your individual needs.
+      </p>
+      <p class="lead" style="margin-top:1rem">
+        This collection keeps growing — new dishes are added again and again. Feel free to check back regularly.
+      </p>
+    </div>
+  </section>
+
+  <!-- Rezepte Liste & Filter -->
+  <section style="padding-top:0">
+    <div class="wrap reveal in">
+
+      <!-- Suchfeld -->
+      <div class="search-bar">
+        <label for="rezept-suche" class="sr-only">Search recipes</label>
+        <input type="search" id="rezept-suche" class="search-input" placeholder="Search recipes, e.g. “pasta” …" autocomplete="off">
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar" role="tablist" aria-label="Recipe filter">
+        <button class="filter-btn is-active" type="button" data-filter="alle">All</button>
+        <button class="filter-btn" type="button" data-filter="fruehstueck">Breakfast</button>
+        <button class="filter-btn" type="button" data-filter="hauptgericht">Main course</button>
+        <button class="filter-btn" type="button" data-filter="snack">Snacks &amp; sweets</button>
+        <button class="filter-btn" type="button" data-filter="vor-dem-training">Pre-workout</button>
+      </div>
+
+      <!-- Rezept-Grid with all 28 recipes -->
+      <div class="post-grid" id="rezept-grid">
+
+        <!-- 1. Swiss Chard Lasagne with Feta -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-mangold-lasagne-mit-feta-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-mangold-lasagne-mit-feta.jpg" alt="Swiss Chard Lasagne with Feta" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Swiss Chard Lasagne with Feta</h3>
+            <div class="post-badges">
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">Pasta</span>
+            </div>
+            <div class="post-foot">
+              <span>524 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 2. Oven-Roasted Vegetables with Crème Fraîche -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-ofengemuse-mit-creme-fraiche-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-ofengemuse-mit-creme-fraiche.jpg" alt="Oven-Roasted Vegetables with Crème Fraîche" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Oven-Roasted Vegetables with Crème Fraîche</h3>
+            <div class="post-badges">
+              <span class="post-badge">15 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-fibre</span>
+            </div>
+            <div class="post-foot">
+              <span>509 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 3. Summer Chickpea Salad with Sheep's Cheese -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-sommerlicher-kichererbsensalat-mit-schafkase-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-sommerlicher-kichererbsensalat-mit-schafkase.jpg" alt="Summer Chickpea Salad with Sheep&#x27;s Cheese" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Summer Chickpea Salad with Sheep&#x27;s Cheese</h3>
+            <div class="post-badges">
+              <span class="post-badge">15 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-fibre</span>
+            </div>
+            <div class="post-foot">
+              <span>403 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 4. Classic Potato Gratin -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-klassisches-kartoffelgratin-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-klassisches-kartoffelgratin.jpg" alt="Classic Potato Gratin" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Classic Potato Gratin</h3>
+            <div class="post-badges">
+              <span class="post-badge">60 min</span>
+              <span class="post-badge">Vegetarian</span>
+            </div>
+            <div class="post-foot">
+              <span>531 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 5. Noodle Paella -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-nudel-paella-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-nudel-paella.jpg" alt="Noodle Paella" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Noodle Paella</h3>
+            <div class="post-badges">
+              <span class="post-badge">35 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-carb</span>
+            </div>
+            <div class="post-foot">
+              <span>435 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 6. Cinnamon Skyr Cream with Crunchy Oat Flakes -->
+        <a class="post" data-kategorie="fruehstueck" href="https://ascensus.fit/rezept-zimtige-skyr-creme-mit-knusperflocken-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-zimtige-skyr-creme-mit-knusperflocken.jpg" alt="Cinnamon Skyr Cream with Crunchy Oat Flakes" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Breakfast</p>
+            <h3>Cinnamon Skyr Cream with Crunchy Oat Flakes</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>436 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 7. Nasi Goreng with Egg and Peanut Sauce -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-nasi-goreng-mit-ei-und-erdnusssauce-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-nasi-goreng-mit-ei-und-erdnusssauce.jpg" alt="Nasi Goreng with Egg and Peanut Sauce" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Nasi Goreng with Egg and Peanut Sauce</h3>
+            <div class="post-badges">
+              <span class="post-badge">30 min</span>
+              <span class="post-badge">Vegetarian</span>
+            </div>
+            <div class="post-foot">
+              <span>597 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 8. Broccoli Pasta -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-brokkoli-pasta-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-brokkoli-pasta.jpg" alt="Broccoli Pasta" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Broccoli Pasta</h3>
+            <div class="post-badges">
+              <span class="post-badge">25 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-fibre</span>
+            </div>
+            <div class="post-foot">
+              <span>708 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 9. Millet Porridge with Pear -->
+        <a class="post" data-kategorie="vor-dem-training" href="https://ascensus.fit/rezept-hirse-porridge-mit-birne-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-hirse-porridge-mit-birne.jpg" alt="Millet Porridge with Pear" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Pre-workout</p>
+            <h3>Millet Porridge with Pear</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Vegan</span>
+              <span class="post-badge">High-carb</span>
+            </div>
+            <div class="post-foot">
+              <span>424 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 10. Iced Protein Coffee -->
+        <a class="post" data-kategorie="snack" href="https://ascensus.fit/rezept-iced-protein-coffee-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-iced-protein-coffee.jpg" alt="Iced Protein Coffee" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Snacks &amp; sweets</p>
+            <h3>Iced Protein Coffee</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">High-protein</span>
+              <span class="post-badge">Low-calorie</span>
+            </div>
+            <div class="post-foot">
+              <span>108 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 11. Bircher Muesli -->
+        <a class="post" data-kategorie="fruehstueck" href="https://ascensus.fit/rezept-bircher-musli-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-bircher-musli.jpg" alt="Bircher Muesli" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Breakfast</p>
+            <h3>Bircher Muesli</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-fibre</span>
+            </div>
+            <div class="post-foot">
+              <span>379 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 12. Creamy One-Pot Chicken Orzo Skillet -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-cremige-one-pot-hahnchen-orzo-pfanne-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-cremige-one-pot-hahnchen-orzo-pfanne.jpg" alt="Creamy One-Pot Chicken Orzo Skillet" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Creamy One-Pot Chicken Orzo Skillet</h3>
+            <div class="post-badges">
+              <span class="post-badge">25 min</span>
+              <span class="post-badge">High-protein</span>
+              <span class="post-badge">Pasta</span>
+            </div>
+            <div class="post-foot">
+              <span>647 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 13. Couscous Salad with Tuna -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-couscous-salat-mit-thunfisch-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-couscous-salat-mit-thunfisch.jpg" alt="Couscous Salad with Tuna" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Couscous Salad with Tuna</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Fish</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>508 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 14. Apple Cinnamon Porridge -->
+        <a class="post" data-kategorie="vor-dem-training" href="https://ascensus.fit/rezept-apfel-zimt-porridge-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-apfel-zimt-porridge.jpg" alt="Apple Cinnamon Porridge" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Pre-workout</p>
+            <h3>Apple Cinnamon Porridge</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-carb</span>
+            </div>
+            <div class="post-foot">
+              <span>386 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 15. Cocoa Energy Balls -->
+        <a class="post" data-kategorie="snack" href="https://ascensus.fit/rezept-kakao-energy-balls-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-kakao-energy-balls.jpg" alt="Cocoa Energy Balls" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Snacks &amp; sweets</p>
+            <h3>Cocoa Energy Balls</h3>
+            <div class="post-badges">
+              <span class="post-badge">15 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-carb</span>
+            </div>
+            <div class="post-foot">
+              <span>215 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 16. Apple Buckwheat Pancakes -->
+        <a class="post" data-kategorie="fruehstueck" href="https://ascensus.fit/rezept-apfel-buchweizen-pancakes-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-apfel-buchweizen-pancakes.jpg" alt="Apple Buckwheat Pancakes" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Breakfast</p>
+            <h3>Apple Buckwheat Pancakes</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">Gluten-free</span>
+            </div>
+            <div class="post-foot">
+              <span>480 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 17. Salmon Fillet with Baked Sweet Potato and Avocado Cream -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-lachsfilet-mit-gebackener-sukartoffel-und-avocado-creme-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-lachsfilet-mit-gebackener-sukartoffel-und-avocado-creme.jpg" alt="Salmon Fillet with Baked Sweet Potato and Avocado Cream" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Salmon Fillet with Baked Sweet Potato and Avocado Cream</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Fish</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>712 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 18. Chicken Curry with Rice -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-curry-hahnchen-mit-reis-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-curry-hahnchen-mit-reis.jpg" alt="Chicken Curry with Rice" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Chicken Curry with Rice</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">High-protein</span>
+              <span class="post-badge">Gluten-free</span>
+            </div>
+            <div class="post-foot">
+              <span>557 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 19. Millet Porridge with Apple and Blueberries -->
+        <a class="post" data-kategorie="fruehstueck" href="https://ascensus.fit/rezept-hirse-porridge-mit-apfel-und-heidelbeeren-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-hirse-porridge-mit-apfel-und-heidelbeeren.jpg" alt="Millet Porridge with Apple and Blueberries" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Breakfast</p>
+            <h3>Millet Porridge with Apple and Blueberries</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">Vegan</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>561 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 20. Pumpkin Pancakes -->
+        <a class="post" data-kategorie="fruehstueck" href="https://ascensus.fit/rezept-pumpkin-pancakes-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-pumpkin-pancakes.jpg" alt="Pumpkin Pancakes" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Breakfast</p>
+            <h3>Pumpkin Pancakes</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>483 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 21. Blueberry Banana Shake -->
+        <a class="post" data-kategorie="fruehstueck" href="https://ascensus.fit/rezept-blaubeere-banane-shake-vegan-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-blaubeere-banane-shake-vegan.jpg" alt="Blueberry Banana Shake" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Breakfast</p>
+            <h3>Blueberry Banana Shake</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">Vegan</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>329 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 22. Harzer Cheese Chips -->
+        <a class="post" data-kategorie="snack" href="https://ascensus.fit/rezept-harzer-kase-chips-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-harzer-kase-chips.jpg" alt="Harzer Cheese Chips" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Snacks &amp; sweets</p>
+            <h3>Harzer Cheese Chips</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>127 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 23. Chocolate Mug Cake -->
+        <a class="post" data-kategorie="snack" href="https://ascensus.fit/rezept-schoko-mug-cake-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-schoko-mug-cake.jpg" alt="Chocolate Mug Cake" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Snacks &amp; sweets</p>
+            <h3>Chocolate Mug Cake</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>325 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 24. Wrap with Ham, Feta and Vegetables -->
+        <a class="post" data-kategorie="snack" href="https://ascensus.fit/rezept-wrap-mit-schinken-feta-und-gemuse-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-wrap-mit-schinken-feta-und-gemuse.jpg" alt="Wrap with Ham, Feta and Vegetables" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Snacks &amp; sweets</p>
+            <h3>Wrap with Ham, Feta and Vegetables</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">High-protein</span>
+              <span class="post-badge">Low-calorie</span>
+            </div>
+            <div class="post-foot">
+              <span>391 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 25. Sliced Veal with Leaf Spinach and Feta -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-kalbsfilet-mit-blattspinat-und-fetakase-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-kalbsfilet-mit-blattspinat-und-fetakase.jpg" alt="Sliced Veal with Leaf Spinach and Feta" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Sliced Veal with Leaf Spinach and Feta</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">High-protein</span>
+              <span class="post-badge">Low-carb</span>
+            </div>
+            <div class="post-foot">
+              <span>450 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 26. Chicken Breast Fillet with Oven-Roasted Vegetables -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-hahnchenbrustfilet-mit-ofengemuse-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-hahnchenbrustfilet-mit-ofengemuse.jpg" alt="Chicken Breast Fillet with Oven-Roasted Vegetables" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Chicken Breast Fillet with Oven-Roasted Vegetables</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">High-protein</span>
+              <span class="post-badge">Gluten-free</span>
+            </div>
+            <div class="post-foot">
+              <span>667 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 27. Chili sin Carne -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-chili-sin-carne-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-chili-sin-carne.jpg" alt="Chili sin Carne" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Chili sin Carne</h3>
+            <div class="post-badges">
+              <span class="post-badge">10 min</span>
+              <span class="post-badge">Vegan</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>360 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 28. Lentil Pasta with Feta and Courgette -->
+        <a class="post" data-kategorie="hauptgericht" href="https://ascensus.fit/rezept-linsennudeln-mit-feta-und-zucchini-en.html">
+          <div class="post-bild">
+            <img src="https://ascensus.fit/rezept-linsennudeln-mit-feta-und-zucchini.jpg" alt="Lentil Pasta with Feta and Courgette" loading="lazy" width="600" height="450">
+          </div>
+          <div class="post-body">
+            <p class="post-cat">Main course</p>
+            <h3>Lentil Pasta with Feta and Courgette</h3>
+            <div class="post-badges">
+              <span class="post-badge">5 min</span>
+              <span class="post-badge">Vegetarian</span>
+              <span class="post-badge">High-protein</span>
+            </div>
+            <div class="post-foot">
+              <span>672 kcal / serving</span>
+              <span class="post-more">View →</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Leere Anzeige, falls Filter keine Treffer hat -->
+      <p class="post-empty" id="rezept-leer">
+        <strong>Nothing found</strong>
+        There is currently no recipe online for this category.
+      </p>
+
+      <!-- Callout Box -->
+      <div class="call-mini reveal in">
+        <div>
+          <strong>Nutrition that fits your everyday life</strong>
+          <p>Recipes are the first step. How an individual meal plan fits your everyday life and training, we clarify in a free 30-minute intro call.</p>
+        </div>
+        <a class="asc-btn asc-btn-primary" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Book intro call</a>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- Footer (gleiches Design wie index.html) -->
+<footer class="asc-footer">
+  <div class="asc-footer-inner">
+    <div class="asc-footer-grid">
+      <div class="asc-footer-brand">
+        <img src="https://ascensus.fit/bildmarke-weiss.png" alt="" aria-hidden="true">
+        <div>
+          <div class="asc-footer-name">Ascensus</div>
+          <div class="asc-footer-desc">Nutrition &amp; running coaching · Frankfurt am Main</div>
+          <div class="asc-footer-slogan">Authentic · Evidence-based · Sustainable</div>
+        </div>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:patrick@ascensus.fit">patrick@ascensus.fit</a></li>
+          <li><a href="https://wa.me/4915679810556" target="_blank" rel="noopener">WhatsApp +49 156 798 105 56</a></li>
+          <li><a href="https://instagram.com/via_ascensus" target="_blank" rel="noopener">Instagram @via_ascensus</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="https://ascensus.fit/impressum-en.html">Legal notice</a></li>
+          <li><a href="https://ascensus.fit/datenschutz-en.html">Privacy policy</a></li>
+          <li><a href="https://ascensus.fit/agb-en.html">Terms &amp; conditions</a></li>
+          <li><a href="https://ascensus.fit/widerruf-en.html">Right of withdrawal</a></li>
+          <li><a href="https://ascensus.fit/datenschutz-en.html" data-asc-consent>Privacy settings</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="asc-footer-bottom">
+      <span>© <span id="yr" data-asc-year>2026</span> ASCENSUS · Patrick Spengler</span>
+      <a href="https://ascensus.fit/mitglieder-login.html">Member login →</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Standardisierte Mobile Bottom Bar -->
+<nav class="asc-bottombar" aria-label="Quick access">
+  <a href="https://ascensus.fit/pakete-en.html">Packages</a>
+  <a href="https://ascensus.fit/rezepte-en.html">Recipes</a>
+  <a href="https://ascensus.fit/wissen-en.html">Knowledge</a>
+  <a class="asc-bottombar-cta" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener">Intro call</a>
+</nav>
+
+<!-- JavaScript für Navigation, Scroll-Effekte & Filter-Logik -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Menü, Header-Scroll-Linie & Jahreszahl übernimmt ascensus.js
+
+    // Interaktive Filter- & Such-Logik für Rezept-Kategorien
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const posts = document.querySelectorAll('.post');
+    const emptyMsg = document.getElementById('rezept-leer');
+    const suchfeld = document.getElementById('rezept-suche');
+    let aktiverFilter = 'alle';
+
+    function anwenden() {
+      const suchtext = suchfeld ? suchfeld.value.trim().toLowerCase() : '';
+      let visibleCount = 0;
+
+      posts.forEach(post => {
+        const cat = post.getAttribute('data-kategorie');
+        const passtKategorie = aktiverFilter === 'alle' || aktiverFilter === 'all' || cat === aktiverFilter;
+        const passtSuche = !suchtext || post.textContent.toLowerCase().includes(suchtext);
+
+        if (passtKategorie && passtSuche) {
+          post.style.display = 'flex';
+          visibleCount++;
+        } else {
+          post.style.display = 'none';
+        }
+      });
+
+      if (emptyMsg) {
+        emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    }
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        aktiverFilter = btn.getAttribute('data-filter');
+        anwenden();
+      });
+    });
+
+    if (suchfeld) {
+      suchfeld.addEventListener('input', anwenden);
+    }
+  });
+</script>
+
+<div id="klaro"></div>
+</body>
+</html>
