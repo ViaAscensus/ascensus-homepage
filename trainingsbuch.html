@@ -985,7 +985,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       entries = [];
       console.error('Laden fehlgeschlagen', e);
     }
-    await loadMuscleMap();
+    await Promise.all([loadMuscleMap(), loadCatalog()]);
     loadingState.style.display = 'none';
     renderOverview();
     updateExerciseList();
@@ -1002,6 +1002,63 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       const loc = JSON.parse(localStorage.getItem('tb_muscle_map') || '{}');
       Object.keys(loc).forEach(k => { if(!userMuscle[k]) userMuscle[k] = { gruppe: loc[k], id: null }; });
     }catch(e){}
+  }
+
+  // ---------- Übungskatalog (PocketBase-Sammlung uebungskatalog, Import aus wger) ----------
+  // Exakter Name -> Gruppe wird automatisch genutzt, ähnlicher Name -> Vorschlag.
+  let catalog = [];            // [{name, norm, gruppe}]
+  let catalogExact = {};       // norm -> gruppe
+  function normName(n){
+    return String(n || '').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+      .replace(/[^a-z0-9]+/g,' ').trim();
+  }
+  async function loadCatalog(){
+    catalog = []; catalogExact = {};
+    try{
+      const recs = await pb.collection('uebungskatalog').getFullList({ fields: 'name,muskelgruppe', batch: 500 });
+      recs.forEach(r => {
+        if(!r.name || !muscleGroups.includes(r.muskelgruppe) || r.muskelgruppe === 'Sonstiges') return;
+        const norm = normName(r.name);
+        if(!norm) return;
+        catalog.push({ name: r.name, norm, gruppe: r.muskelgruppe });
+        if(!catalogExact[norm]) catalogExact[norm] = r.muskelgruppe;
+      });
+    }catch(e){ /* Sammlung leer oder nicht lesbar: dann bleibt es bei der Nachfrage */ }
+  }
+  function editDistance(a, b){
+    const m = a.length, n = b.length;
+    let prev = Array.from({length: n + 1}, (_, j) => j);
+    for(let i = 1; i <= m; i++){
+      const cur = [i];
+      for(let j = 1; j <= n; j++){
+        cur[j] = Math.min(prev[j] + 1, cur[j-1] + 1, prev[j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[n];
+  }
+  // Ähnlichster Katalogname: gleiche Wörter in anderer Reihenfolge, kleiner Tippfehler/Endung,
+  // oder einer enthält den anderen als ganze Wörter. Sonst kein Vorschlag.
+  function catalogSuggest(name){
+    const q = normName(name);
+    if(q.length < 4 || !catalog.length) return null;
+    const qw = q.split(' ');
+    let best = null, bestScore = Infinity;
+    for(const c of catalog){
+      let score = Infinity;
+      const cw = c.norm.split(' ');
+      if(qw.slice().sort().join(' ') === cw.slice().sort().join(' ')) score = 0.5;
+      else{
+        const d = editDistance(q, c.norm);
+        if(d <= Math.max(2, Math.floor(Math.min(q.length, c.norm.length) * 0.2))) score = d;
+        else if(qw.length > 1 && cw.length > 1){
+          const small = qw.length <= cw.length ? qw : cw, big = qw.length <= cw.length ? cw : qw;
+          if(small.length >= 2 && small.every(w => big.includes(w))) score = 3 + (big.length - small.length);
+        }
+      }
+      if(score < bestScore){ bestScore = score; best = c; }
+    }
+    return best;
   }
 
   // Zuordnung merken: in PocketBase, ohne die Sammlung nur auf diesem Gerät
@@ -1571,6 +1628,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     for(const [keywords, group] of muscleKeywordMap){
       if(keywords.some(k => n.includes(k))) return group;
     }
+    const cat = catalogExact[normName(n)];
+    if(cat) return cat;
     return 'Sonstiges';
   }
 
@@ -2661,6 +2720,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const box = document.getElementById('muscleAsk');
     box.style.display = 'none'; box.innerHTML = '';
   }
+  function renderMuscleAskFull(box, exercise){
+    box.innerHTML = `<div class="muscle-ask-title">Neue Übung: Welche Muskelgruppe trainiert „${escapeHtml(exercise)}"?</div>` +
+      `<div class="muscle-ask-grid">${muscleGroups.filter(g => g !== 'Sonstiges').map(g => `<button type="button" class="muscle-ask-chip" data-g="${g}">${g}</button>`).join('')}</div>` +
+      `<button type="button" class="muscle-ask-skip">Weiß ich nicht</button>`;
+  }
   function maybeAskMuscle(exercise){
     if(isCardioName(exercise) || getMuscleGroup(exercise) !== 'Sonstiges') return;
     const key = (activeTraining ? activeTraining.id : '') + '|' + exercise.toLowerCase();
@@ -2668,14 +2732,20 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     askedMuscle.add(key);
     const box = document.getElementById('muscleAsk');
     box.dataset.ex = exercise;
-    box.innerHTML = `<div class="muscle-ask-title">Neue Übung: Welche Muskelgruppe trainiert „${escapeHtml(exercise)}"?</div>` +
-      `<div class="muscle-ask-grid">${muscleGroups.filter(g => g !== 'Sonstiges').map(g => `<button type="button" class="muscle-ask-chip" data-g="${g}">${g}</button>`).join('')}</div>` +
-      `<button type="button" class="muscle-ask-skip">Weiß ich nicht</button>`;
+    const sug = catalogSuggest(exercise);
+    if(sug){
+      box.innerHTML = `<div class="muscle-ask-title">Neue Übung „${escapeHtml(exercise)}": Meinst du „${escapeHtml(sug.name)}" aus dem Katalog? Das trainiert ${sug.gruppe}.</div>` +
+        `<div class="muscle-ask-grid"><button type="button" class="muscle-ask-chip" data-g="${sug.gruppe}">Ja, ${sug.gruppe}</button>` +
+        `<button type="button" class="muscle-ask-chip muscle-ask-other">Andere wählen</button></div>`;
+    }else{
+      renderMuscleAskFull(box, exercise);
+    }
     box.style.display = 'block';
   }
   document.getElementById('muscleAsk').addEventListener('click', async (ev) => {
     const box = document.getElementById('muscleAsk');
     if(ev.target.closest('.muscle-ask-skip')){ hideMuscleAsk(); return; }
+    if(ev.target.closest('.muscle-ask-other')){ renderMuscleAskFull(box, box.dataset.ex); return; }
     const chip = ev.target.closest('.muscle-ask-chip');
     if(!chip) return;
     const ex = box.dataset.ex, g = chip.dataset.g;
