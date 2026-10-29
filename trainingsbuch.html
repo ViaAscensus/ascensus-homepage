@@ -177,6 +177,31 @@
   .plan-card-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px; }
   .plan-name{ font-weight:700; font-size:1rem; }
   .plan-meta{ font-size:0.78rem; color: var(--text-dim); margin-top:2px; }
+  .pe-sec{ padding: 0 18px 14px; }
+  .pe-card{ border:1px solid var(--border); border-radius: var(--radius); padding:12px; margin-bottom:14px; }
+  .pe-head{ display:flex; gap:8px; align-items:flex-end; margin-bottom:10px; }
+  .pe-head .field{ flex:1; margin-bottom:0; }
+  .pe-ex{ border-top:1px solid var(--border); padding:10px 0; }
+  .pe-ex:first-of-type{ border-top:none; }
+  .pe-row1{ display:flex; gap:6px; align-items:center; }
+  .pe-namewrap{ position:relative; flex:1; }
+  .pe-namewrap input, .pe-card input.pe-in, .pe-sec select{
+    width:100%; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); padding:10px; font-size:0.95rem; font-family:inherit;
+  }
+  .pe-ico{
+    flex-shrink:0; width:40px; height:40px; background:none; border:1px solid var(--border); color: var(--text);
+    border-radius: var(--radius); font-size:1rem; cursor:pointer; font-family:inherit;
+  }
+  .pe-ico:disabled{ opacity:0.3; cursor:default; }
+  .pe-row2{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:8px; margin-top:8px; }
+  .pe-row2 label{ display:block; font-size:0.72rem; color: var(--text-dim); margin-bottom:3px; }
+  .pe-row2 input{ text-align:center; padding:8px 4px !important; }
+  .pe-add{
+    width:100%; min-height:44px; margin-top:6px; background:none; border:1px dashed var(--border-strong);
+    color: var(--text); border-radius: var(--radius); font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer;
+  }
+  .plan-btnrow{ display:flex; gap:8px; }
   .plan-del{
     background:none; border:1px solid var(--border); color: var(--text-dim); border-radius: var(--radius);
     padding:6px 10px; font-size:0.78rem; cursor:pointer; font-family:'IBM Plex Sans', system-ui, sans-serif;
@@ -771,7 +796,30 @@
     <h2>Trainingspläne</h2>
     <p class="sub">Tag wählen und loslegen</p>
   </div>
+  <div style="padding: 0 18px 4px;"><button type="button" class="btn btn-primary" id="planNewBtn" style="width:100%;">+ Neuen Plan anlegen</button></div>
   <div id="planList"></div>
+</div>
+
+<!-- ========== Plan bearbeiten ========== -->
+<div class="screen" id="planedit-screen">
+  <button class="screen-back" id="peBackBtn">← Pläne</button>
+  <div class="head">
+    <h2 id="peTitle">Neuer Plan</h2>
+  </div>
+  <div class="pe-sec">
+    <div class="field"><label for="peName">Name des Plans</label><input type="text" id="peName" maxlength="80" placeholder="z. B. Oberkörper"></div>
+    <div class="field"><label for="peTyp">Art</label>
+      <select id="peTyp">
+        <option value="flexibel">Flexibel – Reihenfolge, Auslassen und Zusatzübungen frei</option>
+        <option value="fest">Fest – feste Reihenfolge, nur „Gerät besetzt"</option>
+      </select>
+    </div>
+  </div>
+  <div class="pe-sec" id="peBody"></div>
+  <div class="pe-sec">
+    <button type="button" class="btn btn-primary" id="peSaveBtn" style="width:100%;">Plan speichern</button>
+    <div class="formmsg" id="peMsg"></div>
+  </div>
 </div>
 
 <!-- ========== Alle Trainingseinheiten ========== -->
@@ -1123,7 +1171,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     stats: document.getElementById('stats-screen'),
     new: document.getElementById('new-screen'),
     summary: document.getElementById('summary-screen'),
-    plans: document.getElementById('plans-screen')
+    plans: document.getElementById('plans-screen'),
+    planedit: document.getElementById('planedit-screen')
   };
   const loadingState = document.getElementById('loadingState');
 
@@ -3381,7 +3430,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function renderPlans(){
     const box = document.getElementById('planList');
     if(!plans.length){
-      box.innerHTML = '<p class="plan-empty">Noch kein Plan. Beende ein Training und tippe in der Zusammenfassung auf „Als Plan speichern".</p>';
+      box.innerHTML = '<p class="plan-empty">Noch kein Plan. Lege oben einen Plan an oder beende ein Training und tippe in der Zusammenfassung auf „Als Plan speichern".</p>';
       return;
     }
     box.innerHTML = plans.map(p => `
@@ -3391,7 +3440,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
             <div class="plan-name">${escapeHtml(p.name)}</div>
             <div class="plan-meta"><span class="plan-badge">${p.typ === 'fest' ? 'Fest' : 'Flexibel'}</span> · ${p.tage.length} ${p.tage.length === 1 ? 'Tag' : 'Tage'}${isLocalPlan(p) ? ' · nur auf diesem Gerät' : ''}</div>
           </div>
-          <button type="button" class="plan-del${planDeleteArmed === p.id ? ' sure' : ''}" data-id="${escapeHtml(p.id)}">${planDeleteArmed === p.id ? 'Wirklich löschen?' : 'Löschen'}</button>
+          <div class="plan-btnrow">
+            <button type="button" class="plan-del plan-edit" data-id="${escapeHtml(p.id)}">Bearbeiten</button>
+            <button type="button" class="plan-del${planDeleteArmed === p.id ? ' sure' : ''}" data-act="del" data-id="${escapeHtml(p.id)}">${planDeleteArmed === p.id ? 'Wirklich löschen?' : 'Löschen'}</button>
+          </div>
         </div>
         ${p.tage.map((t, i) => `
           <button type="button" class="plan-day" data-p="${escapeHtml(p.id)}" data-t="${i}">
@@ -3409,6 +3461,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('planTrainingBtn').addEventListener('click', openPlans);
   document.getElementById('plansBackBtn').addEventListener('click', () => { renderOverview(); showScreen('overview'); });
   document.getElementById('planList').addEventListener('click', async (ev) => {
+    const edit = ev.target.closest('.plan-edit');
+    if(edit){ openPlanEditor(edit.dataset.id); return; }
     const del = ev.target.closest('.plan-del');
     if(del){
       if(planDeleteArmed !== del.dataset.id){ planDeleteArmed = del.dataset.id; renderPlans(); return; }
@@ -3442,6 +3496,128 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     showSubsection('pick');
     showScreen('new');
   }
+
+  // ---------- Plan-Editor ----------
+  let pe = null; // { id, tage: [{ name, uebungen: [{ exercise, sets, reps, gewicht, rir }] }] }
+  const newEx = () => ({ exercise: '', sets: 3, reps: 10, gewicht: 0, rir: null });
+  function openPlanEditor(id){
+    const p = id ? plans.find(x => x.id === id) : null;
+    pe = p
+      ? { id: p.id, tage: JSON.parse(JSON.stringify(p.tage)) }
+      : { id: null, tage: [{ name: 'Tag A', uebungen: [newEx()] }] };
+    pe.tage.forEach(t => { if(!t.uebungen.length) t.uebungen.push(newEx()); });
+    document.getElementById('peTitle').textContent = p ? 'Plan bearbeiten' : 'Neuer Plan';
+    document.getElementById('peName').value = p ? p.name : '';
+    document.getElementById('peTyp').value = p ? p.typ : 'flexibel';
+    document.getElementById('peMsg').textContent = '';
+    document.getElementById('peSaveBtn').disabled = false;
+    renderPlanEditor();
+    showScreen('planedit');
+    window.scrollTo(0, 0);
+  }
+  function renderPlanEditor(){
+    const box = document.getElementById('peBody');
+    box.style.padding = '0';
+    box.innerHTML = pe.tage.map((t, di) => `
+      <div class="pe-card" data-d="${di}">
+        <div class="pe-head">
+          <div class="field"><label>Trainingstag</label><input type="text" class="pe-in pe-dayname" maxlength="80" value="${escapeHtml(t.name)}"></div>
+          <button type="button" class="pe-ico pe-delday" aria-label="Tag löschen"${pe.tage.length < 2 ? ' disabled' : ''}>✕</button>
+        </div>
+        ${t.uebungen.map((u, ei) => `
+          <div class="pe-ex" data-e="${ei}">
+            <div class="pe-row1">
+              <div class="pe-namewrap"><input type="text" class="pe-name" placeholder="Übung" autocomplete="off" value="${escapeHtml(u.exercise)}"><div class="suggest-box" role="listbox"></div></div>
+              <button type="button" class="pe-ico pe-up" aria-label="Nach oben"${ei === 0 ? ' disabled' : ''}>▲</button>
+              <button type="button" class="pe-ico pe-down" aria-label="Nach unten"${ei === t.uebungen.length - 1 ? ' disabled' : ''}>▼</button>
+              <button type="button" class="pe-ico pe-delex" aria-label="Übung löschen">✕</button>
+            </div>
+            <div class="pe-row2">
+              <div><label>Sätze</label><input type="number" class="pe-in pe-sets" inputmode="numeric" min="1" value="${u.sets}"></div>
+              <div><label>Wdh.</label><input type="number" class="pe-in pe-reps" inputmode="numeric" min="0" value="${u.reps || ''}"></div>
+              <div><label>kg</label><input type="number" class="pe-in pe-kg" inputmode="decimal" step="0.5" min="0" value="${u.gewicht || ''}"></div>
+              <div><label>RiR</label><input type="number" class="pe-in pe-rir" inputmode="numeric" min="0" max="10" value="${u.rir === null || u.rir === undefined ? '' : u.rir}"></div>
+            </div>
+          </div>`).join('')}
+        <button type="button" class="pe-add pe-addex">+ Übung hinzufügen</button>
+      </div>`).join('') + '<button type="button" class="pe-add" id="peAddDay">+ Trainingstag hinzufügen</button>';
+  }
+  function peCtx(el){
+    const card = el.closest('.pe-card'); if(!card) return null;
+    const d = parseInt(card.dataset.d);
+    const exEl = el.closest('.pe-ex');
+    return { d, e: exEl ? parseInt(exEl.dataset.e) : null };
+  }
+  const numOrNull = v => (v === '' || isNaN(parseFloat(v))) ? null : parseFloat(v);
+  document.getElementById('peBody').addEventListener('input', (ev) => {
+    const el = ev.target, c = peCtx(el); if(!c) return;
+    const t = pe.tage[c.d];
+    if(el.classList.contains('pe-dayname')){ t.name = el.value; return; }
+    const u = c.e === null ? null : t.uebungen[c.e]; if(!u) return;
+    if(el.classList.contains('pe-name')){
+      u.exercise = el.value;
+      const box = el.parentElement.querySelector('.suggest-box');
+      const list = suggestFor(el.value);
+      box.innerHTML = list.map(x => `<button type="button" class="suggest-item" data-name="${escapeHtml(x.name)}"><span>${escapeHtml(x.name)}</span>${x.gruppe ? `<small>${escapeHtml(x.gruppe)}</small>` : ''}</button>`).join('');
+      box.classList.toggle('open', list.length > 0);
+    }
+    else if(el.classList.contains('pe-sets')) u.sets = Math.max(1, parseInt(el.value) || 1);
+    else if(el.classList.contains('pe-reps')) u.reps = Math.max(0, parseInt(el.value) || 0);
+    else if(el.classList.contains('pe-kg')) u.gewicht = Math.max(0, parseFloat(String(el.value).replace(',', '.')) || 0);
+    else if(el.classList.contains('pe-rir')) u.rir = numOrNull(el.value);
+  });
+  document.getElementById('peBody').addEventListener('focusout', (ev) => {
+    const box = ev.target.closest('.pe-namewrap');
+    if(box) setTimeout(() => box.querySelector('.suggest-box').classList.remove('open'), 150);
+  });
+  document.getElementById('peBody').addEventListener('pointerdown', (ev) => {
+    const it = ev.target.closest('.suggest-item'); if(!it) return;
+    ev.preventDefault();
+    const c = peCtx(it); if(!c) return;
+    pe.tage[c.d].uebungen[c.e].exercise = it.dataset.name;
+    const wrap = it.closest('.pe-namewrap');
+    wrap.querySelector('input').value = it.dataset.name;
+    wrap.querySelector('.suggest-box').classList.remove('open');
+    wrap.querySelector('input').blur();
+  });
+  document.getElementById('peBody').addEventListener('click', (ev) => {
+    const el = ev.target;
+    if(el.id === 'peAddDay'){
+      const n = pe.tage.length;
+      pe.tage.push({ name: 'Tag ' + String.fromCharCode(65 + (n % 26)), uebungen: [newEx()] });
+      renderPlanEditor(); return;
+    }
+    const btn = el.closest('button'); if(!btn) return;
+    const c = peCtx(btn); if(!c) return;
+    const t = pe.tage[c.d];
+    if(btn.classList.contains('pe-addex')) t.uebungen.push(newEx());
+    else if(btn.classList.contains('pe-delday')) pe.tage.splice(c.d, 1);
+    else if(btn.classList.contains('pe-delex')){ t.uebungen.splice(c.e, 1); if(!t.uebungen.length) t.uebungen.push(newEx()); }
+    else if(btn.classList.contains('pe-up') && c.e > 0) [t.uebungen[c.e - 1], t.uebungen[c.e]] = [t.uebungen[c.e], t.uebungen[c.e - 1]];
+    else if(btn.classList.contains('pe-down') && c.e < t.uebungen.length - 1) [t.uebungen[c.e + 1], t.uebungen[c.e]] = [t.uebungen[c.e], t.uebungen[c.e + 1]];
+    else return;
+    renderPlanEditor();
+  });
+  document.getElementById('planNewBtn').addEventListener('click', () => openPlanEditor(null));
+  document.getElementById('peBackBtn').addEventListener('click', openPlans);
+  document.getElementById('peSaveBtn').addEventListener('click', async () => {
+    const msg = document.getElementById('peMsg');
+    msg.classList.remove('error');
+    const name = document.getElementById('peName').value.trim();
+    if(!name){ msg.textContent = 'Bitte dem Plan einen Namen geben.'; msg.classList.add('error'); return; }
+    const tage = pe.tage.map((t, i) => ({
+      name: (t.name || '').trim() || ('Tag ' + (i + 1)),
+      uebungen: t.uebungen.filter(u => u.exercise.trim()).map(u => ({
+        exercise: u.exercise.trim(), sets: Math.max(1, u.sets || 1), reps: u.reps || 0, gewicht: u.gewicht || 0, rir: u.rir === undefined ? null : u.rir
+      }))
+    }));
+    if(tage.some(t => !t.uebungen.length)){ msg.textContent = 'Jeder Trainingstag braucht mindestens eine Übung mit Namen.'; msg.classList.add('error'); return; }
+    const btn = document.getElementById('peSaveBtn'); btn.disabled = true;
+    const res = await persistPlan({ id: pe.id || undefined, name, typ: document.getElementById('peTyp').value, tage });
+    btn.disabled = false;
+    if(res.local){ msg.textContent = '✓ Gespeichert, aber nur auf diesem Gerät: In PocketBase fehlt die Sammlung für Pläne (Einrichtungsskript).'; msg.classList.add('error'); return; }
+    openPlans();
+  });
 
   // Übungsliste des Plans im Schritt "Übung wählen"
   function renderPlanChips(container){
