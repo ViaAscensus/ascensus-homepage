@@ -174,7 +174,7 @@ def sammlung_einrichten():
             'listRule': LESEN, 'viewRule': LESEN,
         })
         return {f['name'] for f in FELDER}
-    vorhanden = {f['name'] for f in s.get('fields', [])}
+    vorhanden = {f['name'].lower() for f in s.get('fields', [])}
     print('Vorhandene Felder: ' + ', '.join(sorted(vorhanden)))
     for regel in ('listRule', 'viewRule'):
         if s.get(regel) is None:
@@ -182,10 +182,10 @@ def sammlung_einrichten():
             pb(f'api/collections/{s["id"]}', 'PATCH', {regel: LESEN})
     # Fehlende Felder einzeln ergänzen: ein Fehler bei einem Feld stoppt die anderen nicht.
     for f in FELDER:
-        if f['name'] in vorhanden:
+        if f['name'].lower() in vorhanden:
             continue
         aktuell = pb(f'api/collections/{s["id"]}')
-        if f['name'] in {x['name'] for x in aktuell.get('fields', [])}:
+        if f['name'].lower() in {x['name'].lower() for x in aktuell.get('fields', [])}:
             continue
         try:
             pb(f'api/collections/{s["id"]}', 'PATCH', {'fields': aktuell['fields'] + [f]})
@@ -193,7 +193,7 @@ def sammlung_einrichten():
         except Fehler as e:
             print(f'! Feld {f["name"]} konnte nicht ergänzt werden, wird beim Import ausgelassen: {str(e)[:160]}')
     final = pb(f'api/collections/{s["id"]}')
-    return {x['name'] for x in final.get('fields', [])}
+    return {x['name'] for x in final.get('fields', [])}  # echte Schreibweise der Felder
 
 
 def wger_alle(pfad, **params):
@@ -302,7 +302,8 @@ def main():
 
     anmelden()
     felder = sammlung_einrichten()
-    eintraege = [{k: v for k, v in e.items() if k in felder} for e in eintraege]
+    echt = {n.lower(): n for n in felder}
+    eintraege = [{echt[k.lower()]: v for k, v in e.items() if k.lower() in echt} for e in eintraege]
     vorhanden = {}
     for r in _pb_alle(NAME):
         vorhanden[r.get('wger_id')] = r
