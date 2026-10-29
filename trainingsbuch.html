@@ -2431,8 +2431,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function updateExerciseList(){
     const names = [...new Set(entries.map(e => e.exercise))].sort();
     if(!names.some(n => isCardioName(n))) names.push('Laufband');
+    // Eigene Übungen zuerst, danach die Katalogübungen mit ihrer Muskelgruppe als Zusatz
+    const own = new Set(names.map(n => normName(n)));
+    const fromCatalog = catalog.filter(c => !own.has(c.norm)).sort((x, y) => x.name.localeCompare(y.name, 'de'));
     document.getElementById('exerciseList').innerHTML =
-      names.map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
+      names.map(n => `<option value="${escapeHtml(n)}"></option>`).join('') +
+      fromCatalog.map(c => `<option value="${escapeHtml(c.name)}" label="${escapeHtml(c.gruppe)}"></option>`).join('');
   }
 
   // ---------- Form: last-value hint ----------
