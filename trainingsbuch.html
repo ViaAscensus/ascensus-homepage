@@ -71,14 +71,50 @@
     background: transparent; color: var(--text); border: 1px solid var(--border-strong);
     margin-top: -6px;
   }
-  .new-training-btn-plan{
-    background: transparent; color: var(--text-dim); border: 1px dashed var(--border);
-    margin-top: -6px; cursor:default; display:flex; align-items:center; justify-content:center; gap:8px;
+  .field select{
+    width:100%; background: var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding:11px 12px; font-size:0.95rem;
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
   }
-  .coming-soon-badge{
-    background: var(--surface); color: var(--text-dim); font-size:0.7rem; font-weight:600;
-    padding:3px 8px; border-radius: 999px; text-transform:uppercase; letter-spacing:0.4px;
+  /* ---------- Trainingspläne ---------- */
+  #planList{ padding: 6px 18px 18px; }
+  .plan-card{ border:1px solid var(--border); border-radius: var(--radius); padding:12px; margin-bottom:14px; }
+  .plan-card-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .plan-name{ font-weight:700; font-size:1rem; }
+  .plan-meta{ font-size:0.78rem; color: var(--text-dim); margin-top:2px; }
+  .plan-del{
+    background:none; border:1px solid var(--border); color: var(--text-dim); border-radius: var(--radius);
+    padding:6px 10px; font-size:0.78rem; cursor:pointer; font-family:'IBM Plex Sans', system-ui, sans-serif;
   }
+  .plan-del.sure{ color: var(--hart); border-color: var(--hart); }
+  .plan-day{
+    display:flex; align-items:center; justify-content:space-between; width:100%; min-height:48px;
+    padding:10px 12px; margin-top:8px; background: var(--surface); border:1px solid var(--border-strong);
+    border-radius: var(--radius); color: var(--text); font-size:0.9rem; font-weight:600; cursor:pointer;
+    font-family:'IBM Plex Sans', system-ui, sans-serif; text-align:left;
+  }
+  .plan-day small{ color: var(--text-dim); font-weight:400; font-size:0.78rem; }
+  .plan-empty, .plan-note{ font-size:0.85rem; color: var(--text-dim); line-height:1.45; }
+  .plan-note{ margin-top:10px; }
+  .plan-ex{
+    display:flex; align-items:center; gap:10px; width:100%; min-height:54px; padding:10px 12px; margin-bottom:8px;
+    background: var(--surface); border:1px solid var(--border-strong); border-radius: var(--radius);
+    color: var(--text); text-align:left; cursor:pointer; font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  .plan-ex:disabled{ opacity:0.45; cursor:default; }
+  .plan-ex:not(:disabled):active{ background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .plan-ex .n{ font-weight:700; width:1.3em; }
+  .plan-ex .nm{ flex:1; font-size:0.9rem; font-weight:600; }
+  .plan-ex .soll{ font-size:0.76rem; color: var(--text-dim); text-align:right; }
+  .plan-badge{ font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; color: var(--accent); }
+  .plan-hint{ font-size:0.85rem; color: var(--accent); margin-bottom:8px; }
+  .soll-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--border); }
+  .soll-row:first-child{ border-top:none; }
+  .soll-ex{ font-weight:600; font-size:0.9rem; }
+  .soll-txt{ font-size:0.8rem; color: var(--text-dim); margin-top:2px; }
+  .soll-mark{ font-weight:700; }
+  .soll-mark.ok{ color: #6FCF97; }
+  .soll-mark.warn{ color: #F2C94C; }
 
   .cal{ margin:4px 18px 14px; padding:10px 10px 8px; border:1px solid var(--border); border-radius: var(--radius); }
   .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
@@ -600,13 +636,21 @@
   <button class="new-training-btn" id="newTrainingBtn">+ Neues individuelles Training starten</button>
   <button class="new-training-btn new-training-btn-suggest" id="suggestedTrainingBtn">+ Vorgeschlagenes Training starten</button>
   <button class="new-training-btn new-training-btn-backfill" id="backfillBtn">+ Training nachtragen</button>
-  <button class="new-training-btn new-training-btn-plan" disabled>
-    Trainingsplan <span class="coming-soon-badge">Bald verfügbar</span>
-  </button>
+  <button class="new-training-btn new-training-btn-suggest" id="planTrainingBtn">Nach Trainingsplan trainieren</button>
   <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
   <div id="calendar" class="cal"></div>
   <div id="dayList"></div>
   <p class="attrib">Der Übungskatalog beruht auf Daten von <a href="https://wger.de" target="_blank" rel="noopener">wger.de</a> (wger-Projekt), Lizenz <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.de" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Namen und Zuordnungen wurden angepasst.</p>
+</div>
+
+<!-- ========== Trainingspläne ========== -->
+<div class="screen" id="plans-screen">
+  <button class="screen-back" id="plansBackBtn">← Übersicht</button>
+  <div class="head">
+    <h2>Trainingspläne</h2>
+    <p class="sub">Tag wählen und loslegen</p>
+  </div>
+  <div id="planList"></div>
 </div>
 
 <!-- ========== Alle Trainingseinheiten ========== -->
@@ -755,6 +799,7 @@
     <h2>Übung wählen</h2>
     <div class="hint" id="pickDateHint" style="margin-top:0;"></div>
     <div id="quickChips"></div>
+    <div id="pickFree">
     <div class="field">
       <label for="fExercise">Übung</label>
       <div class="clear-wrap">
@@ -764,6 +809,7 @@
       <datalist id="exerciseList"></datalist>
     </div>
     <button class="btn btn-primary" id="continueToDetailBtn" style="width:100%;">Weiter</button>
+    </div>
   </section>
 
   <!-- Schritt 2: Übung erfassen -->
@@ -771,6 +817,7 @@
     <h2 id="detailExerciseName"></h2>
     <img id="exerciseImg" class="exercise-img" alt="" style="display:none;" loading="lazy">
     <div class="hint" id="todayPositionHint" style="margin-top:0; margin-bottom:4px; color: var(--accent);"></div>
+    <div class="plan-hint" id="planSoll" style="display:none;"></div>
     <div class="hint exercise-note" id="exerciseNote" style="display:none;"></div>
     <div class="hint" id="lastHint"></div>
     <button type="button" class="btn btn-primary" id="startSetBtn" style="width:100%; margin-bottom:14px;">Satz beginnen</button>
@@ -830,6 +877,7 @@
     </div>
     <div class="record-msg" id="recordMsg" style="display:none;"></div>
     <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Übung beenden</button>
+    <button type="button" class="btn" id="busyBtn" style="width:100%; margin-top:10px; display:none;">Gerät besetzt – Übung ans Ende</button>
     <div class="save-confirm" id="endExConfirm">
       <div class="save-confirm-msg" id="endExMsg"></div>
       <div class="save-confirm-row">
@@ -858,6 +906,36 @@
   <section id="summaryRecordsSection" style="display:none;">
     <h2 class="summary-h">🏆 Neue Rekorde</h2>
     <div id="summaryRecords"></div>
+  </section>
+  <section id="summaryPlanSection" style="display:none;">
+    <h2 class="summary-h" id="summaryPlanTitle">Plan: Soll und Ist</h2>
+    <div id="summaryPlan"></div>
+  </section>
+  <section id="savePlanSection">
+    <button type="button" class="btn" id="savePlanOpenBtn" style="width:100%;">Als Plan speichern</button>
+    <div id="savePlanForm" style="display:none; margin-top:12px;">
+      <div class="field">
+        <label for="spTarget">Wohin?</label>
+        <select id="spTarget"></select>
+      </div>
+      <div class="field" id="spNameField">
+        <label for="spName">Name des Plans</label>
+        <input type="text" id="spName" maxlength="80" placeholder="z. B. Oberkörper">
+      </div>
+      <div class="field" id="spTypField">
+        <label for="spTyp">Art</label>
+        <select id="spTyp">
+          <option value="flexibel">Flexibel – Reihenfolge, Auslassen und Zusatzübungen frei</option>
+          <option value="fest">Fest – feste Reihenfolge, nur „Gerät besetzt"</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="spDay">Name des Trainingstags</label>
+        <input type="text" id="spDay" maxlength="80" placeholder="z. B. Tag A">
+      </div>
+      <button type="button" class="btn btn-primary" id="savePlanBtn" style="width:100%;">Plan speichern</button>
+      <div class="formmsg" id="savePlanMsg"></div>
+    </div>
   </section>
   <section>
     <button type="button" class="btn btn-primary" id="summaryDetailsBtn" style="width:100%;">Alle Sätze ansehen</button>
@@ -923,7 +1001,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     day: document.getElementById('day-screen'),
     stats: document.getElementById('stats-screen'),
     new: document.getElementById('new-screen'),
-    summary: document.getElementById('summary-screen')
+    summary: document.getElementById('summary-screen'),
+    plans: document.getElementById('plans-screen')
   };
   const loadingState = document.getElementById('loadingState');
 
@@ -1004,7 +1083,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       entries = [];
       console.error('Laden fehlgeschlagen', e);
     }
-    await Promise.all([loadMuscleMap(), loadCatalog()]);
+    await Promise.all([loadMuscleMap(), loadCatalog(), loadPlans()]);
     loadingState.style.display = 'none';
     renderOverview();
     updateExerciseList();
@@ -1365,6 +1444,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     fExercise.value = '';
     updateClearBtn();
     suggestedQueue = null;
+    syncPlanQueue();
     renderQuickChips();
     showSubsection('pick');
     showScreen('new');
@@ -2049,6 +2129,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     document.getElementById('suggest-overview-section').style.display = name === 'overview' ? 'block' : 'none';
     document.getElementById('backfill-section').style.display = name === 'backfill' ? 'block' : 'none';
     document.getElementById('pick-section').style.display = name === 'pick' ? 'block' : 'none';
+    // Fester Plan: keine freie Übungswahl
+    document.getElementById('pickFree').style.display = (activeTraining && activeTraining.plan && activeTraining.plan.typ === 'fest') ? 'none' : '';
     document.getElementById('detail-section').style.display = name === 'detail' ? 'block' : 'none';
     // Timer-Leiste nur, wenn wirklich trainiert wird
     document.getElementById('timerBar').style.display = (name === 'pick' || name === 'detail') ? 'block' : 'none';
@@ -2271,6 +2353,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
     document.getElementById('fSets').value = 1;
     applyCardioMode(cardio);
+    applyPlanToDetail(inThisTraining.length > 0, cardio);
 
     document.getElementById('exerciseCompleteBanner').style.display = 'none';
     updateRemainingSetsDisplay();
@@ -2353,7 +2436,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const qItem = suggestedQueue.find(item => item.exercise === exerciseName);
     if(!qItem) return null;
     const today = document.getElementById('fDate').value;
-    const loggedToday = entries.filter(e => e.date.slice(0,10) === today && e.exercise === exerciseName).length;
+    const key = activeTraining ? activeTraining.id : null;
+    const loggedToday = entries.filter(e => e.exercise === exerciseName &&
+      (key ? (e.training_id === key || (!e.training_id && e.date.slice(0,10) === today)) : e.date.slice(0,10) === today)).length;
     return Math.max(0, qItem.sets - loggedToday);
   }
 
@@ -2378,6 +2463,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   document.getElementById('nextExerciseBtn').addEventListener('click', () => {
     document.getElementById('exerciseCompleteBanner').style.display = 'none';
+    if(activeTraining && activeTraining.plan){
+      const nextP = activeTraining.plan.items.find(i => planRemaining(i) > 0);
+      if(nextP){ fExercise.value = nextP.exercise; showDetailStep(); } else showPickStep();
+      return;
+    }
     if(!suggestedQueue) return;
     const today = document.getElementById('fDate').value;
     const doneToday = new Set(entries.filter(e => e.date.slice(0,10) === today).map(e => e.exercise));
@@ -2460,6 +2550,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   function renderQuickChips(){
     const container = document.getElementById('quickChips');
+    if(activeTraining && activeTraining.plan){ renderPlanChips(container); return; }
     const currentDate = document.getElementById('fDate').value;
     const doneToday = doneInCurrent(currentDate);
 
@@ -2715,6 +2806,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
         member: pb.authStore.model.id,
         date, exercise, weight, reps, sets,
         training_id: activeTraining.id, // PocketBase ignoriert das Feld, solange es nicht angelegt ist
+        ...(activeTraining.plan ? { plan_id: activeTraining.plan.id, plan_tag: activeTraining.plan.tag } : {}),
         tendenz: selectedTendenz,
         gewichtBeiEintrag: memberBodyweight,
         // Pausen vor diesem Satz; PocketBase ignoriert die Felder, solange sie nicht angelegt sind
@@ -2941,7 +3033,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     return minutes >= 1 ? minutes : null;
   }
 
-  async function showSummary(date, key){
+  async function showSummary(date, key, plan){
     const dayEntries = entries.filter(e => key ? sessionKey(e) === key : e.date.slice(0,10) === date);
     if(dayEntries.length === 0){
       renderOverview();
@@ -2982,6 +3074,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       recSection.style.display = 'none';
     }
 
+    renderSummaryPlan(dayEntries, plan);
+    resetSavePlanForm(dayEntries);
+
     const quote = document.getElementById('summaryQuote');
     quote.textContent = '';
     showScreen('summary');
@@ -3017,9 +3112,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     document.getElementById('fSets').value = '1';
     forgetSetEnd();
     const doneKey = activeTraining ? activeTraining.id : null;
+    const donePlan = activeTraining && activeTraining.plan ? activeTraining.plan : null;
     activeTraining = null; // Training beendet: nicht mehr fortsetzbar
     saveActive();
-    showSummary(date, doneKey);
+    showSummary(date, doneKey, donePlan);
     trainingStartMs = null;
   });
 
@@ -3027,6 +3123,278 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('summaryDoneBtn').addEventListener('click', () => {
     renderOverview();
     showScreen('overview');
+  });
+
+  // ---------- Trainingspläne ----------
+  // Plan -> Trainingstage -> Übungen (sets, reps, gewicht, rir). Sammlung `trainingsplaene` in PocketBase,
+  // ohne die Sammlung (Einrichtungsskript noch nicht gelaufen) nur im Browser dieses Geräts.
+  const PLAN_LS = 'tb_plans_local';
+  let plans = [];
+  let planStoreOk = true;
+  function localPlans(){ try{ return JSON.parse(localStorage.getItem(PLAN_LS) || '[]'); }catch(e){ return []; } }
+  function storeLocalPlans(list){ try{ localStorage.setItem(PLAN_LS, JSON.stringify(list)); }catch(e){} }
+  const isLocalPlan = p => String(p.id).startsWith('l_');
+  async function loadPlans(){
+    let remote = [];
+    try{
+      remote = await pb.collection('trainingsplaene').getFullList({ sort: 'created' });
+      planStoreOk = true;
+    }catch(e){ planStoreOk = false; }
+    plans = remote.concat(localPlans()).map(p => ({ ...p, tage: Array.isArray(p.tage) ? p.tage : [] }));
+  }
+  // p: { id?, name, typ, tage }; gibt zurück, ob nur lokal gespeichert wurde
+  async function persistPlan(p){
+    if(planStoreOk && !(p.id && String(p.id).startsWith('l_'))){
+      try{
+        if(p.id) await pb.collection('trainingsplaene').update(p.id, { name: p.name, typ: p.typ, tage: p.tage });
+        else await pb.collection('trainingsplaene').create({ member: pb.authStore.model.id, name: p.name, typ: p.typ, tage: p.tage, quelle: 'eigen' });
+        await loadPlans();
+        return { local: false };
+      }catch(e){ console.error(e); }
+    }
+    const loc = localPlans();
+    const i = p.id ? loc.findIndex(x => x.id === p.id) : -1;
+    if(i >= 0) loc[i] = { ...loc[i], name: p.name, typ: p.typ, tage: p.tage };
+    else loc.push({ id: 'l_' + Date.now().toString(36), name: p.name, typ: p.typ, tage: p.tage, quelle: 'eigen' });
+    storeLocalPlans(loc);
+    await loadPlans();
+    return { local: true };
+  }
+  async function removePlan(id){
+    if(String(id).startsWith('l_')) storeLocalPlans(localPlans().filter(x => x.id !== id));
+    else await pb.collection('trainingsplaene').delete(id);
+    await loadPlans();
+  }
+
+  function planSollText(it){
+    if(isCardioName(it.exercise)) return 'Laufband';
+    let t = `${it.sets} × ${it.reps || '?'} Wdh.`;
+    if(it.gewicht > 0) t += ` · ${fmtKg(it.gewicht)} kg`;
+    if(it.rir !== undefined && it.rir !== null && it.rir !== '') t += ` · RiR ${it.rir}`;
+    return t;
+  }
+  function planRemaining(it){
+    const key = activeTraining ? activeTraining.id : null;
+    const today = document.getElementById('fDate').value;
+    const n = entries.filter(e => e.exercise === it.exercise &&
+      (key ? (e.training_id === key || (!e.training_id && e.date.slice(0,10) === today)) : e.date.slice(0,10) === today)).length;
+    return Math.max(0, it.sets - n);
+  }
+  function syncPlanQueue(){
+    if(activeTraining && activeTraining.plan) suggestedQueue = activeTraining.plan.items.map(i => ({ exercise: i.exercise, sets: i.sets }));
+  }
+  function currentPlanItem(){
+    if(!(activeTraining && activeTraining.plan)) return null;
+    const ex = fExercise.value.trim();
+    return activeTraining.plan.items.find(i => i.exercise === ex) || null;
+  }
+
+  // Übersicht der Pläne
+  let planDeleteArmed = null;
+  function renderPlans(){
+    const box = document.getElementById('planList');
+    if(!plans.length){
+      box.innerHTML = '<p class="plan-empty">Noch kein Plan. Beende ein Training und tippe in der Zusammenfassung auf „Als Plan speichern".</p>';
+      return;
+    }
+    box.innerHTML = plans.map(p => `
+      <div class="plan-card">
+        <div class="plan-card-head">
+          <div>
+            <div class="plan-name">${escapeHtml(p.name)}</div>
+            <div class="plan-meta"><span class="plan-badge">${p.typ === 'fest' ? 'Fest' : 'Flexibel'}</span> · ${p.tage.length} ${p.tage.length === 1 ? 'Tag' : 'Tage'}${isLocalPlan(p) ? ' · nur auf diesem Gerät' : ''}</div>
+          </div>
+          <button type="button" class="plan-del${planDeleteArmed === p.id ? ' sure' : ''}" data-id="${escapeHtml(p.id)}">${planDeleteArmed === p.id ? 'Wirklich löschen?' : 'Löschen'}</button>
+        </div>
+        ${p.tage.map((t, i) => `
+          <button type="button" class="plan-day" data-p="${escapeHtml(p.id)}" data-t="${i}">
+            <span>${escapeHtml(t.name)}</span><small>${t.uebungen.length} ${t.uebungen.length === 1 ? 'Übung' : 'Übungen'}</small>
+          </button>`).join('')}
+      </div>`).join('') +
+      (planStoreOk ? '' : '<p class="plan-note">Hinweis: Die Sammlung für Pläne fehlt in PocketBase, die Pläne liegen nur auf diesem Gerät. Bitte das Einrichtungsskript ausführen.</p>');
+  }
+  function openPlans(){
+    planDeleteArmed = null;
+    renderPlans();
+    showScreen('plans');
+    window.scrollTo(0, 0);
+  }
+  document.getElementById('planTrainingBtn').addEventListener('click', openPlans);
+  document.getElementById('plansBackBtn').addEventListener('click', () => { renderOverview(); showScreen('overview'); });
+  document.getElementById('planList').addEventListener('click', async (ev) => {
+    const del = ev.target.closest('.plan-del');
+    if(del){
+      if(planDeleteArmed !== del.dataset.id){ planDeleteArmed = del.dataset.id; renderPlans(); return; }
+      planDeleteArmed = null;
+      try{ await removePlan(del.dataset.id); }catch(e){ console.error(e); }
+      renderPlans();
+      return;
+    }
+    const day = ev.target.closest('.plan-day');
+    if(day) startPlanDay(day.dataset.p, parseInt(day.dataset.t));
+  });
+
+  function startPlanDay(planId, tagIdx){
+    const plan = plans.find(p => p.id === planId);
+    const tag = plan && plan.tage[tagIdx];
+    if(!tag || !tag.uebungen.length) return;
+    backfillMode = false;
+    startTraining(todayIso());
+    activeTraining.plan = {
+      id: plan.id, name: plan.name, typ: plan.typ, tag: tag.name,
+      items: tag.uebungen.map(u => ({ exercise: u.exercise, sets: Math.max(1, parseInt(u.sets) || 1), reps: parseInt(u.reps) || 0, gewicht: parseFloat(u.gewicht) || 0, rir: u.rir === undefined ? null : u.rir }))
+    };
+    saveActive();
+    document.getElementById('fDate').value = todayIso();
+    document.getElementById('formMsg').textContent = '';
+    fExercise.value = '';
+    updateClearBtn();
+    suggestedQueue = null;
+    syncPlanQueue();
+    renderQuickChips();
+    showSubsection('pick');
+    showScreen('new');
+  }
+
+  // Übungsliste des Plans im Schritt "Übung wählen"
+  function renderPlanChips(container){
+    const pl = activeTraining.plan;
+    const open = pl.items.filter(i => planRemaining(i) > 0);
+    const fest = pl.typ === 'fest';
+    let html = `<div class="quick-chips-label">${escapeHtml(pl.name)} · ${escapeHtml(pl.tag)} · <span class="plan-badge">${fest ? 'Fest' : 'Flexibel'}</span></div>`;
+    if(!open.length){
+      html += '<p class="plan-empty" style="margin-bottom:16px;">✓ Alle geplanten Übungen sind erledigt. Mit „Training fertig" abschließen' + (fest ? '.' : ' oder unten eine weitere Übung wählen.') + '</p>';
+    } else {
+      html += open.map((it, i) => {
+        const left = planRemaining(it);
+        const soll = planSollText(it) + (left < it.sets ? ` · noch ${left}` : '');
+        return `<button type="button" class="plan-ex" data-ex="${escapeHtml(it.exercise)}"${fest && i > 0 ? ' disabled' : ''}>
+          <span class="n">${i + 1}</span><span class="nm">${escapeHtml(it.exercise)}</span><span class="soll">${escapeHtml(soll)}</span></button>`;
+      }).join('');
+    }
+    container.innerHTML = html;
+    container.querySelectorAll('.plan-ex').forEach(b => b.addEventListener('click', () => {
+      fExercise.value = b.dataset.ex;
+      showDetailStep();
+    }));
+  }
+
+  // Soll im Detailschritt: Hinweis, Vorbelegung und "Gerät besetzt"
+  function applyPlanToDetail(hasSetsInTraining, cardio){
+    const hint = document.getElementById('planSoll');
+    const busy = document.getElementById('busyBtn');
+    const it = currentPlanItem();
+    busy.style.display = 'none';
+    if(!it){ hint.style.display = 'none'; return; }
+    hint.textContent = 'Plan: ' + planSollText(it);
+    hint.style.display = 'block';
+    if(!hasSetsInTraining && !cardio){
+      if(it.reps > 0) document.getElementById('fReps').value = it.reps;
+      if(it.gewicht > 0){
+        fBodyweight.checked = false; fWeight.disabled = false;
+        document.getElementById('fWeight').value = it.gewicht;
+      }
+    }
+    const pl = activeTraining.plan;
+    if(pl.typ === 'fest' && pl.items.filter(i => planRemaining(i) > 0).length > 1) busy.style.display = '';
+  }
+  document.getElementById('busyBtn').addEventListener('click', () => {
+    const it = currentPlanItem();
+    if(!it) return;
+    if(setActive){
+      const m = document.getElementById('formMsg'); m.textContent = 'Erst den laufenden Satz beenden.'; m.classList.add('error');
+      return;
+    }
+    const items = activeTraining.plan.items;
+    items.splice(items.indexOf(it), 1);
+    items.push(it);
+    saveActive();
+    syncPlanQueue();
+    showPickStep();
+  });
+
+  // Zusammenfassung: Soll gegen Ist
+  function renderSummaryPlan(dayEntries, plan){
+    const sec = document.getElementById('summaryPlanSection');
+    if(!plan){ sec.style.display = 'none'; return; }
+    const groups = groupEntries(dayEntries);
+    const used = new Set();
+    const rows = plan.items.map(it => {
+      const g = groups.find(x => x.name === it.exercise);
+      if(g) used.add(g.name);
+      const n = g ? groupSetCount(g) : 0;
+      const ok = n >= it.sets;
+      const ist = g ? groupSummary(g) : 'nicht gemacht';
+      return `<div class="soll-row"><div><div class="soll-ex">${escapeHtml(it.exercise)}</div>
+        <div class="soll-txt">Soll: ${escapeHtml(planSollText(it))}<br>Ist: ${escapeHtml(ist)}</div></div>
+        <span class="soll-mark ${ok ? 'ok' : 'warn'}">${ok ? '✓' : (n ? n + '/' + it.sets : '–')}</span></div>`;
+    });
+    groups.filter(g => !used.has(g.name)).forEach(g => rows.push(
+      `<div class="soll-row"><div><div class="soll-ex">${escapeHtml(g.name)}</div>
+        <div class="soll-txt">Zusätzlich: ${escapeHtml(groupSummary(g))}</div></div><span class="soll-mark">+</span></div>`));
+    document.getElementById('summaryPlanTitle').textContent = `${plan.name} · ${plan.tag}: Soll und Ist`;
+    document.getElementById('summaryPlan').innerHTML = rows.join('');
+    sec.style.display = 'block';
+  }
+
+  // Zusammenfassung: Training als Plan speichern
+  let savePlanEntries = [];
+  function resetSavePlanForm(dayEntries){
+    savePlanEntries = dayEntries;
+    document.getElementById('savePlanSection').style.display = dayEntries.length ? 'block' : 'none';
+    document.getElementById('savePlanForm').style.display = 'none';
+    document.getElementById('savePlanOpenBtn').style.display = '';
+    document.getElementById('savePlanMsg').textContent = '';
+    document.getElementById('savePlanBtn').disabled = false;
+  }
+  function fillSavePlanTarget(){
+    const sel = document.getElementById('spTarget');
+    sel.innerHTML = '<option value="">Neuer Plan</option>' +
+      plans.map(p => `<option value="${escapeHtml(p.id)}">Als neuer Tag in „${escapeHtml(p.name)}"</option>`).join('');
+    updateSavePlanFields();
+  }
+  function updateSavePlanFields(){
+    const id = document.getElementById('spTarget').value;
+    document.getElementById('spNameField').style.display = id ? 'none' : '';
+    document.getElementById('spTypField').style.display = id ? 'none' : '';
+    const p = plans.find(x => x.id === id);
+    const day = document.getElementById('spDay');
+    day.value = 'Tag ' + (p ? p.tage.length + 1 : 1);
+  }
+  document.getElementById('savePlanOpenBtn').addEventListener('click', () => {
+    fillSavePlanTarget();
+    document.getElementById('savePlanForm').style.display = 'block';
+    document.getElementById('savePlanOpenBtn').style.display = 'none';
+  });
+  document.getElementById('spTarget').addEventListener('change', updateSavePlanFields);
+  document.getElementById('savePlanBtn').addEventListener('click', async () => {
+    const msg = document.getElementById('savePlanMsg');
+    msg.classList.remove('error');
+    const targetId = document.getElementById('spTarget').value;
+    const dayName = document.getElementById('spDay').value.trim() || 'Tag 1';
+    const name = document.getElementById('spName').value.trim();
+    if(!targetId && !name){ msg.textContent = 'Bitte dem Plan einen Namen geben.'; msg.classList.add('error'); return; }
+    const uebungen = groupEntries(savePlanEntries).map(g => {
+      const cardio = g.entries.every(isCardioEntry);
+      const last = g.entries[g.entries.length - 1];
+      return {
+        exercise: g.name,
+        sets: cardio ? 1 : groupSetCount(g),
+        reps: cardio ? 0 : last.reps,
+        gewicht: cardio ? 0 : Math.max(...g.entries.map(e => e.weight || 0)),
+        rir: null
+      };
+    });
+    const btn = document.getElementById('savePlanBtn');
+    btn.disabled = true;
+    const target = plans.find(x => x.id === targetId);
+    const res = await persistPlan(target
+      ? { id: target.id, name: target.name, typ: target.typ, tage: target.tage.concat([{ name: dayName, uebungen }]) }
+      : { name, typ: document.getElementById('spTyp').value, tage: [{ name: dayName, uebungen }] });
+    msg.textContent = res.local
+      ? '✓ Gespeichert, aber nur auf diesem Gerät: In PocketBase fehlt die Sammlung für Pläne (Einrichtungsskript).'
+      : '✓ Plan gespeichert. Du findest ihn unter „Nach Trainingsplan trainieren".';
+    if(res.local) msg.classList.add('error');
   });
 
   // ---------- Timer ----------
