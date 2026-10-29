@@ -80,6 +80,19 @@
     padding:3px 8px; border-radius: 999px; text-transform:uppercase; letter-spacing:0.4px;
   }
 
+  .cal{ margin:4px 18px 14px; padding:10px 10px 8px; border:1px solid var(--border); border-radius: var(--radius); }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .cal-title{ font-weight:700; font-size:0.95rem; }
+  .cal-title small{ display:block; color: var(--text-dim); font-weight:400; font-size:0.75rem; }
+  .cal-nav{ background:none; border:1px solid var(--border); color: var(--text); width:36px; height:36px; border-radius: var(--radius); font-size:1.1rem; cursor:pointer; }
+  .cal-nav:disabled{ opacity:0.3; cursor:default; }
+  .cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap:3px; text-align:center; }
+  .cal-wd{ color: var(--text-dim); font-size:0.7rem; padding:2px 0; }
+  .cal-day{ height:34px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; border-radius: var(--radius); border:1px solid transparent; background:none; color: var(--text); font-family:inherit; padding:0; }
+  .cal-day.out{ visibility:hidden; }
+  .cal-day.today{ border-color: var(--text-dim); }
+  .cal-day.trained{ background: var(--accent); color:#F5F3EE; font-weight:700; cursor:pointer; }
+  .cal-day.trained:active{ opacity:0.7; }
   #dayList{ padding: 0 18px 18px; }
   .day-row{
     display:flex; align-items:center; justify-content:space-between;
@@ -591,6 +604,7 @@
     Trainingsplan <span class="coming-soon-badge">Bald verfügbar</span>
   </button>
   <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
+  <div id="calendar" class="cal"></div>
   <div id="dayList"></div>
   <p class="attrib">Der Übungskatalog beruht auf Daten von <a href="https://wger.de" target="_blank" rel="noopener">wger.de</a> (wger-Projekt), Lizenz <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.de" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Namen und Zuordnungen wurden angepasst.</p>
 </div>
@@ -1276,8 +1290,55 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     });
   }
 
+  // ---------- Kalender: Trainingstage eines Monats auf einen Blick ----------
+  let calMonth = null; // 'JJJJ-MM'
+  function renderCalendar(){
+    const box = document.getElementById('calendar');
+    if(entries.length === 0){ box.style.display = 'none'; return; }
+    box.style.display = '';
+    const thisMonth = todayIso().slice(0,7);
+    if(!calMonth) calMonth = thisMonth;
+    const days = new Set(entries.map(e => e.date.slice(0,10)));
+    const first = entries.length ? [...days].sort()[0].slice(0,7) : thisMonth;
+    const [y, m] = calMonth.split('-').map(Number);
+    const label = new Date(y, m - 1, 1).toLocaleDateString('de-DE', { month:'long', year:'numeric' });
+    const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7; // Montag = 0
+    const total = new Date(y, m, 0).getDate();
+    const inMonth = [...days].filter(d => d.slice(0,7) === calMonth).length;
+    const pad = n => String(n).padStart(2, '0');
+    let cells = '';
+    for(let i = 0; i < lead; i++) cells += '<span class="cal-day out"></span>';
+    for(let d = 1; d <= total; d++){
+      const iso = `${calMonth}-${pad(d)}`;
+      const cls = 'cal-day' + (days.has(iso) ? ' trained' : '') + (iso === todayIso() ? ' today' : '');
+      cells += days.has(iso)
+        ? `<button type="button" class="${cls}" data-date="${iso}" aria-label="${formatDateHeading(iso)}, Training">${d}</button>`
+        : `<span class="${cls}">${d}</span>`;
+    }
+    box.innerHTML =
+      `<div class="cal-head">
+        <button type="button" class="cal-nav" data-dir="-1" aria-label="Vorheriger Monat"${calMonth <= first ? ' disabled' : ''}>‹</button>
+        <div class="cal-title">${label}<small>${inMonth} Trainingstag${inMonth === 1 ? '' : 'e'}</small></div>
+        <button type="button" class="cal-nav" data-dir="1" aria-label="Nächster Monat"${calMonth >= thisMonth ? ' disabled' : ''}>›</button>
+      </div>
+      <div class="cal-grid">${['Mo','Di','Mi','Do','Fr','Sa','So'].map(w => `<span class="cal-wd">${w}</span>`).join('')}${cells}</div>`;
+  }
+  document.getElementById('calendar').addEventListener('click', (ev) => {
+    const nav = ev.target.closest('.cal-nav');
+    if(nav && !nav.disabled){
+      const [y, m] = calMonth.split('-').map(Number);
+      const d = new Date(y, m - 1 + Number(nav.dataset.dir), 1);
+      calMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      renderCalendar();
+      return;
+    }
+    const day = ev.target.closest('.cal-day.trained');
+    if(day){ dayFromSessions = false; openDay(day.dataset.date); }
+  });
+
   function renderOverview(){
     refreshActive();
+    renderCalendar();
     document.getElementById('resumeBtn').style.display = activeTraining ? '' : 'none';
     renderDayList(document.getElementById('dayList'));
   }
