@@ -749,7 +749,6 @@
   <button class="new-training-btn new-training-btn-suggest" id="planTrainingBtn">Nach Trainingsplan trainieren</button>
   <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
   <div id="calendar" class="cal"></div>
-  <div id="dayList"></div>
   <section id="designBox">
     <div class="design-title">Design</div>
     <div class="design-grid" id="designGrid">
@@ -1574,7 +1573,6 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     refreshActive();
     renderCalendar();
     document.getElementById('resumeBtn').style.display = activeTraining ? '' : 'none';
-    renderDayList(document.getElementById('dayList'));
   }
 
   // Eigene Seite nur mit den Trainingseinheiten; aus einem laufenden Training erreichbar
