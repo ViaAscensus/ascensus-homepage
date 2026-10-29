@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Ergänzt `trainingsbuch_entries` um die Felder für Pausenzeiten und Laufband.
+"""Richtet die Trainingsbuch-Sammlungen in PocketBase ein: Felder für Pausenzeiten und Laufband
+in `trainingsbuch_entries` sowie die Sammlung `uebung_muskelgruppe`.
 
 Das Trainingsbuch (trainingsbuch.html) schreibt bei jedem Satz mit, wie lange die
 Pause davor war: von "Satz beenden" bis zum nächsten "Satz beginnen".
@@ -20,7 +21,16 @@ Einträge 0, daran ließen sich alte und neue Einträge sonst nicht unterscheide
 Solange die Felder fehlen, ignoriert PocketBase sie beim Speichern; die Auswertung
 zeigt dann "Noch keine Pausenzeiten erfasst".
 
-Das Skript ist idempotent und ändert nur fehlende Felder. Rechte bleiben unberührt.
+Sammlung `uebung_muskelgruppe` (neu): merkt pro Mitglied, zu welcher Muskelgruppe eine
+Übung gehört (Nachfrage bei neuen Übungen im Trainingsbuch).
+    member   Text   Kennung des Mitglieds
+    uebung   Text   Name der Übung, kleingeschrieben
+    gruppe   Text   Muskelgruppe, z. B. Bauch
+Jedes Mitglied sieht und ändert nur die eigenen Einträge. Ohne die Sammlung merkt sich das
+Trainingsbuch die Zuordnung nur im Browser des Geräts.
+
+Das Skript ist idempotent und ändert nur fehlende Felder und fehlende Sammlungen.
+Rechte bestehender Sammlungen bleiben unberührt.
 
 Aufruf
     python3 tools/richte-trainingsbuch-pausen-ein.py              # Probelauf
@@ -106,6 +116,42 @@ def anmelden(pflicht):
     return True
 
 
+MUSKEL = 'uebung_muskelgruppe'
+EIGENE = 'member = @request.auth.id'
+
+
+def muskelgruppen(schreiben):
+    """Legt die Sammlung für die Muskelgruppen-Zuordnung an, falls sie fehlt."""
+    try:
+        api(f'api/collections/{MUSKEL}')
+        print(f'= {MUSKEL} ist bereits angelegt')
+        return
+    except PBFehler as e:
+        if e.status not in (404,):
+            if e.status in (401, 403):
+                print(f'+ {MUSKEL} würde angelegt (Kein Lesezugriff auf das Schema im Probelauf)')
+                return
+            raise
+    print(f'+ Sammlung {MUSKEL} {"wird" if schreiben else "würde"} angelegt')
+    if not schreiben:
+        return
+    api('api/collections', 'POST', {
+        'name': MUSKEL,
+        'type': 'base',
+        'fields': [
+            {'name': 'member', 'type': 'text', 'required': True, 'max': 40},
+            {'name': 'uebung', 'type': 'text', 'required': True, 'max': 120},
+            {'name': 'gruppe', 'type': 'text', 'required': True, 'max': 40},
+        ],
+        'indexes': [f'CREATE UNIQUE INDEX `idx_{MUSKEL}` ON `{MUSKEL}` (`member`, `uebung`)'],
+        'listRule': EIGENE,
+        'viewRule': EIGENE,
+        'createRule': '@request.auth.id != "" && @request.body.member = @request.auth.id',
+        'updateRule': EIGENE,
+        'deleteRule': EIGENE,
+    })
+
+
 def main():
     schreiben = '--schreiben' in sys.argv[1:]
     print(('AUSFÜHREN' if schreiben else 'PROBELAUF (nichts wird geschrieben, --schreiben zum Ausführen)')
@@ -130,11 +176,13 @@ def main():
     neu = [f for f in FELDER if f['name'] not in namen]
     if not neu:
         print(f'= {NAME} hat alle Felder bereits')
-        return
-    print(f'+ Felder {"werden" if schreiben else "würden"} ergänzt: ' + ', '.join(f['name'] for f in neu))
+    else:
+        print(f'+ Felder {"werden" if schreiben else "würden"} ergänzt: ' + ', '.join(f['name'] for f in neu))
+        if schreiben:
+            api(f'api/collections/{sammlung["id"]}', 'PATCH', {'fields': felder + neu})
+    muskelgruppen(schreiben)
     if schreiben:
-        api(f'api/collections/{sammlung["id"]}', 'PATCH', {'fields': felder + neu})
-        print('Fertig. Ab jetzt speichert das Trainingsbuch Pausen und Laufband-Daten.')
+        print('Fertig.')
 
 
 if __name__ == '__main__':

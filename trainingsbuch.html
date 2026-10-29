@@ -168,8 +168,24 @@
   .last-mal summary{ list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
     gap:8px; padding:8px 0; color: var(--text-dim); font-size:0.9rem; }
   .last-mal summary::-webkit-details-marker{ display:none; }
-  .last-mal summary::after{ content:'▾'; color: var(--accent); }
+  .last-mal summary::after{ content:'▾'; color: var(--accent); font-size:1.8rem; line-height:1; padding:0 4px; }
   .last-mal[open] summary::after{ content:'▴'; }
+  .fw-layer{ position:fixed; width:0; height:0; z-index:200; pointer-events:none; }
+  .fw-layer i{ position:absolute; left:-3px; top:-3px; width:6px; height:6px; border-radius:50%;
+    animation: fw 1.4s ease-out forwards; }
+  @keyframes fw{ 0%{ transform:translate(0,0) scale(1); opacity:1; } 100%{ transform:translate(var(--dx),var(--dy)) scale(.3); opacity:0; } }
+  .muscle-ask{ display:none; border:1px solid var(--accent); border-radius: var(--radius); padding:12px 14px; margin-top:12px; }
+  .muscle-ask-title{ font-weight:700; margin-bottom:10px; font-size:0.95rem; }
+  .muscle-ask-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .muscle-ask-chip, .muscle-ask-skip{
+    padding:10px 14px; border-radius: var(--radius); border:1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family:inherit; font-size:0.9rem; cursor:pointer;
+  }
+  .muscle-ask-skip{ color: var(--text-dim); width:100%; }
+  .unassigned{ margin-top:16px; }
+  .unassigned-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--border); }
+  .unassigned-row select{ max-width:50%; padding:8px; background: var(--surface); color: var(--text); border:1px solid var(--border); border-radius: var(--radius); font-family:inherit; }
+  .exercise-note{ margin-top:0; margin-bottom:4px; color: var(--text-dim); }
   .last-sets{ margin-top:6px; }
   .last-sets .set-line{ color: var(--text); padding: 2px 0; }
   .last-session{
@@ -736,6 +752,7 @@
   <section id="detail-section" style="display:none;">
     <h2 id="detailExerciseName"></h2>
     <div class="hint" id="todayPositionHint" style="margin-top:0; margin-bottom:4px; color: var(--accent);"></div>
+    <div class="hint exercise-note" id="exerciseNote" style="display:none;"></div>
     <div class="hint" id="lastHint"></div>
     <button type="button" class="btn btn-primary" id="startSetBtn" style="width:100%; margin-bottom:14px;">Satz beginnen</button>
     <div class="phase-row" id="phaseRow" role="group" aria-label="Phase">
@@ -794,7 +811,16 @@
     </div>
     <div class="record-msg" id="recordMsg" style="display:none;"></div>
     <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Übung beenden</button>
+    <div class="save-confirm" id="endExConfirm">
+      <div class="save-confirm-msg" id="endExMsg"></div>
+      <div class="save-confirm-row">
+        <button type="button" class="btn btn-primary" id="endExSave">Speichern</button>
+        <button type="button" class="btn" id="endExDiscard">Verwerfen</button>
+        <button type="button" class="btn" id="endExBack">Zurück</button>
+      </div>
+    </div>
     <div class="formmsg" id="formMsg"></div>
+    <div class="muscle-ask" id="muscleAsk"></div>
   </section>
 
   <button class="btn btn-finish" id="finishDayBtn" style="width: calc(100% - 36px); margin: 0 18px 18px;">Training fertig</button>
@@ -867,6 +893,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   // ---------- State ----------
   let entries = [];
   let selectedTendenz = 'okay';
+  // Eigene Zuordnung Übung -> Muskelgruppe (PocketBase-Sammlung uebung_muskelgruppe, Rückfall: localStorage)
+  let userMuscle = {};
+  let muscleStoreOk = true;
   let selectedDate = null;
 
   const screens = {
@@ -956,9 +985,47 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       entries = [];
       console.error('Laden fehlgeschlagen', e);
     }
+    await loadMuscleMap();
     loadingState.style.display = 'none';
     renderOverview();
     updateExerciseList();
+  }
+
+  async function loadMuscleMap(){
+    userMuscle = {};
+    try{
+      const recs = await pb.collection('uebung_muskelgruppe').getFullList();
+      recs.forEach(r => { if(r.uebung && r.gruppe) userMuscle[String(r.uebung).toLowerCase()] = { gruppe: r.gruppe, id: r.id }; });
+      muscleStoreOk = true;
+    }catch(e){ muscleStoreOk = false; }
+    try{
+      const loc = JSON.parse(localStorage.getItem('tb_muscle_map') || '{}');
+      Object.keys(loc).forEach(k => { if(!userMuscle[k]) userMuscle[k] = { gruppe: loc[k], id: null }; });
+    }catch(e){}
+  }
+
+  // Zuordnung merken: in PocketBase, ohne die Sammlung nur auf diesem Gerät
+  async function saveMuscle(exercise, gruppe){
+    const key = exercise.trim().toLowerCase();
+    let id = null;
+    if(muscleStoreOk){
+      try{
+        const old = userMuscle[key];
+        const rec = (old && old.id)
+          ? await pb.collection('uebung_muskelgruppe').update(old.id, { gruppe })
+          : await pb.collection('uebung_muskelgruppe').create({ member: pb.authStore.model.id, uebung: key, gruppe });
+        id = rec.id;
+      }catch(e){ muscleStoreOk = false; }
+    }
+    if(!id){
+      try{
+        const loc = JSON.parse(localStorage.getItem('tb_muscle_map') || '{}');
+        loc[key] = gruppe;
+        localStorage.setItem('tb_muscle_map', JSON.stringify(loc));
+      }catch(e){}
+    }
+    userMuscle[key] = { gruppe, id };
+    return !!id;
   }
 
   function escapeHtml(str){
@@ -1425,7 +1492,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     tendenzDist.innerHTML = buildTendenzDistribution(inRange);
     const gender = pb.authStore.model?.Geschlecht || 'Männlich';
     document.getElementById('bodyMap').innerHTML = buildBodyMap(inRange, gender);
-    document.getElementById('muscleDist').innerHTML = buildMuscleDistribution(inRange);
+    document.getElementById('muscleDist').innerHTML = buildMuscleDistribution(inRange) + buildUnassigned(inRange);
     document.querySelectorAll('.muscle-clickable').forEach(row => {
       row.addEventListener('click', () => highlightMuscle(row.dataset.group, row));
     });
@@ -1487,7 +1554,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     [['bizeps','armbeuger','bicep'], 'Bizeps'],
     [['trizeps','armstrecker','tricep'], 'Trizeps'],
     [['unterarm','forearm','handgelenk'], 'Unterarme'],
-    [['bauch','crunch','situp','sit-up','plank','core'], 'Bauch'],
+    [['bauch','crunch','situp','sit-up','plank','core','beinheb','leg raise'], 'Bauch'],
     [['oblique','seitliche bauch','russian twist'], 'Obliques'],
     [['adduktor','adductor','innere oberschenkel'], 'Adduktoren'],
     [['beinstrecker','beinpresse','leg press','quad','kniebeuge','squat','ausfallschritt','lunge'], 'Quadrizeps'],
@@ -1498,6 +1565,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   ];
   function getMuscleGroup(name){
     const n = name.toLowerCase();
+    const mine = userMuscle[n.trim()];
+    if(mine && muscleGroups.includes(mine.gruppe)) return mine.gruppe;
     if(muscleExactMap[n]) return muscleExactMap[n];
     for(const [keywords, group] of muscleKeywordMap){
       if(keywords.some(k => n.includes(k))) return group;
@@ -1573,6 +1642,21 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       `;
     }).join('');
   }
+
+  function buildUnassigned(inRange){
+    const names = [...new Set(inRange.filter(e => !isCardioEntry(e) && getMuscleGroup(e.exercise) === 'Sonstiges').map(e => e.exercise))].sort();
+    if(!names.length) return '';
+    const opts = '<option value="">Gruppe wählen …</option>' +
+      muscleGroups.filter(g => g !== 'Sonstiges').map(g => `<option value="${g}">${g}</option>`).join('');
+    return `<div class="unassigned"><div class="exercise-name">Übungen ohne Muskelgruppe</div>` +
+      names.map(n => `<div class="unassigned-row"><span>${escapeHtml(n)}</span><select data-ex="${escapeHtml(n)}" aria-label="Muskelgruppe für ${escapeHtml(n)}">${opts}</select></div>`).join('') + '</div>';
+  }
+  document.getElementById('muscleDist').addEventListener('change', async (ev) => {
+    const sel = ev.target.closest('select[data-ex]');
+    if(!sel || !sel.value) return;
+    await saveMuscle(sel.dataset.ex, sel.value);
+    renderStats();
+  });
 
   function highlightMuscle(group, rowEl){
     document.querySelectorAll('.muscle-highlight').forEach(el => el.classList.remove('muscle-highlight'));
@@ -1996,6 +2080,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     return idx === -1 ? null : idx + 1;
   }
 
+  function setTendenz(v){
+    if(!['leicht','okay','hart'].includes(v)) v = 'okay';
+    selectedTendenz = v;
+    document.querySelectorAll('.tendenz-btn').forEach(b => b.classList.toggle('active', b.dataset.val === v));
+  }
+
   function showDetailStep(){
     stopSetStopwatch();
     const exerciseName = fExercise.value.trim();
@@ -2010,6 +2100,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const matches = entries.filter(e => e.exercise.toLowerCase() === q)
                             .sort((a,b) => b.date.localeCompare(a.date));
     const cardio = isCardioName(exerciseName);
+    hideMuscleAsk();
+    document.getElementById('endExConfirm').style.display = 'none';
+    const noteEl = document.getElementById('exerciseNote');
+    if(/rumpfdreh/i.test(exerciseName)){ noteEl.textContent = '1 Wdh. = links + rechts'; noteEl.style.display = 'block'; }
+    else { noteEl.style.display = 'none'; noteEl.textContent = ''; }
     // Im laufenden Training gilt der letzte Satz dieser Übung; sonst das höchste Gewicht vom letzten Mal
     const inThisTraining = activeTraining
       ? groupEntries(entries.filter(e => e.exercise.toLowerCase() === q && sessionKey(e) === activeTraining.id))
@@ -2022,7 +2117,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     } else if(pastSessions.length){
       const l = groupEntries(pastSessions[pastSessions.length - 1].entries.filter(e => e.exercise.toLowerCase() === q))[0].entries;
       const maxW = Math.max(...l.map(e => e.weight));
-      start = { weight: maxW, reps: l[l.length - 1].reps };
+      start = { weight: maxW, reps: l[l.length - 1].reps, tendenz: l[l.length - 1].tendenz };
     } else if(matches.length){
       start = matches[0];
     }
@@ -2037,6 +2132,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       document.getElementById('fWeight').value = '';
       document.getElementById('fReps').value = '';
     }
+
+    // Härte (Leicht/Okay/Hart) vom letzten Mal dieser Übung, nicht von der zuletzt gemachten
+    setTendenz(start && start.tendenz ? start.tendenz : 'okay');
 
     document.getElementById('fSets').value = 1;
     applyCardioMode(cardio);
@@ -2169,7 +2267,33 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     showDetailStep();
   });
 
-  document.getElementById('otherExerciseBtn').addEventListener('click', showPickStep);
+  // Übung beenden: läuft noch ein nicht gespeicherter Satz, erst nachfragen
+  function endExHide(){ document.getElementById('endExConfirm').style.display = 'none'; }
+  document.getElementById('otherExerciseBtn').addEventListener('click', () => {
+    if(!setActive){ showPickStep(); return; }
+    const cardio = isCardioName(fExercise.value.trim());
+    document.getElementById('endExMsg').textContent = cardio
+      ? 'Das Laufband ist noch nicht gespeichert. Weiter eintragen oder verwerfen?'
+      : 'Dieser Satz ist noch nicht gespeichert. Speichern oder verwerfen?';
+    document.getElementById('endExSave').textContent =
+      cardio ? (cardioStage === 'running' ? 'Stoppen, km eintragen' : 'Speichern') : 'Speichern';
+    document.getElementById('endExConfirm').style.display = 'block';
+  });
+  document.getElementById('endExBack').addEventListener('click', endExHide);
+  document.getElementById('endExDiscard').addEventListener('click', () => {
+    endExHide();
+    const cardio = isCardioName(fExercise.value.trim());
+    pendingPause = null;
+    resetSetState();
+    if(cardio) applyCardioMode(true);
+    const m = document.getElementById('formMsg'); m.textContent = ''; m.classList.remove('error');
+    showPickStep();
+  });
+  document.getElementById('endExSave').addEventListener('click', async () => {
+    endExHide();
+    const ok = await saveSet();
+    if(ok) showPickStep();
+  });
 
   function computeTopExercises(excludeSet, count){
     count = count || 6;
@@ -2406,10 +2530,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     return null;
   }
 
-  document.getElementById('saveEntry').addEventListener('click', async () => {
-    if(!setActive) return;
+  // Speichert den laufenden Satz; true = gespeichert
+  async function saveSet(){
+    if(!setActive) return false;
     unlockAudio();
-    if(isCardioName(fExercise.value.trim()) && cardioStage === 'running'){ cardioFreeze(); return; }
+    if(isCardioName(fExercise.value.trim()) && cardioStage === 'running'){ cardioFreeze(); return false; }
     const endMs = (isCardioName(fExercise.value.trim()) && cardioStage === 'stopped' && cardioStopMs) ? cardioStopMs : Date.now();
     const formMsg = document.getElementById('formMsg');
     formMsg.textContent = '';
@@ -2435,12 +2560,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     if(cardio && !(km > 0)){
       formMsg.textContent = 'Bitte die Distanz in km eintragen.';
       formMsg.classList.add('error');
-      return;
+      return false;
     }
     if(!date || !exercise || !reps){
       formMsg.textContent = 'Bitte Datum, Übung und Wiederholungen ausfüllen.';
       formMsg.classList.add('error');
-      return;
+      return false;
     }
 
     const record = cardio ? null : checkRecord(exercise, weight, reps);
@@ -2483,6 +2608,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       if(record){
         recordMsg.textContent = `🏆 Neuer Rekord – ${record.label}`;
         recordMsg.style.display = 'block';
+        celebrate(recordMsg);
       } else {
         recordMsg.style.display = 'none';
       }
@@ -2490,13 +2616,72 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       // Formular bleibt absichtlich mit denselben Werten stehen (schneller nächster Satz),
       // nur Übung/Gewicht/Wdh. werden NICHT geleert.
       if(cardio){ stopTimer(); applyCardioMode(true); } else restartTimer();
+      maybeAskMuscle(exercise);
+      return true;
     }catch(e){
       formMsg.textContent = 'Eintrag konnte nicht gespeichert werden.';
       formMsg.classList.add('error');
       console.error(e);
+      return false;
     }finally{
       updateSetButtons();
     }
+  }
+  document.getElementById('saveEntry').addEventListener('click', () => { saveSet(); });
+
+  // ---------- Rekord: kurze Vibration und kleines Feuerwerk (unter 2 Sekunden) ----------
+  function celebrate(anchor){
+    try{ navigator.vibrate && navigator.vibrate([70, 50, 70, 50, 180]); }catch(e){}
+    try{
+      if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const r = anchor.getBoundingClientRect();
+      const layer = document.createElement('div');
+      layer.className = 'fw-layer';
+      layer.style.left = (r.left + r.width / 2) + 'px';
+      layer.style.top = (r.top + r.height / 2) + 'px';
+      const colors = ['#E4572E', '#F2C94C', '#6FCF97', '#7FA7C9', '#F5F3EE'];
+      const n = 24;
+      for(let i = 0; i < n; i++){
+        const p = document.createElement('i');
+        const ang = (Math.PI * 2 * i / n) + Math.random() * 0.25;
+        const dist = 55 + Math.random() * 70;
+        p.style.setProperty('--dx', Math.round(Math.cos(ang) * dist) + 'px');
+        p.style.setProperty('--dy', Math.round(Math.sin(ang) * dist) + 'px');
+        p.style.background = colors[i % colors.length];
+        layer.appendChild(p);
+      }
+      document.body.appendChild(layer);
+      setTimeout(() => layer.remove(), 1700);
+    }catch(e){}
+  }
+
+  // ---------- Nachfrage zur Muskelgruppe bei Übungen ohne Zuordnung ----------
+  const askedMuscle = new Set(); // einmal pro Training und Übung
+  function hideMuscleAsk(){
+    const box = document.getElementById('muscleAsk');
+    box.style.display = 'none'; box.innerHTML = '';
+  }
+  function maybeAskMuscle(exercise){
+    if(isCardioName(exercise) || getMuscleGroup(exercise) !== 'Sonstiges') return;
+    const key = (activeTraining ? activeTraining.id : '') + '|' + exercise.toLowerCase();
+    if(askedMuscle.has(key)) return;
+    askedMuscle.add(key);
+    const box = document.getElementById('muscleAsk');
+    box.dataset.ex = exercise;
+    box.innerHTML = `<div class="muscle-ask-title">Neue Übung: Welche Muskelgruppe trainiert „${escapeHtml(exercise)}"?</div>` +
+      `<div class="muscle-ask-grid">${muscleGroups.filter(g => g !== 'Sonstiges').map(g => `<button type="button" class="muscle-ask-chip" data-g="${g}">${g}</button>`).join('')}</div>` +
+      `<button type="button" class="muscle-ask-skip">Weiß ich nicht</button>`;
+    box.style.display = 'block';
+  }
+  document.getElementById('muscleAsk').addEventListener('click', async (ev) => {
+    const box = document.getElementById('muscleAsk');
+    if(ev.target.closest('.muscle-ask-skip')){ hideMuscleAsk(); return; }
+    const chip = ev.target.closest('.muscle-ask-chip');
+    if(!chip) return;
+    const ex = box.dataset.ex, g = chip.dataset.g;
+    const imDb = await saveMuscle(ex, g);
+    box.innerHTML = `<div class="muscle-ask-title">✓ „${escapeHtml(ex)}" gehört jetzt zu ${g}.${imDb ? '' : ' (Nur auf diesem Gerät gemerkt: Das Einrichtungsskript fehlt noch.)'}</div>`;
+    setTimeout(hideMuscleAsk, 2500);
   });
 
   // ---------- Training beenden: Sicherheitsabfrage, Zusammenfassung ----------
