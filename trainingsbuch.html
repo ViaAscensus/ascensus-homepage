@@ -9,7 +9,20 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="ascensus.css">
 <script src="ascensus.js" defer></script>
+<script>
+  // Gewähltes Design sofort setzen, damit nichts aufblitzt
+  try{
+    var d = localStorage.getItem('tb_design') || '';
+    if(/^rr-(teal|sonnengelb|pink|nacht|himmel)$/.test(d)){
+      document.documentElement.setAttribute('data-design', 'runrebels');
+      document.documentElement.setAttribute('data-pal', d.slice(3));
+    }
+  }catch(e){}
+</script>
 <style>
+  @font-face{ font-family:'Bungee'; src:url(fonts/Bungee-Regular.woff2) format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
+  @font-face{ font-family:'Outfit'; src:url(fonts/Outfit-Variable.woff2) format('woff2'); font-weight:100 900; font-style:normal; font-display:swap; }
+  @font-face{ font-family:'Graduate'; src:url(fonts/Graduate-Regular.woff2) format('woff2'); font-weight:400; font-style:normal; font-display:swap; }
   :root{
     --bg: #16171a;
     --surface: #1f2119;
@@ -25,7 +38,88 @@
     --radius: 6px;
     --offwhite: #F5F3EE;
     --anthrazit: #232323;
+    --chart: #556B4E;
+    --chart-dim: #9a9ca5;
+    --dot-leicht: #6fcf97;
+    --dot-okay: #7fa7c9;
+    --dot-hart: #e4572e;
+    --map-cold: #2a2b27;
+    --map-mid: #556B4E;
+    --map-hot: #B59A5D;
+    --map-body: #4a4d57;
+    --map-stroke: #232323;
   }
+
+  /* ---------- Design "RunRebels" (Einstellung unten in der Übersicht) ---------- */
+  html[data-design="runrebels"]{
+    --bg: var(--rr-s); --surface: var(--rr-ov);
+    --border: color-mix(in srgb, var(--rr-o) 45%, transparent); --border-strong: var(--rr-o);
+    --text: var(--rr-o); --text-dim: color-mix(in srgb, var(--rr-o) 86%, var(--rr-s));
+    --accent: var(--rr-a); --accent-text: var(--rr-oa);
+    --leicht: var(--rr-o); --okay: var(--rr-o); --hart: var(--rr-o);
+    --radius: 14px;
+    --chart: var(--rr-a); --chart-dim: var(--rr-o);
+    --dot-leicht: var(--rr-s2); --dot-okay: var(--rr-o); --dot-hart: var(--rr-s1);
+  }
+  html[data-design="runrebels"][data-pal="teal"]{ --rr-s:#0E6E75; --rr-o:#FFF4EA; --rr-a:#FFD84D; --rr-oa:#0B3C41; --rr-s1:#FF4D94; --rr-s2:#FFD84D; --rr-ov:rgba(255,255,255,0.08);
+    --map-cold:#0A5A60; --map-mid:#FF4D94; --map-hot:#FFD84D; --map-body:#3C8A90; --map-stroke:#FFF4EA; }
+  html[data-design="runrebels"][data-pal="sonnengelb"]{ --rr-s:#FFD84D; --rr-o:#0B3C41; --rr-a:#0B3C41; --rr-oa:#FFD84D; --rr-s1:#0E6E75; --rr-s2:#FF4D94; --rr-ov:rgba(0,0,0,0.06);
+    --map-cold:#F0C53A; --map-mid:#0E6E75; --map-hot:#FF4D94; --map-body:#FFE98F; --map-stroke:#0B3C41; }
+  html[data-design="runrebels"][data-pal="pink"]{ --rr-s:#FF4D94; --rr-o:#2A0A1A; --rr-a:#2A0A1A; --rr-oa:#FF4D94; --rr-s1:#FFD84D; --rr-s2:#0E6E75; --rr-ov:rgba(0,0,0,0.07);
+    --map-cold:#E8438A; --map-mid:#FFD84D; --map-hot:#0E6E75; --map-body:#FF8DBB; --map-stroke:#2A0A1A; }
+  html[data-design="runrebels"][data-pal="nacht"]{ --rr-s:#0B1020; --rr-o:#E8EDF4; --rr-a:#9CD3FF; --rr-oa:#0B1020; --rr-s1:#9CD3FF; --rr-s2:#FFE08A; --rr-ov:rgba(255,255,255,0.07);
+    --map-cold:#161C33; --map-mid:#9CD3FF; --map-hot:#FFE08A; --map-body:#2A3350; --map-stroke:#E8EDF4; }
+  html[data-design="runrebels"][data-pal="himmel"]{ --rr-s:#1D46F0; --rr-o:#FFFFFF; --rr-a:#FFD84D; --rr-oa:#0B1A5C; --rr-s1:#FFD84D; --rr-s2:#7FE3F0; --rr-ov:rgba(255,255,255,0.1);
+    --map-cold:#1A3DD0; --map-mid:#7FE3F0; --map-hot:#FFD84D; --map-body:#4E70F5; --map-stroke:#FFFFFF; }
+  html[data-design="runrebels"] body{ font-family:'Outfit', system-ui, sans-serif; overflow-x:hidden; }
+  html[data-design="runrebels"] h1, html[data-design="runrebels"] h2, html[data-design="runrebels"] .summary-quote{ font-family:'Bungee', system-ui, sans-serif; font-weight:400; }
+  html[data-design="runrebels"] .timer-display, html[data-design="runrebels"] .stepper-large input,
+  html[data-design="runrebels"] .summary-tile-value, html[data-design="runrebels"] .cal-day{
+    font-family:'Graduate', Georgia, serif; font-weight:400;
+  }
+  /* Kontur wächst mit der Größe: nur die große Timer-Ziffer bekommt sie, kleine Ziffern bleiben normal */
+  html[data-design="runrebels"] .timer-display{
+    color: var(--rr-a); -webkit-text-stroke: 3px var(--rr-o); paint-order: stroke fill; letter-spacing:0.03em;
+  }
+  html[data-design="runrebels"] .stepper-large input, html[data-design="runrebels"] .summary-tile-value{ color: var(--rr-o); letter-spacing:0.03em; }
+  html[data-design="runrebels"] .stepper-large input{ font-size:2rem; }
+  html[data-design="runrebels"] .timer-display.done{ color: var(--rr-a); }
+  html[data-design="runrebels"] .new-training-btn, html[data-design="runrebels"] .btn, html[data-design="runrebels"] .screen-back{
+    text-transform:uppercase; letter-spacing:0.04em; font-size:0.85rem;
+  }
+  html[data-design="runrebels"] .btn-primary, html[data-design="runrebels"] #startSetBtn, html[data-design="runrebels"] #saveEntry{
+    background: var(--rr-a); border-color: var(--rr-a); color: var(--rr-oa);
+  }
+  html[data-design="runrebels"] #otherExerciseBtn{ background: transparent; border-color: var(--rr-o); color: var(--rr-o); }
+  html[data-design="runrebels"] .btn-finish{ background: var(--rr-o); border-color: var(--rr-o); color: var(--rr-s); font-weight:700; }
+  html[data-design="runrebels"] .new-training-btn{ background: var(--rr-a); border-color: var(--rr-a); color: var(--rr-oa); }
+  html[data-design="runrebels"] .new-training-btn-suggest, html[data-design="runrebels"] .new-training-btn-backfill{
+    background: transparent; border:2px solid var(--rr-o); color: var(--rr-o);
+  }
+  html[data-design="runrebels"] .dot.leicht{ background: var(--dot-leicht); }
+  html[data-design="runrebels"] .dot.okay{ background: var(--dot-okay); }
+  html[data-design="runrebels"] .dot.hart{ background: var(--dot-hart); }
+  html[data-design="runrebels"] .soll-mark.ok{ color: var(--rr-a); }
+  html[data-design="runrebels"] .soll-mark.warn{ color: var(--rr-o); }
+  html[data-design="runrebels"] .plan-del.sure{ color: var(--rr-o); border-color: var(--rr-o); }
+  html[data-design="runrebels"] .legend-gradient{ background: linear-gradient(90deg, var(--map-cold), var(--map-mid), var(--map-hot)); }
+  /* Schrägstreifen (−20°) unter den Seitenköpfen, reine Dekoration */
+  html[data-design="runrebels"] #overview-screen .head::after,
+  html[data-design="runrebels"] #plans-screen .head::after,
+  html[data-design="runrebels"] .summary-hero::after{
+    content:''; display:block; height:16px; margin:14px -40px 0; transform: skewX(-20deg);
+    background: linear-gradient(90deg, var(--rr-s1) 0 22%, transparent 22% 26%, var(--rr-s2) 26% 58%, transparent 58% 62%, var(--rr-s1) 62% 100%);
+  }
+  /* Design-Auswahl */
+  .design-title{ font-weight:600; font-size:0.95rem; margin-bottom:10px; }
+  .design-grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; }
+  .design-opt{
+    display:flex; align-items:center; gap:10px; min-height:48px; padding:8px 10px;
+    background: transparent; color: var(--text); border:1px solid var(--border-strong); border-radius: var(--radius);
+    font-family:inherit; font-size:0.85rem; font-weight:600; text-align:left; cursor:pointer;
+  }
+  .design-opt .sw{ width:26px; height:26px; border-radius:999px; flex-shrink:0; border:2px solid var(--border-strong); }
+  .design-opt[aria-pressed="true"]{ background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; }
@@ -127,7 +221,7 @@
   .cal-day{ height:34px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; border-radius: var(--radius); border:1px solid transparent; background:none; color: var(--text); font-family:inherit; padding:0; }
   .cal-day.out{ visibility:hidden; }
   .cal-day.today{ border-color: var(--text-dim); }
-  .cal-day.trained{ background: var(--accent); color:#F5F3EE; font-weight:700; cursor:pointer; }
+  .cal-day.trained{ background: var(--accent); color: var(--accent-text); font-weight:700; cursor:pointer; }
   .cal-day.trained:active{ opacity:0.7; }
   #dayList{ padding: 0 18px 18px; }
   .day-row{
@@ -544,7 +638,7 @@
   }
   .legend-gradient{
     width:100px; height:8px; border-radius:4px;
-    background: linear-gradient(90deg, #2a2b27, #556B4E, #B59A5D);
+    background: linear-gradient(90deg, var(--map-cold), var(--map-mid), var(--map-hot));
   }
 
   .tendenz-picker{ display:flex; gap:8px; margin-bottom:16px; }
@@ -655,6 +749,18 @@
   <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
   <div id="calendar" class="cal"></div>
   <div id="dayList"></div>
+  <section id="designBox">
+    <div class="design-title">Design</div>
+    <div class="design-grid" id="designGrid">
+      <button type="button" class="design-opt" data-d="ascensus"><span class="sw" style="background: linear-gradient(135deg,#16171a 50%,#556B4E 50%)"></span>ASCENSUS</button>
+      <button type="button" class="design-opt" data-d="rr-teal"><span class="sw" style="background: linear-gradient(135deg,#0E6E75 50%,#FFD84D 50%)"></span>RunRebels Teal</button>
+      <button type="button" class="design-opt" data-d="rr-sonnengelb"><span class="sw" style="background: linear-gradient(135deg,#FFD84D 50%,#0B3C41 50%)"></span>RunRebels Sonnengelb</button>
+      <button type="button" class="design-opt" data-d="rr-pink"><span class="sw" style="background: linear-gradient(135deg,#FF4D94 50%,#2A0A1A 50%)"></span>RunRebels Pink</button>
+      <button type="button" class="design-opt" data-d="rr-nacht"><span class="sw" style="background: linear-gradient(135deg,#0B1020 50%,#9CD3FF 50%)"></span>RunRebels Nacht</button>
+      <button type="button" class="design-opt" data-d="rr-himmel"><span class="sw" style="background: linear-gradient(135deg,#1D46F0 50%,#FFD84D 50%)"></span>RunRebels Himmel</button>
+    </div>
+    <div class="formmsg" id="designMsg"></div>
+  </section>
   <p class="attrib">Der Übungskatalog beruht auf Daten von <a href="https://wger.de" target="_blank" rel="noopener">wger.de</a> (wger-Projekt), Lizenz <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.de" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Namen und Zuordnungen wurden angepasst.</p>
 </div>
 
@@ -1021,6 +1127,38 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   };
   const loadingState = document.getElementById('loadingState');
 
+  // ---------- Design (ASCENSUS oder RunRebels), gespeichert im Profil und im Browser ----------
+  const DESIGNS = ['ascensus', 'rr-teal', 'rr-sonnengelb', 'rr-pink', 'rr-nacht', 'rr-himmel'];
+  function CV(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function applyDesign(d){
+    if(!DESIGNS.includes(d)) d = 'ascensus';
+    const r = document.documentElement;
+    if(d === 'ascensus'){ r.removeAttribute('data-design'); r.removeAttribute('data-pal'); }
+    else { r.setAttribute('data-design', 'runrebels'); r.setAttribute('data-pal', d.slice(3)); }
+    document.querySelectorAll('#designGrid .design-opt').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.d === d)));
+    try{ localStorage.setItem('tb_design', d); }catch(e){}
+  }
+  // Beim Laden: Wahl aus dem Profil hat Vorrang vor dem Zwischenspeicher
+  function syncDesignFromProfile(){
+    const own = pb.authStore.model && pb.authStore.model.trainingsbuch_design;
+    if(own && DESIGNS.includes(own)) applyDesign(own);
+    else { let l = 'ascensus'; try{ l = localStorage.getItem('tb_design') || 'ascensus'; }catch(e){} applyDesign(l); }
+  }
+  document.getElementById('designGrid').addEventListener('click', async (ev) => {
+    const b = ev.target.closest('.design-opt');
+    if(!b) return;
+    const msg = document.getElementById('designMsg');
+    msg.classList.remove('error');
+    applyDesign(b.dataset.d);
+    try{
+      const rec = await pb.collection('members').update(pb.authStore.model.id, { trainingsbuch_design: b.dataset.d });
+      if('trainingsbuch_design' in rec) msg.textContent = '✓ Design gespeichert.';
+      else { msg.textContent = 'Nur auf diesem Gerät gespeichert: In PocketBase fehlt das Feld (Einrichtungsskript).'; msg.classList.add('error'); }
+    }catch(e){
+      msg.textContent = 'Nur auf diesem Gerät gespeichert.';
+    }
+  });
+
   // ---------- Trainings: jede Einheit hat eine Kennung ----------
   // Ein Training beginnt mit "Training starten"/"nachtragen" und endet mit "Training fertig".
   // Einträge ohne training_id (ältere) zählen pro Datum als ein Training.
@@ -1092,6 +1230,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   }
 
   async function loadEntries(){
+    syncDesignFromProfile();
     try{
       entries = await pb.collection('trainingsbuch_entries').getFullList({ sort: '-date' });
     }catch(e){
@@ -1905,11 +2044,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function buildBodyMap(inRange, gender){
     gender = gender || 'Männlich';
     const { volume, maxVol } = computeMuscleVolumes(inRange);
-    const COLD = '#2a2b27';
-    const MID  = '#556B4E';
-    const HOT  = '#B59A5D';
-    const BODY = '#4a4d57';
-    const BODY_STROKE = '#232323';
+    const COLD = CV('--map-cold');
+    const MID  = CV('--map-mid');
+    const HOT  = CV('--map-hot');
+    const BODY = CV('--map-body');
+    const BODY_STROKE = CV('--map-stroke');
     const c = g => {
       const ratio = 0.1 + (volume[g] / maxVol) * 0.9;
       return ratio < 0.5
@@ -1990,7 +2129,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const hasWeight = list.some(e => getEffectiveWeight(e) > 0);
     const values = list.map(e => hasWeight ? getEffectiveWeight(e) : (e.reps * e.sets));
     const unit = hasWeight ? 'kg' : 'Wdh.';
-    const tendenzColor = { leicht:'#6fcf97', okay:'#7fa7c9', hart:'#e4572e' };
+    const tendenzColor = { leicht: CV('--dot-leicht'), okay: CV('--dot-okay'), hart: CV('--dot-hart') };
 
     const pbIndex = values.indexOf(Math.max(...values));
     const pbEntry = list[pbIndex];
@@ -2019,17 +2158,17 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const polyline = points.map(p => `${p.x},${p.y}`).join(' ');
 
     const marks = points.map((p, i) => {
-      const c = tendenzColor[p.e.tendenz] || '#556B4E';
+      const c = tendenzColor[p.e.tendenz] || CV('--chart');
       const repsLine = `${chartBottom + rowGap}`;
       const dateLine = `${chartBottom + rowGap * 2}`;
       const tendenzLine = `${chartBottom + rowGap * 3}`;
-      const pbRing = i === pbIndex ? `<circle cx="${p.x}" cy="${p.y}" r="7.5" fill="none" stroke="#556B4E" stroke-width="1.5"></circle>` : '';
+      const pbRing = i === pbIndex ? `<circle cx="${p.x}" cy="${p.y}" r="7.5" fill="none" stroke="${CV('--chart')}" stroke-width="1.5"></circle>` : '';
       return `
         ${pbRing}
-        <text x="${p.x}" y="${p.y - 10}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#f2f1ed" font-family="IBM Plex Sans, sans-serif">${Math.round(p.v)}</text>
+        <text x="${p.x}" y="${p.y - 10}" text-anchor="middle" font-size="10.5" font-weight="600" fill="${CV('--text')}" font-family="IBM Plex Sans, sans-serif">${Math.round(p.v)}</text>
         <circle cx="${p.x}" cy="${p.y}" r="4" fill="${c}"></circle>
-        <text x="${p.x}" y="${repsLine}" text-anchor="middle" font-size="9.5" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${p.e.reps} × ${p.e.sets}</text>
-        <text x="${p.x}" y="${dateLine}" text-anchor="middle" font-size="9.5" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${formatShort(p.e.date).slice(0,5)}</text>
+        <text x="${p.x}" y="${repsLine}" text-anchor="middle" font-size="9.5" fill="${CV('--chart-dim')}" font-family="IBM Plex Sans, sans-serif">${p.e.reps} × ${p.e.sets}</text>
+        <text x="${p.x}" y="${dateLine}" text-anchor="middle" font-size="9.5" fill="${CV('--chart-dim')}" font-family="IBM Plex Sans, sans-serif">${formatShort(p.e.date).slice(0,5)}</text>
         <text x="${p.x}" y="${tendenzLine}" text-anchor="middle" font-size="9.5" fill="${c}" font-family="IBM Plex Sans, sans-serif">${p.e.tendenz}</text>
       `;
     }).join('');
@@ -2039,7 +2178,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       <div class="trend-chart">
         <div class="trend-unit">Verlauf in ${unit}</div>
         <svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-          <polyline points="${polyline}" fill="none" stroke="#556B4E" stroke-width="2"></polyline>
+          <polyline points="${polyline}" fill="none" stroke="${CV('--chart')}" stroke-width="2"></polyline>
           ${marks}
         </svg>
       </div>
@@ -2062,9 +2201,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       const y = chartHeight - barH;
       const shortDate = d.slice(8,10) + '.' + d.slice(5,7) + '.';
       return `
-        <text x="${x + barWidth/2}" y="${y - 6}" text-anchor="middle" font-size="10" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${Math.round(v)}</text>
-        <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="3" fill="#556B4E"></rect>
-        <text x="${x + barWidth/2}" y="${chartHeight + 20}" text-anchor="middle" font-size="10" fill="#9a9ca5" font-family="IBM Plex Sans, sans-serif">${shortDate}</text>
+        <text x="${x + barWidth/2}" y="${y - 6}" text-anchor="middle" font-size="10" fill="${CV('--chart-dim')}" font-family="IBM Plex Sans, sans-serif">${Math.round(v)}</text>
+        <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="3" fill="${CV('--chart')}"></rect>
+        <text x="${x + barWidth/2}" y="${chartHeight + 20}" text-anchor="middle" font-size="10" fill="${CV('--chart-dim')}" font-family="IBM Plex Sans, sans-serif">${shortDate}</text>
       `;
     }).join('');
 
