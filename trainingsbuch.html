@@ -38,6 +38,7 @@
     --radius: 6px;
     --offwhite: #F5F3EE;
     --anthrazit: #232323;
+    --surface-solid: #1f2119; /* deckend, für Menüs und Dialoge, die über Inhalt liegen */
     --chart: #556B4E;
     --chart-dim: #9a9ca5;
     --dot-leicht: #6fcf97;
@@ -52,7 +53,7 @@
 
   /* ---------- Design "RunRebels" (Einstellung unten in der Übersicht) ---------- */
   html[data-design="runrebels"]{
-    --bg: var(--rr-s); --surface: var(--rr-ov);
+    --bg: var(--rr-s); --surface: var(--rr-ov); --surface-solid: color-mix(in srgb, var(--rr-s) 84%, var(--rr-o));
     --border: color-mix(in srgb, var(--rr-o) 45%, transparent); --border-strong: var(--rr-o);
     --text: var(--rr-o); --text-dim: color-mix(in srgb, var(--rr-o) 86%, var(--rr-s));
     --accent: var(--rr-a); --accent-text: var(--rr-oa);
@@ -522,7 +523,7 @@
     display:flex; align-items:center; justify-content:center; padding:18px;
   }
   .modal-box{
-    background: var(--surface); border:1px solid var(--border-strong);
+    background: var(--surface-solid); border:1px solid var(--border-strong);
     border-radius: var(--radius); padding:20px; max-width:380px; width:100%;
   }
   .modal-box h2{ font-size:1.1rem; }
@@ -531,7 +532,7 @@
   .clear-wrap{ position:relative; }
   .suggest-box{
     display:none; position:absolute; left:0; right:0; bottom:calc(100% + 6px); z-index:20;
-    flex-direction:column-reverse; background: var(--surface); border:1px solid var(--border-strong);
+    flex-direction:column-reverse; background: var(--surface-solid); border:1px solid var(--border-strong);
     border-radius: var(--radius); overflow:hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.45);
   }
   .suggest-box.open{ display:flex; }
