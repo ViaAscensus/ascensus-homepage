@@ -435,6 +435,21 @@
   .modal-box p{ color: var(--text-dim); font-size:0.88rem; margin:8px 0 16px; }
   .modal-actions{ display:flex; gap:10px; }
   .clear-wrap{ position:relative; }
+  .suggest-box{
+    display:none; position:absolute; left:0; right:0; bottom:calc(100% + 6px); z-index:20;
+    flex-direction:column-reverse; background: var(--surface); border:1px solid var(--border-strong);
+    border-radius: var(--radius); overflow:hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  }
+  .suggest-box.open{ display:flex; }
+  .suggest-item{
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px; width:100%; min-height:46px;
+    padding:10px 12px; background:none; border:none; border-top:1px solid var(--border); color: var(--text);
+    font-size:0.95rem; text-align:left; cursor:pointer; font-family:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  .suggest-item:first-child{ border-top:none; }
+  .suggest-item:active{ background: var(--accent); color: var(--accent-text); }
+  .suggest-item small{ color: var(--text-dim); font-size:0.75rem; white-space:nowrap; }
+  .suggest-item:active small{ color: inherit; }
   .clear-wrap input{ padding-right:44px; }
   .clear-btn{
     position:absolute; right:4px; top:50%; transform:translateY(-50%);
@@ -803,10 +818,10 @@
     <div class="field">
       <label for="fExercise">Übung</label>
       <div class="clear-wrap">
-        <input type="text" id="fExercise" list="exerciseList" placeholder="z. B. Armbeuger" autocomplete="off">
+        <input type="text" id="fExercise" placeholder="z. B. Armbeuger" autocomplete="off">
+        <div class="suggest-box" id="suggestBox" role="listbox"></div>
         <button type="button" class="clear-btn" id="clearExerciseBtn" aria-label="Übung löschen">×</button>
       </div>
-      <datalist id="exerciseList"></datalist>
     </div>
     <button class="btn btn-primary" id="continueToDetailBtn" style="width:100%;">Weiter</button>
     </div>
@@ -2590,15 +2605,34 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     });
   });
 
+  // Eigenes Vorschlagsmenü statt datalist: Design, Verhalten und Platz über der Tastatur sind steuerbar
+  let suggestAll = [];
+  function suggestFor(q){
+    const n = normName(q);
+    if(!n) return [];
+    const starts = [], contains = [];
+    suggestAll.forEach(x => {
+      if(x.norm === n) return;
+      if(x.norm.startsWith(n)) starts.push(x);
+      else if(x.norm.includes(n)) contains.push(x);
+    });
+    const byOwn = (a, b) => (b.own - a.own);
+    return starts.sort(byOwn).concat(contains.sort(byOwn)).slice(0, 6);
+  }
+  function renderSuggest(){
+    const box = document.getElementById('suggestBox');
+    const list = document.activeElement === fExercise ? suggestFor(fExercise.value) : [];
+    box.innerHTML = list.map(x => `<button type="button" class="suggest-item" role="option" data-name="${escapeHtml(x.name)}"><span>${escapeHtml(x.name)}</span>${x.gruppe ? `<small>${escapeHtml(x.gruppe)}</small>` : ''}</button>`).join('');
+    box.classList.toggle('open', list.length > 0);
+  }
   function updateExerciseList(){
     const names = [...new Set(entries.map(e => e.exercise))].sort();
     if(!names.some(n => isCardioName(n))) names.push('Laufband');
     // Eigene Übungen zuerst, danach die Katalogübungen mit ihrer Muskelgruppe als Zusatz
     const own = new Set(names.map(n => normName(n)));
     const fromCatalog = catalog.filter(c => !own.has(c.norm)).sort((x, y) => x.name.localeCompare(y.name, 'de'));
-    document.getElementById('exerciseList').innerHTML =
-      names.map(n => `<option value="${escapeHtml(n)}"></option>`).join('') +
-      fromCatalog.map(c => `<option value="${escapeHtml(c.name)}" label="${escapeHtml(c.gruppe)}"></option>`).join('');
+    suggestAll = names.map(n => ({ name: n, norm: normName(n), gruppe: '', own: true }))
+      .concat(fromCatalog.map(c => ({ name: c.name, norm: c.norm, gruppe: c.gruppe, own: false })));
   }
 
   // ---------- Form: last-value hint ----------
@@ -2620,6 +2654,21 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       `<div class="last-sets">${setRows(g).map(r => `<div class="set-line">${escapeHtml(r.text)}</div>`).join('')}</div></details>`;
   }
   fExercise.addEventListener('input', updateLastHint);
+  fExercise.addEventListener('input', renderSuggest);
+  fExercise.addEventListener('focus', renderSuggest);
+  fExercise.addEventListener('blur', () => setTimeout(() => document.getElementById('suggestBox').classList.remove('open'), 120));
+  fExercise.addEventListener('keydown', ev => { if(ev.key === 'Escape') document.getElementById('suggestBox').classList.remove('open'); });
+  // pointerdown + preventDefault: das Feld behält den Fokus, die Tastatur bleibt, der Tipp geht nicht verloren
+  document.getElementById('suggestBox').addEventListener('pointerdown', ev => {
+    const it = ev.target.closest('.suggest-item');
+    if(!it) return;
+    ev.preventDefault();
+    fExercise.value = it.dataset.name;
+    document.getElementById('suggestBox').classList.remove('open');
+    fExercise.dispatchEvent(new Event('input'));
+    document.getElementById('suggestBox').classList.remove('open');
+    fExercise.blur();
+  });
 
   // ---------- Übungsfeld: x zum Leeren ----------
   const clearExerciseBtn = document.getElementById('clearExerciseBtn');
