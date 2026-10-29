@@ -402,6 +402,7 @@
   #startSetBtn{ background:#556B4E; border-color:#556B4E; color:#f2f1ed; }
   #saveEntry{ background:#B59A5D; border-color:#B59A5D; color:#232323; }
   #otherExerciseBtn{ background:#F5F3EE; border-color:#F5F3EE; color:#232323; }
+  .exercise-img{ display:block; max-width:100%; max-height:170px; margin:4px 0 12px; border-radius: var(--radius); background:#fff; object-fit:contain; }
   #detailExerciseName{
     text-transform:uppercase; font-size:1.6rem; letter-spacing:0.5px;
     margin-bottom:6px; line-height:1.2;
@@ -754,6 +755,7 @@
   <!-- Schritt 2: Übung erfassen -->
   <section id="detail-section" style="display:none;">
     <h2 id="detailExerciseName"></h2>
+    <img id="exerciseImg" class="exercise-img" alt="" style="display:none;" loading="lazy">
     <div class="hint" id="todayPositionHint" style="margin-top:0; margin-bottom:4px; color: var(--accent);"></div>
     <div class="hint exercise-note" id="exerciseNote" style="display:none;"></div>
     <div class="hint" id="lastHint"></div>
@@ -1011,17 +1013,21 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   // Exakter Name -> Gruppe wird automatisch genutzt, ähnlicher Name -> Vorschlag.
   let catalog = [];            // [{name, norm, gruppe}]
   let catalogExact = {};       // norm -> gruppe
+  let catalogImg = {};         // norm -> Bildadresse (liegt in PocketBase, nie bei wger)
   function normName(n){
     return String(n || '').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
       .replace(/[^a-z0-9]+/g,' ').trim();
   }
   async function loadCatalog(){
-    catalog = []; catalogExact = {};
+    catalog = []; catalogExact = {}; catalogImg = {};
     try{
-      const recs = await pb.collection('uebungskatalog').getFullList({ fields: 'name,muskelgruppe', batch: 500 });
+      const recs = await pb.collection('uebungskatalog').getFullList({ fields: 'id,collectionId,collectionName,name,muskelgruppe,bild', batch: 500 });
       recs.forEach(r => {
-        if(!r.name || !muscleGroups.includes(r.muskelgruppe) || r.muskelgruppe === 'Sonstiges') return;
         const norm = normName(r.name);
+        if(norm && r.bild && !catalogImg[norm]){
+          try{ catalogImg[norm] = pb.files.getUrl(r, r.bild, { thumb: '320x320' }); }catch(e){}
+        }
+        if(!r.name || !muscleGroups.includes(r.muskelgruppe) || r.muskelgruppe === 'Sonstiges') return;
         if(!norm) return;
         catalog.push({ name: r.name, norm, gruppe: r.muskelgruppe });
         if(!catalogExact[norm]) catalogExact[norm] = r.muskelgruppe;
@@ -2152,6 +2158,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     stopSetStopwatch();
     const exerciseName = fExercise.value.trim();
     document.getElementById('detailExerciseName').textContent = exerciseName;
+    const img = document.getElementById('exerciseImg');
+    const imgUrl = catalogImg[normName(exerciseName)];
+    if(imgUrl){ img.src = imgUrl; img.alt = exerciseName; img.style.display = 'block'; }
+    else{ img.removeAttribute('src'); img.style.display = 'none'; }
 
     const todayDate = document.getElementById('fDate').value;
     const todayOrder = activeTraining ? getExerciseOrderForSession(activeTraining.id) : getExerciseOrderForDay(todayDate);

@@ -12,7 +12,8 @@ Felder der Sammlung (fehlende werden angelegt, vorhandene bleiben unberührt)
     muskeln_primaer   Text    wger-Muskeln, kommagetrennt
     muskeln_sekundaer Text    wger-Muskeln, kommagetrennt
     equipment         Text    Geräte, kommagetrennt
-    bild_url          Text    Hauptbild bei wger (nur Verweis, es wird nichts kopiert)
+    bild_url          Text    Hauptbild bei wger (Quelle)
+    bild              Datei   Kopie des Hauptbilds in PocketBase; die Seite lädt es von dort und nie von wger
     wger_id           Zahl    Kennung bei wger; macht den Lauf wiederholbar
 
 Lesen darf jedes angemeldete Mitglied, schreiben nur der Superuser. Eine bereits gesetzte
@@ -28,6 +29,7 @@ Aufruf
     python3 tools/import-uebungskatalog.py --dry-run           # nur zeigen, nichts schreiben
     python3 tools/import-uebungskatalog.py --dry-run --limit=30
     python3 tools/import-uebungskatalog.py                     # importieren
+    python3 tools/import-uebungskatalog.py --ohne-bilder       # Texte importieren, keine Bilder laden
     python3 tools/import-uebungskatalog.py --englisch          # Übungen ohne deutschen Namen mit englischem Namen aufnehmen
 
 Zugang: Superuser (E-Mail und Passwort werden abgefragt, oder PB_TOKEN bzw.
@@ -58,7 +60,10 @@ FELDER = [
     {'name': 'equipment', 'type': 'text', 'required': False, 'max': 400},
     {'name': 'bild_url', 'type': 'text', 'required': False, 'max': 600},
     {'name': 'wger_id', 'type': 'number', 'required': False, 'onlyInt': True},
+    {'name': 'bild', 'type': 'file', 'required': False, 'maxSelect': 1, 'maxSize': 2000000,
+     'mimeTypes': ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], 'thumbs': ['320x320']},
 ]
+MAX_BILD = 2000000
 
 # wger-Muskel (Kennung -> unsere Gruppe). Die Kennungen sind bei wger fest vergeben;
 # zusätzlich wird der englische Name geprüft, falls sich eine Kennung ändert.
@@ -263,10 +268,45 @@ def eintrag_bauen(info, de_id, englisch):
     }
 
 
+def bild_laden(url):
+    """Lädt das Bild von wger; gibt (Bytes, Dateiname, Typ) zurück oder None."""
+    try:
+        r = urllib.request.Request(url, headers={'User-Agent': 'ascensus-katalog-import/1.0'})
+        with urllib.request.urlopen(r, timeout=60) as resp:
+            typ = (resp.headers.get('Content-Type') or '').split(';')[0].strip().lower()
+            daten = resp.read(MAX_BILD + 1)
+    except (urllib.error.URLError, OSError):
+        return None
+    if typ not in ('image/jpeg', 'image/png', 'image/webp', 'image/gif') or not daten or len(daten) > MAX_BILD:
+        return None
+    endung = {'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif'}[typ]
+    return daten, f'uebung.{endung}', typ
+
+
+def bild_hochladen(satz_id, feldname, daten, dateiname, typ):
+    grenze = '----ascensus' + str(int(time.time() * 1000))
+    kopf = (f'--{grenze}\r\nContent-Disposition: form-data; name="{feldname}"; filename="{dateiname}"\r\n'
+            f'Content-Type: {typ}\r\n\r\n').encode()
+    body = kopf + daten + f'\r\n--{grenze}--\r\n'.encode()
+    for versuch in range(3):
+        r = urllib.request.Request(f'{PB}/api/collections/{NAME}/records/{satz_id}', data=body, method='PATCH')
+        r.add_header('Content-Type', f'multipart/form-data; boundary={grenze}')
+        r.add_header('Authorization', token)
+        try:
+            with urllib.request.urlopen(r, timeout=120) as resp:
+                return json.loads(resp.read() or b'{}')
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 502, 503, 504) and versuch < 2:
+                time.sleep(2 * (versuch + 1))
+                continue
+            raise Fehler(f'Bild-Upload fehlgeschlagen (HTTP {e.code}): {e.read().decode("utf-8", "replace")[:200]}') from None
+
+
 def main():
     args = sys.argv[1:]
     trocken = '--dry-run' in args
     englisch = '--englisch' in args
+    bilder = '--ohne-bilder' not in args
     limit = next((int(a.split('=', 1)[1]) for a in args if a.startswith('--limit=')), None)
     print(('PROBELAUF (nichts wird geschrieben)' if trocken else 'IMPORT') + f' · wger: {WGER} · PocketBase: {PB}')
 
@@ -307,20 +347,36 @@ def main():
     vorhanden = {}
     for r in _pb_alle(NAME):
         vorhanden[r.get('wger_id')] = r
-    neu = geaendert = gleich = 0
+    echt_bild = echt.get('bild')
+    neu = geaendert = gleich = bild_neu = bild_fehlt = 0
     for i, e in enumerate(eintraege, 1):
         alt = vorhanden.get(e['wger_id'])
         if alt is None:
-            pb(f'api/collections/{NAME}/records', 'POST', e)
+            satz = pb(f'api/collections/{NAME}/records', 'POST', e)
+            satz_id = satz['id']
+            hat_bild = False
             neu += 1
-        elif any(alt.get(k) != v for k, v in e.items()):
-            pb(f'api/collections/{NAME}/records/{alt["id"]}', 'PATCH', e)
-            geaendert += 1
         else:
-            gleich += 1
+            satz_id = alt['id']
+            hat_bild = bool(echt_bild and alt.get(echt_bild))
+            if any(alt.get(k) != v for k, v in e.items()):
+                pb(f'api/collections/{NAME}/records/{satz_id}', 'PATCH', e)
+                geaendert += 1
+            else:
+                gleich += 1
+        quelle = e.get(echt.get('bild_url', 'bild_url'))
+        if bilder and echt_bild and quelle and not hat_bild:
+            geladen = bild_laden(quelle)
+            if geladen:
+                bild_hochladen(satz_id, echt_bild, *geladen)
+                bild_neu += 1
+            else:
+                bild_fehlt += 1
         if i % 100 == 0:
             print(f'  ... {i}/{len(eintraege)} verarbeitet')
     print(f'Fertig: {neu} neu, {geaendert} aktualisiert, {gleich} unverändert.')
+    if bilder:
+        print(f'Bilder: {bild_neu} hochgeladen, {bild_fehlt} nicht ladbar (fehlend, zu groß oder kein Bild).')
 
 
 def _pb_alle(sammlung):
