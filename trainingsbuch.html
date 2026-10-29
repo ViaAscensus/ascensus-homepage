@@ -171,6 +171,24 @@
     border-radius: var(--radius); color: var(--text); padding:11px 12px; font-size:0.95rem;
     font-family:'IBM Plex Sans', system-ui, sans-serif;
   }
+  /* ---------- Notiz zur Übung, Körperwerte ---------- */
+  #plans-screen .head, #planedit-screen .head, #body-screen .head{ padding: 16px 18px 4px; }
+  .note-box{ margin-bottom:12px; }
+  .note-box label{ display:block; font-size:0.8rem; color: var(--text-dim); margin-bottom:5px; }
+  .note-box textarea{
+    width:100%; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); padding:10px 12px; font-size:0.92rem; font-family:inherit; resize:vertical; min-height:44px;
+  }
+  .note-state{ font-size:0.75rem; color: var(--text-dim); min-height:1em; margin-top:3px; }
+  .body-grid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px 10px; }
+  .body-grid .field{ margin-bottom:0; }
+  .body-sub{ font-size:0.8rem; color: var(--text-dim); margin:14px 0 8px; }
+  .body-chart{ margin:6px 0 4px; }
+  .body-chart svg{ width:100%; height:auto; display:block; }
+  .body-delta{ font-size:0.85rem; color: var(--text-dim); margin-bottom:10px; }
+  .body-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--border); }
+  .body-row .d{ font-weight:600; font-size:0.9rem; }
+  .body-row .v{ font-size:0.8rem; color: var(--text-dim); margin-top:2px; line-height:1.4; }
   /* ---------- Trainingspläne ---------- */
   #planList{ padding: 6px 18px 18px; }
   .plan-card{ border:1px solid var(--border); border-radius: var(--radius); padding:12px; margin-bottom:14px; }
@@ -773,6 +791,7 @@
   <button class="new-training-btn new-training-btn-backfill" id="backfillBtn">+ Training nachtragen</button>
   <button class="new-training-btn new-training-btn-suggest" id="planTrainingBtn">Nach Trainingsplan trainieren</button>
   <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
+  <button class="stats-link" id="bodyLink">⚖️ Körperwerte</button>
   <div id="calendar" class="cal"></div>
   <section id="designBox">
     <div class="design-title">Design</div>
@@ -801,6 +820,37 @@
 </div>
 
 <!-- ========== Plan bearbeiten ========== -->
+<!-- ========== Körperwerte ========== -->
+<div class="screen" id="body-screen">
+  <button class="screen-back" id="bodyBackBtn">← Übersicht</button>
+  <div class="head">
+    <h2>Körperwerte</h2>
+    <p class="sub">Gewicht und Umfänge im Verlauf</p>
+  </div>
+  <div class="pe-sec">
+    <div class="body-grid">
+      <div class="field"><label for="bDate">Datum</label><input type="date" id="bDate"></div>
+      <div class="field"><label for="bGewicht">Gewicht (kg)</label><input type="number" id="bGewicht" step="0.1" min="0" inputmode="decimal" placeholder="0,0"></div>
+    </div>
+    <div class="body-sub">Umfänge in cm (optional)</div>
+    <div class="body-grid">
+      <div class="field"><label for="bBauch">Bauch</label><input type="number" id="bBauch" step="0.5" min="0" inputmode="decimal"></div>
+      <div class="field"><label for="bHuefte">Hüfte</label><input type="number" id="bHuefte" step="0.5" min="0" inputmode="decimal"></div>
+      <div class="field"><label for="bBrust">Brust</label><input type="number" id="bBrust" step="0.5" min="0" inputmode="decimal"></div>
+      <div class="field"><label for="bOberarm">Oberarm</label><input type="number" id="bOberarm" step="0.5" min="0" inputmode="decimal"></div>
+      <div class="field"><label for="bOberschenkel">Oberschenkel</label><input type="number" id="bOberschenkel" step="0.5" min="0" inputmode="decimal"></div>
+    </div>
+    <button type="button" class="btn btn-primary" id="bodySaveBtn" style="width:100%; margin-top:14px;">Speichern</button>
+    <div class="formmsg" id="bodyMsg"></div>
+    <div class="body-sub">Verlauf</div>
+    <div class="field"><label for="bMetric">Anzeigen</label><select id="bMetric"></select></div>
+    <div class="body-chart" id="bodyChart"></div>
+    <div class="body-delta" id="bodyDelta"></div>
+    <div id="bodyList"></div>
+    <p class="plan-note" id="bodyNote"></p>
+  </div>
+</div>
+
 <div class="screen" id="planedit-screen">
   <button class="screen-back" id="peBackBtn">← Pläne</button>
   <div class="head">
@@ -989,6 +1039,11 @@
     <div class="plan-hint" id="planSoll" style="display:none;"></div>
     <div class="hint exercise-note" id="exerciseNote" style="display:none;"></div>
     <div class="hint" id="lastHint"></div>
+    <div class="note-box" id="noteBox">
+      <label for="noteText">Notiz zur Übung</label>
+      <textarea id="noteText" rows="2" maxlength="500" placeholder="z. B. Sitzhöhe 4, enger Griff"></textarea>
+      <div class="note-state" id="noteState"></div>
+    </div>
     <button type="button" class="btn btn-primary" id="startSetBtn" style="width:100%; margin-bottom:14px;">Satz beginnen</button>
     <div class="phase-row" id="phaseRow" role="group" aria-label="Phase">
       <button type="button" class="phase-btn" data-typ="aufwaermen">Aufwärmen</button>
@@ -1172,7 +1227,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     new: document.getElementById('new-screen'),
     summary: document.getElementById('summary-screen'),
     plans: document.getElementById('plans-screen'),
-    planedit: document.getElementById('planedit-screen')
+    planedit: document.getElementById('planedit-screen'),
+    body: document.getElementById('body-screen')
   };
   const loadingState = document.getElementById('loadingState');
 
@@ -1286,7 +1342,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       entries = [];
       console.error('Laden fehlgeschlagen', e);
     }
-    await Promise.all([loadMuscleMap(), loadCatalog(), loadPlans()]);
+    await Promise.all([loadMuscleMap(), loadCatalog(), loadPlans(), loadNotes(), loadBody()]);
     loadingState.style.display = 'none';
     renderOverview();
     updateExerciseList();
@@ -2518,6 +2574,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
                             .sort((a,b) => b.date.localeCompare(a.date));
     const cardio = isCardioName(exerciseName);
     hideMuscleAsk();
+    showNote(exerciseName);
     document.getElementById('endExConfirm').style.display = 'none';
     const noteEl = document.getElementById('exerciseNote');
     if(/rumpfdreh/i.test(exerciseName)){ noteEl.textContent = '1 Wdh. = links + rechts'; noteEl.style.display = 'block'; }
@@ -3758,6 +3815,216 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       ? '✓ Gespeichert, aber nur auf diesem Gerät: In PocketBase fehlt die Sammlung für Pläne (Einrichtungsskript).'
       : '✓ Plan gespeichert. Du findest ihn unter „Nach Trainingsplan trainieren".';
     if(res.local) msg.classList.add('error');
+  });
+
+
+  // ---------- Notiz je Übung (PocketBase-Sammlung uebung_notizen, Rückfall: localStorage) ----------
+  const NOTE_LS = 'tb_notes_local';
+  let notes = {};          // Übungsname (klein) -> { text, id }
+  let noteStoreOk = true;
+  let noteKey = '';
+  let noteTimer = null;
+  async function loadNotes(){
+    notes = {};
+    try{
+      const recs = await pb.collection('uebung_notizen').getFullList();
+      recs.forEach(r => { if(r.uebung && r.notiz) notes[String(r.uebung).toLowerCase()] = { text: r.notiz, id: r.id }; });
+      noteStoreOk = true;
+    }catch(e){ noteStoreOk = false; }
+    try{
+      const loc = JSON.parse(localStorage.getItem(NOTE_LS) || '{}');
+      Object.keys(loc).forEach(k => { if(!notes[k]) notes[k] = { text: loc[k], id: null }; });
+    }catch(e){}
+  }
+  function showNote(name){
+    noteKey = name.trim().toLowerCase();
+    clearTimeout(noteTimer);
+    document.getElementById('noteText').value = (notes[noteKey] && notes[noteKey].text) || '';
+    document.getElementById('noteState').textContent = '';
+  }
+  async function saveNote(key, text){
+    text = text.trim();
+    const old = notes[key];
+    if((old ? old.text : '') === text) return null;
+    let id = old ? old.id : null, remote = false;
+    if(noteStoreOk){
+      try{
+        if(!text){ if(id) await pb.collection('uebung_notizen').delete(id); id = null; }
+        else if(id) await pb.collection('uebung_notizen').update(id, { notiz: text });
+        else id = (await pb.collection('uebung_notizen').create({ member: pb.authStore.model.id, uebung: key, notiz: text })).id;
+        remote = true;
+      }catch(e){ console.error(e); noteStoreOk = false; }
+    }
+    try{
+      const loc = JSON.parse(localStorage.getItem(NOTE_LS) || '{}');
+      if(text && !remote) loc[key] = text; else delete loc[key];
+      localStorage.setItem(NOTE_LS, JSON.stringify(loc));
+    }catch(e){}
+    if(text) notes[key] = { text, id: remote ? id : null }; else delete notes[key];
+    return remote;
+  }
+  async function flushNote(){
+    clearTimeout(noteTimer);
+    const key = noteKey, text = document.getElementById('noteText').value;
+    const st = document.getElementById('noteState');
+    const r = await saveNote(key, text);
+    if(key !== noteKey || r === null) return;
+    st.textContent = r ? '✓ Gespeichert' : 'Nur auf diesem Gerät gespeichert (Einrichtungsskript fehlt)';
+  }
+  document.getElementById('noteText').addEventListener('input', () => { clearTimeout(noteTimer); noteTimer = setTimeout(flushNote, 900); });
+  document.getElementById('noteText').addEventListener('change', flushNote);
+
+  // ---------- Körperwerte (PocketBase-Sammlung koerperwerte, Rückfall: localStorage) ----------
+  const BODY_LS = 'tb_body_local';
+  const BODY_METRICS = [
+    ['gewicht', 'Gewicht', 'kg'], ['bauch', 'Bauch', 'cm'], ['huefte', 'Hüfte', 'cm'],
+    ['brust', 'Brust', 'cm'], ['oberarm', 'Oberarm', 'cm'], ['oberschenkel', 'Oberschenkel', 'cm']
+  ];
+  let body = [];            // [{id, datum, gewicht, bauch, ...}] aufsteigend nach Datum
+  let bodyStoreOk = true;
+  let bodyDeleteArmed = null;
+  const localBody = () => { try{ return JSON.parse(localStorage.getItem(BODY_LS) || '[]'); }catch(e){ return []; } };
+  const storeLocalBody = list => { try{ localStorage.setItem(BODY_LS, JSON.stringify(list)); }catch(e){} };
+  async function loadBody(){
+    let remote = [];
+    try{
+      remote = await pb.collection('koerperwerte').getFullList({ sort: 'datum' });
+      bodyStoreOk = true;
+    }catch(e){ bodyStoreOk = false; }
+    body = remote.concat(localBody()).map(r => ({ ...r, datum: String(r.datum).slice(0, 10) }))
+      .sort((a, b) => a.datum.localeCompare(b.datum));
+  }
+  function bodyNum(id){
+    const v = parseFloat(String(document.getElementById(id).value).replace(',', '.'));
+    return isFinite(v) && v > 0 ? Math.round(v * 10) / 10 : null;
+  }
+  const bodyFmt = n => String(n).replace('.', ',');
+  async function persistBody(rec){
+    const same = body.find(r => r.datum === rec.datum);
+    const data = {};
+    BODY_METRICS.forEach(([k]) => { if(rec[k] != null) data[k] = rec[k]; });
+    if(bodyStoreOk && !(same && String(same.id).startsWith('l_'))){
+      try{
+        if(same) await pb.collection('koerperwerte').update(same.id, data);
+        else await pb.collection('koerperwerte').create({ member: pb.authStore.model.id, datum: rec.datum, ...data });
+        await loadBody();
+        return { local: false };
+      }catch(e){ console.error(e); }
+    }
+    const loc = localBody();
+    const i = same ? loc.findIndex(x => x.id === same.id) : -1;
+    if(i >= 0) loc[i] = { ...loc[i], ...data };
+    else loc.push({ id: 'l_' + Date.now().toString(36), datum: rec.datum, ...data });
+    storeLocalBody(loc);
+    await loadBody();
+    return { local: true };
+  }
+  async function removeBody(id){
+    if(String(id).startsWith('l_')) storeLocalBody(localBody().filter(x => x.id !== id));
+    else await pb.collection('koerperwerte').delete(id);
+    await loadBody();
+  }
+  // Neuestes Gewicht ins Profil übernehmen (Stammdaten, werden für Übungen mit Körpergewicht genutzt)
+  async function syncProfileWeight(){
+    const latest = [...body].reverse().find(r => r.gewicht > 0);
+    if(!latest || latest.gewicht === memberBodyweight) return;
+    try{
+      await pb.collection('members').update(pb.authStore.model.id, { Gewicht: latest.gewicht });
+      memberBodyweight = latest.gewicht;
+    }catch(e){ console.error(e); }
+  }
+  function renderBodyChart(){
+    const sel = document.getElementById('bMetric');
+    const key = sel.value || 'gewicht';
+    const m = BODY_METRICS.find(x => x[0] === key) || BODY_METRICS[0];
+    const pts = body.filter(r => r[key] > 0).map(r => ({ d: r.datum, v: r[key] }));
+    const chart = document.getElementById('bodyChart'), delta = document.getElementById('bodyDelta');
+    if(!pts.length){ chart.innerHTML = '<p class="plan-empty">Noch keine Werte für ' + escapeHtml(m[1]) + '.</p>'; delta.textContent = ''; return; }
+    const W = 340, H = 170, L = 36, R = 14, T = 16, B = 28;
+    const vs = pts.map(p => p.v);
+    let lo = Math.min(...vs), hi = Math.max(...vs);
+    if(hi - lo < 1){ lo -= 0.5; hi += 0.5; }
+    const pad = (hi - lo) * 0.15; lo -= pad; hi += pad;
+    const t0 = new Date(pts[0].d + 'T00:00:00').getTime(), t1 = new Date(pts[pts.length - 1].d + 'T00:00:00').getTime();
+    const X = d => pts.length === 1 || t1 === t0 ? (L + W - R) / 2 : L + (new Date(d + 'T00:00:00').getTime() - t0) / (t1 - t0) * (W - L - R);
+    const Y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+    const line = pts.map(p => X(p.d).toFixed(1) + ',' + Y(p.v).toFixed(1)).join(' ');
+    const dots = pts.map((p, i) => `<circle cx="${X(p.d).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="${i === pts.length - 1 ? 5 : 3.5}" fill="${CV('--chart')}"></circle>`).join('');
+    const short = d => d.slice(8, 10) + '.' + d.slice(5, 7) + '.';
+    const last = pts[pts.length - 1];
+    chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Verlauf ${escapeHtml(m[1])}">
+      <line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke="${CV('--chart-dim')}" stroke-width="1" opacity="0.5"></line>
+      <text x="${L - 6}" y="${Y(Math.max(...vs)) + 3}" text-anchor="end" font-size="10" fill="${CV('--chart-dim')}">${bodyFmt(Math.max(...vs))}</text>
+      <text x="${L - 6}" y="${Y(Math.min(...vs)) + 3}" text-anchor="end" font-size="10" fill="${CV('--chart-dim')}">${bodyFmt(Math.min(...vs))}</text>
+      ${pts.length > 1 ? `<polyline points="${line}" fill="none" stroke="${CV('--chart')}" stroke-width="2"></polyline>` : ''}
+      ${dots}
+      <text x="${X(last.d).toFixed(1)}" y="${(Y(last.v) - 9).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${CV('--chart')}">${bodyFmt(last.v)} ${m[2]}</text>
+      <text x="${L}" y="${H - 10}" text-anchor="start" font-size="10" fill="${CV('--chart-dim')}">${short(pts[0].d)}</text>
+      ${pts.length > 1 ? `<text x="${W - R}" y="${H - 10}" text-anchor="end" font-size="10" fill="${CV('--chart-dim')}">${short(last.d)}</text>` : ''}
+    </svg>`;
+    if(pts.length > 1){
+      const diff = Math.round((last.v - pts[0].v) * 10) / 10;
+      delta.textContent = (diff > 0 ? '+' : diff < 0 ? '−' : '±') + bodyFmt(Math.abs(diff)) + ' ' + m[2] + ' seit ' + formatShort(pts[0].d);
+    } else delta.textContent = 'Ein Wert vom ' + formatShort(last.d) + '. Ab dem zweiten Eintrag erscheint der Verlauf.';
+  }
+  function renderBody(){
+    const sel = document.getElementById('bMetric');
+    if(!sel.options.length){
+      sel.innerHTML = BODY_METRICS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('');
+    }
+    renderBodyChart();
+    const list = document.getElementById('bodyList');
+    list.innerHTML = [...body].reverse().map(r => {
+      const v = BODY_METRICS.filter(([k]) => r[k] > 0).map(([k, n, u]) => `${n} ${bodyFmt(r[k])} ${u}`).join(' · ');
+      return `<div class="body-row"><div><div class="d">${formatShort(r.datum)}${String(r.id).startsWith('l_') ? ' · nur auf diesem Gerät' : ''}</div><div class="v">${escapeHtml(v)}</div></div>
+        <button type="button" class="plan-del${bodyDeleteArmed === r.id ? ' sure' : ''}" data-id="${escapeHtml(String(r.id))}">${bodyDeleteArmed === r.id ? 'Wirklich löschen?' : 'Löschen'}</button></div>`;
+    }).join('');
+    document.getElementById('bodyNote').textContent = bodyStoreOk ? '' :
+      'Hinweis: Die Sammlung für Körperwerte fehlt in PocketBase, die Werte liegen nur auf diesem Gerät. Bitte das Einrichtungsskript ausführen.';
+  }
+  function openBody(){
+    bodyDeleteArmed = null;
+    document.getElementById('bDate').value = todayIso();
+    document.getElementById('bodyMsg').textContent = '';
+    fillBodyForm();
+    renderBody();
+    showScreen('body');
+    window.scrollTo(0, 0);
+  }
+  // Zum gewählten Datum vorhandene Werte vorbelegen
+  function fillBodyForm(){
+    const d = document.getElementById('bDate').value;
+    const r = body.find(x => x.datum === d) || {};
+    const ids = { gewicht: 'bGewicht', bauch: 'bBauch', huefte: 'bHuefte', brust: 'bBrust', oberarm: 'bOberarm', oberschenkel: 'bOberschenkel' };
+    Object.keys(ids).forEach(k => { document.getElementById(ids[k]).value = r[k] > 0 ? r[k] : ''; });
+  }
+  document.getElementById('bodyLink').addEventListener('click', openBody);
+  document.getElementById('bodyBackBtn').addEventListener('click', () => { renderOverview(); showScreen('overview'); });
+  document.getElementById('bDate').addEventListener('change', fillBodyForm);
+  document.getElementById('bMetric').addEventListener('change', renderBodyChart);
+  document.getElementById('bodySaveBtn').addEventListener('click', async () => {
+    const msg = document.getElementById('bodyMsg');
+    msg.classList.remove('error');
+    const datum = document.getElementById('bDate').value;
+    const rec = { datum, gewicht: bodyNum('bGewicht'), bauch: bodyNum('bBauch'), huefte: bodyNum('bHuefte'),
+      brust: bodyNum('bBrust'), oberarm: bodyNum('bOberarm'), oberschenkel: bodyNum('bOberschenkel') };
+    if(!datum){ msg.textContent = 'Bitte ein Datum wählen.'; msg.classList.add('error'); return; }
+    if(BODY_METRICS.every(([k]) => rec[k] == null)){ msg.textContent = 'Bitte mindestens einen Wert eintragen.'; msg.classList.add('error'); return; }
+    const btn = document.getElementById('bodySaveBtn'); btn.disabled = true;
+    const res = await persistBody(rec);
+    if(rec.gewicht != null) await syncProfileWeight();
+    btn.disabled = false;
+    renderBody();
+    if(res.local){ msg.textContent = '✓ Gespeichert, aber nur auf diesem Gerät: In PocketBase fehlt die Sammlung für Körperwerte (Einrichtungsskript).'; msg.classList.add('error'); }
+    else msg.textContent = '✓ Gespeichert';
+  });
+  document.getElementById('bodyList').addEventListener('click', async (ev) => {
+    const b = ev.target.closest('.plan-del');
+    if(!b) return;
+    if(bodyDeleteArmed !== b.dataset.id){ bodyDeleteArmed = b.dataset.id; renderBody(); return; }
+    bodyDeleteArmed = null;
+    try{ await removeBody(b.dataset.id); await syncProfileWeight(); }catch(e){ console.error(e); }
+    fillBodyForm(); renderBody();
   });
 
   // ---------- Timer ----------
