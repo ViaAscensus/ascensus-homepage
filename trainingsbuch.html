@@ -3496,7 +3496,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   async function loadPlans(){
     let remote = [];
     try{
-      remote = await pb.collection('trainingsplaene').getFullList({ sort: 'created' });
+      remote = await pb.collection('trainingsplaene').getFullList();
       planStoreOk = true;
     }catch(e){ planStoreOk = false; }
     plans = remote.concat(localPlans()).map(p => ({ ...p, tage: Array.isArray(p.tage) ? p.tage : [] }));
