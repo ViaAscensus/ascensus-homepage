@@ -245,6 +245,21 @@
   .plan-ex .n{ font-weight:700; width:1.3em; }
   .plan-ex .nm{ flex:1; font-size:0.9rem; font-weight:600; }
   .plan-ex .soll{ font-size:0.76rem; color: var(--text-dim); text-align:right; }
+  .today-card{ border:1px solid var(--accent); border-radius: var(--radius); padding:14px; margin-bottom:14px; }
+  .today-label{ font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--accent); }
+  .today-name{ font-size:1.15rem; font-weight:700; margin:2px 0 4px; }
+  .today-sub{ font-size:0.82rem; opacity:0.7; margin-bottom:10px; }
+  .today-card .btn{ width:100%; margin-top:8px; }
+  .today-catch{ border-top:1px solid var(--border); margin-top:12px; padding-top:10px; font-size:0.85rem; }
+  .wk-row{ display:flex; align-items:center; gap:10px; width:100%; min-height:44px; padding:8px 10px; margin-top:6px; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); color: var(--text); font:inherit; font-size:0.88rem; text-align:left; }
+  .wk-row .wd{ width:28px; font-weight:700; }
+  .wk-row .nm{ flex:1; min-width:0; }
+  .wk-row small{ opacity:0.65; }
+  .wk-row.today{ border-color: var(--accent); }
+  .wk-row.pick{ border-color: var(--accent); box-shadow:0 0 0 2px rgba(85,107,78,0.35); }
+  .wk-row:disabled{ opacity:0.55; }
+  .wk-actions{ display:flex; gap:8px; margin-top:10px; }
+  .wk-actions .btn{ flex:1; margin-top:0; }
   .plan-badge{ font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; color: var(--accent); }
   .plan-hint{ font-size:0.85rem; color: var(--accent); margin-bottom:8px; }
   .soll-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--border); }
@@ -786,6 +801,7 @@
     <h1>Trainingsbuch</h1>
     <p class="sub">Deine bisherigen Trainingseinheiten</p>
   </div>
+  <div id="todayCard"></div>
   <button class="new-training-btn" id="resumeBtn" style="display:none;">▶ Training fortsetzen</button>
   <button class="new-training-btn" id="newTrainingBtn">+ Neues individuelles Training starten</button>
   <button class="new-training-btn new-training-btn-suggest" id="suggestedTrainingBtn">+ Vorgeschlagenes Training starten</button>
@@ -819,6 +835,20 @@
   </div>
   <div style="padding: 0 18px 4px;"><button type="button" class="btn btn-primary" id="planNewBtn" style="width:100%;">+ Neuen Plan anlegen</button></div>
   <div id="planList"></div>
+</div>
+
+<!-- ========== Wochenplan ========== -->
+<div class="screen" id="week-screen">
+  <button class="screen-back" id="weekBackBtn">← Übersicht</button>
+  <div class="head">
+    <h2 id="weekTitle">Diese Woche</h2>
+    <p class="sub" id="weekSub"></p>
+  </div>
+  <div style="padding:0 18px 18px;">
+    <div id="weekRows"></div>
+    <div class="wk-actions" id="weekActions"></div>
+    <div class="formmsg" id="weekMsg"></div>
+  </div>
 </div>
 
 <!-- ========== Plan bearbeiten ========== -->
@@ -858,7 +888,7 @@
   <div class="head">
     <h2 id="peTitle">Neuer Plan</h2>
   </div>
-  <div class="pe-sec">
+  <div class="pe-sec" id="peMetaSec">
     <div class="field"><label for="peName">Name des Plans</label><input type="text" id="peName" maxlength="80" placeholder="z. B. Oberkörper"></div>
     <div class="field"><label for="peTyp">Art</label>
       <select id="peTyp">
@@ -1231,6 +1261,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     summary: document.getElementById('summary-screen'),
     plans: document.getElementById('plans-screen'),
     planedit: document.getElementById('planedit-screen'),
+    week: document.getElementById('week-screen'),
     body: document.getElementById('body-screen')
   };
   const loadingState = document.getElementById('loadingState');
@@ -1681,6 +1712,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function renderOverview(){
     refreshActive();
     renderCalendar();
+    renderTodayCard();
     document.getElementById('resumeBtn').style.display = activeTraining ? '' : 'none';
   }
 
@@ -3599,10 +3631,215 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     showScreen('new');
   }
 
+  // ---------- Wochenplan vom Coach: Heute, Woche, Nachholen, Tauschen, Anpassen ----------
+  const WDN = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+  const parseIso = s => new Date(s + 'T12:00:00');
+  const addIsoDays = (s, n) => { const d = parseIso(s); d.setDate(d.getDate() + n); return localIso(d); };
+  const isWeekPlan = p => p.quelle === 'coach' && Array.isArray(p.wochen) && p.wochen.length && /^\d{4}-\d{2}-\d{2}$/.test(p.start || '');
+  function deriveNamesM(wochen){
+    const tage = [], ids = new Map(), names = new Set(), slotNames = {};
+    wochen.forEach((w, wi) => w.tage.forEach((sl, i) => {
+      if(!sl) return;
+      const id = sl.name + '|' + JSON.stringify(sl.uebungen);
+      if(!ids.has(id)){
+        let name = sl.name;
+        if(names.has(name)) name = `${sl.name} (Woche ${wi + 1})`;
+        let n = 2; while(names.has(name)) name = `${sl.name} (Woche ${wi + 1}, ${n++})`;
+        names.add(name); ids.set(id, name);
+        tage.push({ name, uebungen: sl.uebungen });
+      }
+      slotNames[wi + ':' + i] = ids.get(id);
+    }));
+    return { tage, slotNames };
+  }
+  const normWochen = p => (p.wochen || []).map(w => ({ tage: Array.from({ length: 7 }, (_, i) => {
+    const sl = w && Array.isArray(w.tage) ? w.tage[i] : null;
+    return sl && Array.isArray(sl.uebungen) ? { ...sl, name: sl.name || 'Training' } : null;
+  }) }));
+  // aktueller Wochenplan: der mit Start <= heute, in seiner Laufzeit
+  function activeWeekPlan(){
+    const today = localIso(new Date());
+    const cands = plans.filter(isWeekPlan).map(p => {
+      const wochen = normWochen(p);
+      const diff = Math.round((parseIso(today) - parseIso(p.start)) / 864e5);
+      return { p, wochen, diff, wi: Math.floor(diff / 7) };
+    }).filter(c => c.diff >= 0 && c.wi < c.wochen.length);
+    if(!cands.length) return null;
+    cands.sort((a, b) => b.p.start.localeCompare(a.p.start));
+    const c = cands[0];
+    return { plan: c.p, wochen: c.wochen, wi: c.wi, wd: c.diff % 7, today, monday: addIsoDays(c.p.start, 7 * c.wi) };
+  }
+  // Stand der sieben Tage: done = an diesem Tag schon trainiert
+  function weekStatus(ctx){
+    const { plan, wochen, wi, monday } = ctx;
+    const { slotNames } = deriveNamesM(wochen);
+    const dates = {}; // Tagname -> Set Datum
+    entries.forEach(e => {
+      if(e.plan_id !== plan.id) return;
+      const d = (e.date || '').slice(0, 10);
+      if(d < monday || d > addIsoDays(monday, 6)) return;
+      (dates[e.plan_tag] = dates[e.plan_tag] || new Set()).add(d);
+    });
+    const seen = {};
+    return wochen[wi].tage.map((sl, i) => {
+      if(!sl) return { i, rest: true, date: addIsoDays(monday, i) };
+      const name = slotNames[wi + ':' + i];
+      seen[name] = (seen[name] || 0) + 1;
+      const done = (dates[name] ? dates[name].size : 0) >= seen[name];
+      return { i, slot: sl, name, done, date: addIsoDays(monday, i), n: (sl.uebungen || []).length };
+    });
+  }
+  function tagIndexFor(ctx, i){
+    const { slotNames, tage } = deriveNamesM(ctx.wochen);
+    const name = slotNames[ctx.wi + ':' + i];
+    return tage.findIndex(t => t.name === name);
+  }
+  function renderTodayCard(){
+    const box = document.getElementById('todayCard');
+    const ctx = activeWeekPlan();
+    if(!ctx){ box.innerHTML = ''; return; }
+    const st = weekStatus(ctx);
+    const t = st[ctx.wd];
+    const catchUp = st.filter(x => !x.rest && !x.done && x.i < ctx.wd);
+    let html = `<div class="today-card"><div class="today-label">Heute · ${escapeHtml(ctx.plan.name)} · Woche ${ctx.wi + 1} von ${ctx.wochen.length}</div>`;
+    if(t.rest) html += `<div class="today-name">Ruhetag</div><div class="today-sub">Heute ist nichts geplant. Erhol dich gut.</div>`;
+    else if(t.done) html += `<div class="today-name">${escapeHtml(t.slot.name)} ✓</div><div class="today-sub">Heute schon trainiert.</div>`;
+    else html += `<div class="today-name">${escapeHtml(t.slot.name)}</div><div class="today-sub">${t.n} ${t.n === 1 ? 'Übung' : 'Übungen'}</div><button type="button" class="btn btn-primary" data-start="${ctx.wd}">Training starten</button>`;
+    if(catchUp.length) html += `<div class="today-catch">${catchUp.map(x => `<button type="button" class="btn" data-start="${x.i}">Nachholen: ${escapeHtml(x.slot.name)} (${WDN[x.i]})</button>`).join('')}</div>`;
+    html += `<button type="button" class="btn" id="weekOpenBtn">Woche ansehen</button></div>`;
+    box.innerHTML = html;
+  }
+  document.getElementById('todayCard').addEventListener('click', (ev) => {
+    if(ev.target.closest('#weekOpenBtn')){ openWeekOverview(); return; }
+    const b = ev.target.closest('[data-start]'); if(!b) return;
+    startWeekDay(parseInt(b.dataset.start));
+  });
+  function startWeekDay(i){
+    const ctx = activeWeekPlan(); if(!ctx) return;
+    const idx = tagIndexFor(ctx, i);
+    if(idx < 0) return;
+    // Plan und Tage aus derselben Ableitung, damit der Tagname zu plan_tag passt
+    const plan = { ...ctx.plan, tage: deriveNamesM(ctx.wochen).tage };
+    const k = plans.findIndex(x => x.id === ctx.plan.id);
+    if(k >= 0 && JSON.stringify(plans[k].tage) !== JSON.stringify(plan.tage)) plans[k] = plan;
+    startPlanDay(ctx.plan.id, idx);
+  }
+
+  // Wochenübersicht mit Tauschen und Anpassen
+  let weekSwap = null; // null | { first: index|null }
+  function openWeekOverview(){
+    weekSwap = null; renderWeekOverview(); showScreen('week'); window.scrollTo(0, 0);
+  }
+  function renderWeekOverview(){
+    const ctx = activeWeekPlan();
+    if(!ctx){ renderOverview(); showScreen('overview'); return; }
+    const st = weekStatus(ctx);
+    const p = ctx.plan;
+    document.getElementById('weekTitle').textContent = `Woche ${ctx.wi + 1} von ${ctx.wochen.length}`;
+    document.getElementById('weekSub').textContent = `${p.name} · ${formatShort(ctx.monday)} bis ${formatShort(addIsoDays(ctx.monday, 6))}`;
+    const swapping = !!weekSwap;
+    document.getElementById('weekRows').innerHTML = st.map(x => {
+      const isToday = x.i === ctx.wd, past = x.i < ctx.wd;
+      let tag = '';
+      if(x.rest) tag = 'Ruhetag';
+      else if(x.done) tag = '✓ erledigt';
+      else if(past) tag = 'verpasst';
+      else if(isToday) tag = 'heute';
+      if(!x.rest && x.slot.mod) tag += (tag ? ' · ' : '') + (x.slot.mod === 't' ? 'getauscht' : 'angepasst');
+      const lock = swapping && (x.done || x.i < ctx.wd);
+      return `<button type="button" class="wk-row${isToday ? ' today' : ''}${swapping && weekSwap.first === x.i ? ' pick' : ''}" data-i="${x.i}"${lock ? ' disabled' : ''}><span class="wd">${WDN[x.i]}</span><span class="nm">${x.rest ? 'Ruhetag' : escapeHtml(x.slot.name)}</span><small>${escapeHtml(x.rest ? '' : tag)}</small></button>`;
+    }).join('');
+    const acts = [];
+    if(p.darf_tauschen) acts.push(swapping ? '<button type="button" class="btn" id="swapCancel">Tauschen abbrechen</button>' : '<button type="button" class="btn" id="swapBtn">Tage tauschen</button>');
+    document.getElementById('weekActions').innerHTML = acts.join('');
+    const m = document.getElementById('weekMsg'); m.classList.remove('error');
+    m.textContent = swapping ? (weekSwap.first === null ? 'Tippe den ersten Tag, dann den zweiten.' : 'Jetzt den Tag antippen, mit dem getauscht wird.')
+      : (p.darf_aendern ? 'Tippe einen noch offenen Trainingstag, um ihn anzupassen.' : '');
+  }
+  document.getElementById('weekBackBtn').addEventListener('click', () => { weekSwap = null; renderOverview(); showScreen('overview'); });
+  document.getElementById('weekActions').addEventListener('click', (ev) => {
+    if(ev.target.closest('#swapBtn')){ weekSwap = { first: null }; renderWeekOverview(); }
+    else if(ev.target.closest('#swapCancel')){ weekSwap = null; renderWeekOverview(); }
+  });
+  document.getElementById('weekRows').addEventListener('click', async (ev) => {
+    const b = ev.target.closest('.wk-row'); if(!b) return;
+    const i = parseInt(b.dataset.i);
+    const ctx = activeWeekPlan(); if(!ctx) return;
+    if(weekSwap){
+      if(weekSwap.first === null){ weekSwap.first = i; renderWeekOverview(); return; }
+      if(weekSwap.first === i){ weekSwap.first = null; renderWeekOverview(); return; }
+      await swapDays(ctx, weekSwap.first, i);
+      return;
+    }
+    const sl = ctx.wochen[ctx.wi].tage[i];
+    if(sl && ctx.plan.darf_aendern){ if(weekStatus(ctx)[i].done){ const m = document.getElementById('weekMsg'); m.textContent = 'Ein schon trainierter Tag lässt sich nicht mehr anpassen.'; m.classList.add('error'); } else openSlotEditor(ctx, i); }
+    else if(sl && !weekStatus(ctx)[i].done && i === ctx.wd) startWeekDay(i);
+  });
+  async function persistWeekPlan(plan, wochen){
+    const tage = deriveNamesM(wochen).tage;
+    const rec = await pb.collection('trainingsplaene').update(plan.id, { wochen, tage, geaendert: true });
+    const k = plans.findIndex(x => x.id === plan.id);
+    if(k >= 0) plans[k] = { ...plans[k], ...rec, wochen, tage: Array.isArray(rec.tage) ? rec.tage : tage };
+  }
+  async function swapDays(ctx, a, b){
+    const wochen = JSON.parse(JSON.stringify(ctx.wochen));
+    const days = wochen[ctx.wi].tage;
+    [days[a], days[b]] = [days[b], days[a]];
+    [a, b].forEach(i => { if(days[i]) days[i].mod = 't'; });
+    const m = document.getElementById('weekMsg');
+    try{
+      await persistWeekPlan(ctx.plan, wochen);
+      weekSwap = null; renderWeekOverview();
+    }catch(e){
+      console.error(e);
+      weekSwap = null; renderWeekOverview();
+      m.textContent = 'Tauschen hat nicht geklappt. Bitte später noch einmal versuchen.'; m.classList.add('error');
+    }
+  }
+  function openSlotEditor(ctx, i){
+    const sl = ctx.wochen[ctx.wi].tage[i];
+    pe = { id: null, slot: { planId: ctx.plan.id, wi: ctx.wi, i }, tage: [JSON.parse(JSON.stringify(sl))] };
+    pe.tage[0].uebungen.forEach(u => { if(u.rir === undefined) u.rir = null; });
+    document.getElementById('peTitle').textContent = `${WDN[i]} anpassen`;
+    document.getElementById('peMetaSec').style.display = 'none';
+    document.getElementById('peSaveBtn').textContent = 'Änderung speichern';
+    document.getElementById('peSaveBtn').disabled = false;
+    document.getElementById('peBackBtn').textContent = '← Woche';
+    document.getElementById('peMsg').textContent = '';
+    renderPlanEditor();
+    showScreen('planedit'); window.scrollTo(0, 0);
+  }
+  async function saveSlotEdit(msg){
+    const ctx = activeWeekPlan();
+    const t = pe.tage[0];
+    const uebungen = t.uebungen.filter(u => u.exercise.trim()).map(u => ({
+      exercise: u.exercise.trim(), sets: Math.max(1, u.sets || 1), reps: u.reps || 0, gewicht: u.gewicht || 0, rir: u.rir === undefined ? null : u.rir
+    }));
+    if(!uebungen.length){ msg.textContent = 'Der Tag braucht mindestens eine Übung mit Namen.'; msg.classList.add('error'); return; }
+    if(!ctx || ctx.plan.id !== pe.slot.planId){ msg.textContent = 'Der Plan ist nicht mehr aktuell.'; msg.classList.add('error'); return; }
+    const wochen = JSON.parse(JSON.stringify(ctx.wochen));
+    const old = wochen[pe.slot.wi].tage[pe.slot.i];
+    const neu = { ...old, name: (t.name || '').trim() || old.name, uebungen };
+    if(JSON.stringify([old.name, old.uebungen]) !== JSON.stringify([neu.name, neu.uebungen])) neu.mod = 'g';
+    wochen[pe.slot.wi].tage[pe.slot.i] = neu;
+    const btn = document.getElementById('peSaveBtn'); btn.disabled = true;
+    try{
+      await persistWeekPlan(ctx.plan, wochen);
+      pe = null; openWeekOverview();
+    }catch(e){
+      console.error(e);
+      msg.textContent = 'Speichern hat nicht geklappt. Bitte später noch einmal versuchen.'; msg.classList.add('error');
+    }
+    btn.disabled = false;
+  }
+
   // ---------- Plan-Editor ----------
   let pe = null; // { id, tage: [{ name, uebungen: [{ exercise, sets, reps, gewicht, rir }] }] }
   const newEx = () => ({ exercise: '', sets: 3, reps: 10, gewicht: 0, rir: null });
   function openPlanEditor(id){
+    document.getElementById('peMetaSec').style.display = '';
+    document.getElementById('peSaveBtn').textContent = 'Plan speichern';
+    document.getElementById('peBackBtn').textContent = '← Pläne';
     const p = id ? plans.find(x => x.id === id) : null;
     pe = p
       ? { id: p.id, tage: JSON.parse(JSON.stringify(p.tage)) }
@@ -3643,7 +3880,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
             </div>
           </div>`).join('')}
         <button type="button" class="pe-add pe-addex">+ Übung hinzufügen</button>
-      </div>`).join('') + '<button type="button" class="pe-add" id="peAddDay">+ Trainingstag hinzufügen</button>';
+      </div>`).join('') + (pe.slot ? '' : '<button type="button" class="pe-add" id="peAddDay">+ Trainingstag hinzufügen</button>');
   }
   function peCtx(el){
     const card = el.closest('.pe-card'); if(!card) return null;
@@ -3702,10 +3939,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     renderPlanEditor();
   });
   document.getElementById('planNewBtn').addEventListener('click', () => openPlanEditor(null));
-  document.getElementById('peBackBtn').addEventListener('click', openPlans);
+  document.getElementById('peBackBtn').addEventListener('click', () => { if(pe && pe.slot) openWeekOverview(); else openPlans(); });
   document.getElementById('peSaveBtn').addEventListener('click', async () => {
     const msg = document.getElementById('peMsg');
     msg.classList.remove('error');
+    if(pe.slot){ await saveSlotEdit(msg); return; }
     const name = document.getElementById('peName').value.trim();
     if(!name){ msg.textContent = 'Bitte dem Plan einen Namen geben.'; msg.classList.add('error'); return; }
     const tage = pe.tage.map((t, i) => ({
