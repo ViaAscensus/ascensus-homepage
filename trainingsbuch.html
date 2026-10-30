@@ -793,6 +793,7 @@
   <button class="new-training-btn new-training-btn-suggest" id="planTrainingBtn">Nach Trainingsplan trainieren</button>
   <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
   <button class="stats-link" id="bodyLink">⚖️ Körperwerte</button>
+  <button class="stats-link" id="coachLink" style="display:none;">🧑‍🏫 Coach-Bereich</button>
   <div id="calendar" class="cal"></div>
   <section id="designBox">
     <div class="design-title">Design</div>
@@ -1338,6 +1339,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   async function loadEntries(){
     syncDesignFromProfile();
+    document.getElementById('coachLink').style.display = (pb.authStore.model && pb.authStore.model.email === 'patrick@ascensus.fit') ? '' : 'none';
     try{
       entries = await pb.collection('trainingsbuch_entries').getFullList({ sort: '-date' });
     }catch(e){
@@ -3527,10 +3529,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
         <div class="plan-card-head">
           <div>
             <div class="plan-name">${escapeHtml(p.name)}</div>
-            <div class="plan-meta"><span class="plan-badge">${p.typ === 'fest' ? 'Fest' : 'Flexibel'}</span> · ${p.tage.length} ${p.tage.length === 1 ? 'Tag' : 'Tage'}${isLocalPlan(p) ? ' · nur auf diesem Gerät' : ''}</div>
+            <div class="plan-meta"><span class="plan-badge">${p.typ === 'fest' ? 'Fest' : 'Flexibel'}</span>${p.quelle === 'coach' ? ' · <span class="plan-badge">Vom Coach</span>' : ''} · ${p.tage.length} ${p.tage.length === 1 ? 'Tag' : 'Tage'}${isLocalPlan(p) ? ' · nur auf diesem Gerät' : ''}</div>
           </div>
           <div class="plan-btnrow">
-            <button type="button" class="plan-del plan-edit" data-id="${escapeHtml(p.id)}">Bearbeiten</button>
+            ${p.quelle === 'coach'
+              ? `<button type="button" class="plan-del plan-copy" data-id="${escapeHtml(p.id)}">Als eigenen Plan kopieren</button>`
+              : `<button type="button" class="plan-del plan-edit" data-id="${escapeHtml(p.id)}">Bearbeiten</button>`}
             <button type="button" class="plan-del${planDeleteArmed === p.id ? ' sure' : ''}" data-act="del" data-id="${escapeHtml(p.id)}">${planDeleteArmed === p.id ? 'Wirklich löschen?' : 'Löschen'}</button>
           </div>
         </div>
@@ -3552,6 +3556,15 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   document.getElementById('planList').addEventListener('click', async (ev) => {
     const edit = ev.target.closest('.plan-edit');
     if(edit){ openPlanEditor(edit.dataset.id); return; }
+    const copy = ev.target.closest('.plan-copy');
+    if(copy){
+      const src = plans.find(x => x.id === copy.dataset.id);
+      if(!src) return;
+      copy.disabled = true;
+      try{ await persistPlan({ name: src.name + ' (Kopie)', typ: src.typ, tage: JSON.parse(JSON.stringify(src.tage)) }); }catch(e){ console.error(e); }
+      renderPlans();
+      return;
+    }
     const del = ev.target.closest('.plan-del');
     if(del){
       if(planDeleteArmed !== del.dataset.id){ planDeleteArmed = del.dataset.id; renderPlans(); return; }
@@ -4031,6 +4044,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     Object.keys(ids).forEach(k => { document.getElementById(ids[k]).value = r[k] > 0 ? r[k] : ''; });
   }
   document.getElementById('bodyLink').addEventListener('click', openBody);
+  document.getElementById('coachLink').addEventListener('click', () => { location.href = 'https://coach.ascensus.fit'; });
   document.getElementById('bodyBackBtn').addEventListener('click', () => { renderOverview(); showScreen('overview'); });
   document.getElementById('bDate').addEventListener('change', fillBodyForm);
   document.getElementById('bMetric').addEventListener('change', renderBodyChart);
