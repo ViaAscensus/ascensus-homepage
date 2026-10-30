@@ -245,12 +245,20 @@
   .plan-ex .n{ font-weight:700; width:1.3em; }
   .plan-ex .nm{ flex:1; font-size:0.9rem; font-weight:600; }
   .plan-ex .soll{ font-size:0.76rem; color: var(--text-dim); text-align:right; }
-  .today-card{ border:1px solid var(--accent); border-radius: var(--radius); padding:14px; margin-bottom:14px; }
-  .today-label{ font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--accent); }
-  .today-name{ font-size:1.15rem; font-weight:700; margin:2px 0 4px; }
-  .today-sub{ font-size:0.82rem; opacity:0.7; margin-bottom:10px; }
-  .today-card .btn{ width:100%; margin-top:8px; }
-  .today-catch{ border-top:1px solid var(--border); margin-top:12px; padding-top:10px; font-size:0.85rem; }
+  #todayCard{ padding: 0 18px; }
+  .today-card{ background: var(--accent); color: var(--accent-text); border-radius: calc(var(--radius) + 6px); padding:20px; margin:12px 0; }
+  .today-label{ font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; opacity:0.85; }
+  .today-name{ font-size:1.8rem; font-weight:700; line-height:1.1; margin:4px 0 4px; }
+  .today-sub{ font-size:0.9rem; opacity:0.9; }
+  .today-go{ display:block; width:100%; min-height:52px; margin-top:16px; border:none; border-radius: var(--radius); background: var(--accent-text); color: var(--accent); font:inherit; font-size:1rem; font-weight:700; cursor:pointer; }
+  .catch-row{ display:flex; align-items:center; justify-content:space-between; width:100%; min-height:52px; margin:0 0 10px; padding:0 16px; background: var(--surface); border:1px solid var(--border-strong); border-radius: var(--radius); color: var(--text); font:inherit; font-size:0.92rem; cursor:pointer; text-align:left; }
+  .catch-row b{ color: var(--accent); }
+  .tile-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:0 18px; margin:6px 0 14px; }
+  .tile{ display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; aspect-ratio:1.75; padding:12px 14px; background: var(--surface); border:1px solid var(--border); border-radius: calc(var(--radius) + 4px); color: var(--text); font:inherit; text-align:left; cursor:pointer; }
+  .tile svg{ color: var(--accent); }
+  .tile:active{ transform: scale(0.98); }
+  .tile-t{ font-size:0.92rem; font-weight:700; line-height:1.2; }
+  .tile-t small{ display:block; font-weight:400; font-size:0.72rem; opacity:0.7; margin-top:2px; }
   .wk-row{ display:flex; align-items:center; gap:10px; width:100%; min-height:44px; padding:8px 10px; margin-top:6px; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); color: var(--text); font:inherit; font-size:0.88rem; text-align:left; }
   .wk-row .wd{ width:28px; font-weight:700; }
   .wk-row .nm{ flex:1; min-width:0; }
@@ -801,16 +809,43 @@
     <h1>Trainingsbuch</h1>
     <p class="sub">Deine bisherigen Trainingseinheiten</p>
   </div>
-  <div id="todayCard"></div>
   <button class="new-training-btn" id="resumeBtn" style="display:none;">▶ Training fortsetzen</button>
-  <button class="new-training-btn" id="newTrainingBtn">+ Neues individuelles Training starten</button>
-  <button class="new-training-btn new-training-btn-suggest" id="suggestedTrainingBtn">+ Vorgeschlagenes Training starten</button>
-  <button class="new-training-btn new-training-btn-backfill" id="backfillBtn">+ Training nachtragen</button>
-  <button class="new-training-btn new-training-btn-suggest" id="planTrainingBtn">Nach Trainingsplan trainieren</button>
-  <button class="stats-link" id="statsLink">📊 Auswertung ansehen</button>
-  <button class="stats-link" id="bodyLink">⚖️ Körperwerte</button>
+  <div id="todayCard"></div>
+  <div class="tile-grid">
+    <button type="button" class="tile" id="weekTileBtn" style="display:none;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <span class="tile-t">Woche<small>Mo bis So, tauschen</small></span>
+    </button>
+    <button type="button" class="tile" id="newTrainingBtn">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="tile-t">Freies Training<small>ohne Plan starten</small></span>
+    </button>
+    <button type="button" class="tile" id="suggestedTrainingBtn">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>
+      <span class="tile-t">Vorschlag<small>Training vorschlagen</small></span>
+    </button>
+    <button type="button" class="tile" id="backfillBtn">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+      <span class="tile-t">Nachtragen<small>vergangenes Training</small></span>
+    </button>
+    <button type="button" class="tile" id="planTrainingBtn">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      <span class="tile-t">Pläne<small>eigene und vom Coach</small></span>
+    </button>
+    <button type="button" class="tile" id="statsLink">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+      <span class="tile-t">Auswertung<small>Fortschritt, Rekorde</small></span>
+    </button>
+    <button type="button" class="tile" id="bodyLink">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zM12 12l4-3"/></svg>
+      <span class="tile-t">Körperwerte<small>Gewicht, Umfänge</small></span>
+    </button>
+    <button type="button" class="tile" id="verlaufBtn">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span class="tile-t">Verlauf<small>alle Einheiten, Kalender</small></span>
+    </button>
+  </div>
   <button class="stats-link" id="coachLink" style="display:none;">🧑‍🏫 Coach-Bereich</button>
-  <div id="calendar" class="cal"></div>
   <section id="designBox">
     <div class="design-title">Design</div>
     <div class="design-grid" id="designGrid">
@@ -908,8 +943,10 @@
 <div class="screen" id="sessions-screen">
   <button class="screen-back" id="sessionsBackBtn">← Übersicht</button>
   <div class="head">
-    <h2>Alle Trainingseinheiten</h2>
+    <h2>Verlauf</h2>
+    <p class="sub">Kalender und alle Trainingseinheiten</p>
   </div>
+  <div id="calendar" class="cal"></div>
   <div id="sessionList"></div>
 </div>
 
@@ -979,7 +1016,7 @@
 <!-- ========== Neues Training ========== -->
 <div class="screen" id="new-screen">
   <div class="new-topbar">
-    <button class="screen-back" id="newBackBtn">← Alle Trainingseinheiten</button>
+    <button class="screen-back" id="newBackBtn">← Verlauf</button>
     <button type="button" class="screen-back" id="lastSessionBtn" aria-expanded="false" style="display:none;">Letztes Training ▾</button>
   </div>
   <div id="lastSessionBox" style="display:none;"></div>
@@ -1706,12 +1743,11 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       return;
     }
     const day = ev.target.closest('.cal-day.trained');
-    if(day){ dayFromSessions = false; openDay(day.dataset.date); }
+    if(day){ dayFromSessions = true; openDay(day.dataset.date); }
   });
 
   function renderOverview(){
     refreshActive();
-    renderCalendar();
     renderTodayCard();
     document.getElementById('resumeBtn').style.display = activeTraining ? '' : 'none';
   }
@@ -1721,6 +1757,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     refreshActive();
     document.getElementById('sessionsBackBtn').textContent = activeTraining ? '← Zurück zum Training' : '← Übersicht';
     renderDayList(document.getElementById('sessionList'));
+    renderCalendar();
     showScreen('sessions');
     window.scrollTo(0, 0);
   }
@@ -1760,7 +1797,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   function leaveDay(){
     refreshActive();
-    if(activeTraining && screens.sessions && dayFromSessions){ openSessions(); }
+    if(screens.sessions && dayFromSessions){ openSessions(); }
     else { renderOverview(); showScreen('overview'); }
   }
   let dayFromSessions = false;
@@ -1842,6 +1879,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   // ---------- Auswertung ----------
   document.getElementById('statsLink').addEventListener('click', openStats);
+  document.getElementById('verlaufBtn').addEventListener('click', openSessions);
   document.getElementById('statsBackBtn').addEventListener('click', () => {
     renderOverview();
     showScreen('overview');
@@ -2431,7 +2469,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     // Button "Letztes Training": nur im normalen Training und wenn es ein früheres gibt
     const hasLast = previousSessions().length > 0;
     refreshActive();
-    document.getElementById('newBackBtn').textContent = activeTraining ? '← Alle Trainingseinheiten' : '← Übersicht';
+    document.getElementById('newBackBtn').textContent = activeTraining ? '← Verlauf' : '← Übersicht';
     document.getElementById('lastSessionBtn').style.display =
       ((name === 'pick' || name === 'detail') && !backfillMode && hasLast) ? 'inline-flex' : 'none';
     // Obere Navigation nur ausblenden, solange trainiert wird
@@ -3697,6 +3735,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function renderTodayCard(){
     const box = document.getElementById('todayCard');
     const ctx = activeWeekPlan();
+    document.getElementById('weekTileBtn').style.display = ctx ? '' : 'none';
     if(!ctx){
       // Plan noch nicht gestartet: nächster Start als Vorschau, damit die Zuweisung sichtbar ist
       const today = localIso(new Date());
@@ -3709,19 +3748,20 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const st = weekStatus(ctx);
     const t = st[ctx.wd];
     const catchUp = st.filter(x => !x.rest && !x.done && x.i < ctx.wd);
-    let html = `<div class="today-card"><div class="today-label">Heute · ${escapeHtml(ctx.plan.name)} · Woche ${ctx.wi + 1} von ${ctx.wochen.length}</div>`;
+    const WDL = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+    let html = `<div class="today-card"><div class="today-label">Heute · ${WDL[ctx.wd]} · ${escapeHtml(ctx.plan.name)} · Woche ${ctx.wi + 1} von ${ctx.wochen.length}</div>`;
     if(t.rest) html += `<div class="today-name">Ruhetag</div><div class="today-sub">Heute ist nichts geplant. Erhol dich gut.</div>`;
     else if(t.done) html += `<div class="today-name">${escapeHtml(t.slot.name)} ✓</div><div class="today-sub">Heute schon trainiert.</div>`;
-    else html += `<div class="today-name">${escapeHtml(t.slot.name)}</div><div class="today-sub">${t.n} ${t.n === 1 ? 'Übung' : 'Übungen'}</div><button type="button" class="btn btn-primary" data-start="${ctx.wd}">Training starten</button>`;
-    if(catchUp.length) html += `<div class="today-catch">${catchUp.map(x => `<button type="button" class="btn" data-start="${x.i}">Nachholen: ${escapeHtml(x.slot.name)} (${WDN[x.i]})</button>`).join('')}</div>`;
-    html += `<button type="button" class="btn" id="weekOpenBtn">Woche ansehen</button></div>`;
+    else html += `<div class="today-name">${escapeHtml(t.slot.name)}</div><div class="today-sub">${t.n} ${t.n === 1 ? 'Übung' : 'Übungen'}</div><button type="button" class="today-go" data-start="${ctx.wd}">Training starten</button>`;
+    html += '</div>';
+    html += catchUp.map(x => `<button type="button" class="catch-row" data-start="${x.i}"><span><b>Nachholen</b> · ${escapeHtml(x.slot.name)} (${WDN[x.i]})</span><span aria-hidden="true">›</span></button>`).join('');
     box.innerHTML = html;
   }
   document.getElementById('todayCard').addEventListener('click', (ev) => {
-    if(ev.target.closest('#weekOpenBtn')){ openWeekOverview(); return; }
     const b = ev.target.closest('[data-start]'); if(!b) return;
     startWeekDay(parseInt(b.dataset.start));
   });
+  document.getElementById('weekTileBtn').addEventListener('click', openWeekOverview);
   function startWeekDay(i){
     const ctx = activeWeekPlan(); if(!ctx) return;
     const idx = tagIndexFor(ctx, i);
