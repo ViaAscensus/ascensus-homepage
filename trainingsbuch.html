@@ -172,6 +172,7 @@
     font-family:'IBM Plex Sans', system-ui, sans-serif;
   }
   /* ---------- Notiz zur Übung, Körperwerte ---------- */
+  .prog-hint{ margin:-4px 0 12px; padding:9px 12px; border:1px solid var(--accent); border-radius: var(--radius); font-size:0.85rem; line-height:1.4; }
   #plans-screen .head, #planedit-screen .head, #body-screen .head{ padding: 16px 18px 4px; }
   .note-box{ margin-bottom:12px; }
   .note-box label{ display:block; font-size:0.8rem; color: var(--text-dim); margin-bottom:5px; }
@@ -1039,6 +1040,7 @@
     <div class="plan-hint" id="planSoll" style="display:none;"></div>
     <div class="hint exercise-note" id="exerciseNote" style="display:none;"></div>
     <div class="hint" id="lastHint"></div>
+    <div class="prog-hint" id="progHint" style="display:none;"></div>
     <div class="note-box" id="noteBox">
       <label for="noteText">Notiz zur Übung</label>
       <textarea id="noteText" rows="2" maxlength="500" placeholder="z. B. Sitzhöhe 4, enger Griff"></textarea>
@@ -2618,6 +2620,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     updateRemainingSetsDisplay();
 
     updateLastHint();
+    updateProgHint();
     resetSetState();
     showSubsection('detail');
   }
@@ -2897,6 +2900,34 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     hintEl.innerHTML = `<details class="last-mal"><summary>Letztes Mal (${formatShort(sx.date)}${posText})</summary>` +
       `<div class="last-sets">${setRows(g).map(r => `<div class="set-line">${escapeHtml(r.text)}</div>`).join('')}</div></details>`;
   }
+  // Progression: Im letzten Training mit dieser Übung haben alle Sätze mit dem höchsten Gewicht mindestens
+  // 8 Wiederholungen geschafft und stehen auf Leicht oder Okay -> Hinweis zum Steigern (ohne Gewichtsvorschlag).
+  const PROG_MIN_REPS = 8;
+  function updateProgHint(){
+    const el = document.getElementById('progHint');
+    el.style.display = 'none';
+    const name = fExercise.value.trim();
+    const q = name.toLowerCase();
+    if(!q || isCardioName(name)) return;
+    const past = previousSessions().filter(sx => sx.entries.some(e => e.exercise.toLowerCase() === q && !isCardioEntry(e)));
+    if(!past.length) return;
+    const sx = past[past.length - 1];
+    const sets = sx.entries.filter(e => e.exercise.toLowerCase() === q && !isCardioEntry(e));
+    const top = Math.max(...sets.map(e => e.weight || 0));
+    if(!(top > 0)) return;                       // nur Körpergewicht: kein Zusatzgewicht zum Steigern
+    const work = sets.filter(e => (e.weight || 0) === top);
+    if(!work.every(e => e.reps >= PROG_MIN_REPS && (e.tendenz === 'leicht' || e.tendenz === 'okay'))) return;
+    // Schon schwerer als letztes Mal gearbeitet (in diesem Training oder am gewählten Tag)? Dann kein Hinweis mehr.
+    const key = activeTraining ? activeTraining.id : null;
+    const day = document.getElementById('fDate').value;
+    const now = entries.filter(e => e.exercise.toLowerCase() === q &&
+      (key ? (e.training_id === key || (!e.training_id && e.date.slice(0,10) === day)) : e.date.slice(0,10) === day));
+    if(now.some(e => (e.weight || 0) > top)) return;
+    const n = work.reduce((a, e) => a + Math.max(1, e.sets || 1), 0);
+    const reps = Math.min(...work.map(e => e.reps));
+    el.textContent = `💪 Letztes Mal ${n} × ${work.length > 1 && new Set(work.map(e => e.reps)).size > 1 ? reps + '+' : reps} mit ${fmtKg(top)} kg, alles geschafft. Zeit zu steigern.`;
+    el.style.display = 'block';
+  }
   fExercise.addEventListener('input', updateLastHint);
   fExercise.addEventListener('input', renderSuggest);
   fExercise.addEventListener('focus', renderSuggest);
@@ -3139,6 +3170,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       // nur Übung/Gewicht/Wdh. werden NICHT geleert.
       if(cardio){ stopTimer(); applyCardioMode(true); } else restartTimer();
       maybeAskMuscle(exercise);
+      updateProgHint();
       return true;
     }catch(e){
       formMsg.textContent = 'Eintrag konnte nicht gespeichert werden.';
