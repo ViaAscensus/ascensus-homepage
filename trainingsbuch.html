@@ -253,6 +253,51 @@
   .today-go{ display:block; width:100%; min-height:52px; margin-top:16px; border:none; border-radius: var(--radius); background: var(--accent-text); color: var(--accent); font:inherit; font-size:1rem; font-weight:700; cursor:pointer; }
   .catch-row{ display:flex; align-items:center; justify-content:space-between; width:100%; min-height:52px; margin:0 0 10px; padding:0 16px; background: var(--surface); border:1px solid var(--border-strong); border-radius: var(--radius); color: var(--text); font:inherit; font-size:0.92rem; cursor:pointer; text-align:left; }
   .catch-row b{ color: var(--accent); }
+  /* Fortschritt */
+  #progress-screen .head, #strength-screen .head{ padding: 16px 18px 4px; }
+  #progressCardBox{ padding: 0 18px; }
+  .pr-wrap{ padding: 0 18px 24px; display:flex; flex-direction:column; gap:14px; }
+  .pr-card{ background: var(--surface); border:1px solid var(--border); border-radius: calc(var(--radius) + 4px); padding:14px 16px; }
+  .pr-card.hl{ border:2px solid var(--accent); }
+  .pr-h{ font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color: var(--accent); margin:6px 0 -4px; }
+  .pr-open{ display:flex; align-items:center; gap:14px; width:100%; margin:12px 0; padding:14px 16px; background: var(--surface); border:2px solid var(--accent); border-radius: calc(var(--radius) + 4px); color: var(--text); font:inherit; text-align:left; cursor:pointer; }
+  .pr-open b{ font-size:1rem; }
+  .pr-open small{ display:block; font-size:0.84rem; opacity:0.85; margin-top:2px; }
+  .pr-open .grow{ flex:1; }
+  .pr-goal{ display:flex; gap:16px; align-items:center; }
+  .pr-goal .t{ font-size:0.9rem; }
+  .pr-step{ display:inline-flex; align-items:center; gap:8px; margin-top:8px; font-size:0.84rem; }
+  .pr-step button{ width:44px; height:44px; border:1px solid var(--border-strong); background: transparent; color: var(--text); border-radius: var(--radius); font:inherit; font-size:1.2rem; cursor:pointer; }
+  .pr-btn{ min-height:48px; padding:0 16px; border:1px solid var(--accent); background: var(--accent); color: var(--accent-text); border-radius: var(--radius); font:inherit; font-weight:600; cursor:pointer; width:100%; }
+  .pr-btn.ghost{ background: transparent; color: var(--text); border-color: var(--border-strong); }
+  .pr-tiles{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+  .pr-tile{ background: var(--surface); border:1px solid var(--border); border-radius: calc(var(--radius) + 4px); padding:10px 12px; }
+  .pr-tile .k{ font-size:0.68rem; opacity:0.75; }
+  .pr-tile .v{ font-size:1.5rem; font-weight:300; color: var(--accent); line-height:1.2; }
+  .pr-tile .v small{ font-size:0.68rem; }
+  .hm{ display:grid; grid-template-columns:22px 1fr; gap:3px; }
+  .hm-wd{ display:grid; grid-template-rows:repeat(7,1fr); gap:3px; font-size:0.62rem; }
+  .hm-wd span{ display:flex; align-items:center; }
+  .hm-grid{ display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); grid-template-rows:repeat(7,auto); grid-auto-flow:column; gap:3px; }
+  .hm-grid i{ aspect-ratio:1; border-radius:4px; border:1px solid transparent; display:block; box-sizing:border-box; }
+  .hm-grid i.l1{ background: var(--accent); opacity:.35; border:none; }
+  .hm-grid i.l2{ background: var(--accent); opacity:.65; border:none; }
+  .hm-grid i.l3{ background: var(--accent); border:none; }
+  .hm-grid i.miss{ background: rgba(255,255,255,0.07); border:none; }
+  .hm-grid i.rest{ border:1px dashed var(--border-strong); }
+  .hm-grid i.open{ border:1px solid var(--border-strong); }
+  .hm-months{ display:grid; grid-template-columns:22px repeat(12,minmax(0,1fr)); gap:3px; font-size:0.62rem; margin-bottom:3px; }
+  .hm-leg{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; font-size:0.7rem; margin-top:8px; }
+  .hm-leg i{ display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-right:4px; background: var(--accent); }
+  .pr-rec{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+  .pr-rec:last-child{ border-bottom:none; }
+  .pr-rec small{ display:block; font-size:0.72rem; opacity:0.75; }
+  .pr-rec b.v{ color: var(--accent); font-size:1rem; white-space:nowrap; }
+  .pr-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pr-chip{ min-height:44px; padding:0 12px; border:1px solid var(--accent); background: transparent; color: var(--accent); border-radius: var(--radius); font:inherit; font-size:0.84rem; font-weight:600; cursor:pointer; }
+  .pr-chip[aria-pressed="true"]{ background: var(--accent); color: var(--accent-text); }
+  .pr-note{ font-size:0.8rem; opacity:0.85; margin:0; }
+  .pr-svg text{ fill: var(--text); }
   .tile-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:0 18px; margin:6px 0 14px; }
   .tile{ display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; aspect-ratio:1.75; padding:12px 14px; background: var(--surface); border:1px solid var(--border); border-radius: calc(var(--radius) + 4px); color: var(--text); font:inherit; text-align:left; cursor:pointer; }
   .tile svg{ color: var(--accent); }
@@ -811,6 +856,7 @@
   </div>
   <button class="new-training-btn" id="resumeBtn" style="display:none;">▶ Training fortsetzen</button>
   <div id="todayCard"></div>
+  <div id="progressCardBox"></div>
   <div class="tile-grid">
     <button type="button" class="tile" id="weekTileBtn" style="display:none;">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
@@ -887,6 +933,26 @@
 </div>
 
 <!-- ========== Plan bearbeiten ========== -->
+<!-- ========== Fortschritt ========== -->
+<div class="screen" id="progress-screen">
+  <button class="screen-back" id="progressBackBtn">← Übersicht</button>
+  <div class="head">
+    <h2>Fortschritt</h2>
+    <p class="sub" id="progressSub"></p>
+  </div>
+  <div class="pr-wrap" id="progressBody"></div>
+</div>
+
+<!-- ========== Kraftverlauf ========== -->
+<div class="screen" id="strength-screen">
+  <button class="screen-back" id="strengthBackBtn">← Fortschritt</button>
+  <div class="head">
+    <h2>Kraftverlauf</h2>
+    <p class="sub">Dein Höchstgewicht je Woche</p>
+  </div>
+  <div class="pr-wrap" id="strengthBody"></div>
+</div>
+
 <!-- ========== Körperwerte ========== -->
 <div class="screen" id="body-screen">
   <button class="screen-back" id="bodyBackBtn">← Übersicht</button>
@@ -1299,7 +1365,9 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     plans: document.getElementById('plans-screen'),
     planedit: document.getElementById('planedit-screen'),
     week: document.getElementById('week-screen'),
-    body: document.getElementById('body-screen')
+    body: document.getElementById('body-screen'),
+    progress: document.getElementById('progress-screen'),
+    strength: document.getElementById('strength-screen')
   };
   const loadingState = document.getElementById('loadingState');
 
@@ -1749,6 +1817,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function renderOverview(){
     refreshActive();
     renderTodayCard();
+    renderProgressCard();
     document.getElementById('resumeBtn').style.display = activeTraining ? '' : 'none';
   }
 
@@ -4538,6 +4607,228 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       if(isRunning) tick();
       acquireWakeLock();
     }
+  });
+
+  // ---------- Fortschritt: Wochenziel, Serie, Heatmap, Bestleistungen, Kraftverlauf ----------
+  const entryDay = e => String(e.date || '').slice(0, 10);
+  const monOfIso = iso => addIsoDays(iso, -((parseIso(iso).getDay() + 6) % 7));
+  const hasCoachPlan = () => plans.some(p => p.quelle === 'coach');
+  const fmtW = n => String(Math.round(n * 10) / 10).replace('.', ',');
+  const dm = iso => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.`;
+  const MONTHS_S = ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.'];
+  function trainedDays(){ const m = {}; entries.forEach(e => { const d = entryDay(e); if(d) m[d] = (m[d] || 0) + 1; }); return m; } // Datum -> Sätze
+  // Wochenpläne vom Coach mit ihrer Laufzeit; planDay: undefined = kein Plan, null = Ruhetag, sonst Trainingstag
+  function planList(){ return plans.filter(isWeekPlan).map(p => ({ p, w: normWochen(p) })).sort((a, b) => b.p.start.localeCompare(a.p.start)); }
+  function planDay(list, iso){
+    for(const c of list){
+      const diff = Math.round((parseIso(iso) - parseIso(c.p.start)) / 864e5);
+      if(diff < 0 || Math.floor(diff / 7) >= c.w.length) continue;
+      return c.w[Math.floor(diff / 7)].tage[diff % 7] || null;
+    }
+    return undefined;
+  }
+  // Eigenes Wochenziel (ohne Plan): Profilfeld wochenziel, Rückfall Browser
+  let goalOverride = null;
+  function ownGoal(){
+    if(goalOverride) return goalOverride;
+    const m = pb.authStore.model, v = m ? Number(m.wochenziel) : 0;
+    if(v >= 1 && v <= 7) return v;
+    try{ const l = parseInt(localStorage.getItem('tb_wochenziel')); if(l >= 1 && l <= 7) return l; }catch(e){}
+    return null;
+  }
+  async function setOwnGoal(n){
+    n = Math.max(1, Math.min(7, n)); goalOverride = n;
+    try{ localStorage.setItem('tb_wochenziel', String(n)); }catch(e){}
+    try{ await pb.collection('members').update(pb.authStore.model.id, { wochenziel: n }); }catch(e){ console.error('Wochenziel nicht gespeichert', e); }
+  }
+  function weekGoal(){
+    const ctx = activeWeekPlan();
+    if(ctx){
+      const st = weekStatus(ctx).filter(x => !x.rest);
+      return { kind: 'plan', ctx, goal: st.length, done: st.filter(x => x.done).length, next: st.find(x => !x.done && x.i >= ctx.wd) };
+    }
+    const days = trainedDays(), mon = monOfIso(localIso(new Date()));
+    let n = 0; for(let i = 0; i < 7; i++) if(days[addIsoDays(mon, i)]) n++;
+    return { kind: 'own', goal: ownGoal(), done: n };
+  }
+  function ringSvg(done, goal, size, label){
+    const r = size * 0.405, c = 2 * Math.PI * r, f = goal > 0 ? Math.min(1, done / goal) : 0, sw = size * 0.107, h = size / 2;
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="${escapeHtml(label)}"><circle cx="${h}" cy="${h}" r="${r.toFixed(1)}" fill="none" style="stroke:var(--border-strong)" stroke-width="${sw.toFixed(1)}"/><circle cx="${h}" cy="${h}" r="${r.toFixed(1)}" fill="none" style="stroke:var(--accent)" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" stroke-dasharray="${(f * c).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${h} ${h})"/>${goal > 0 ? `<text x="${h}" y="${h + size * 0.08}" text-anchor="middle" font-size="${(size * 0.24).toFixed(0)}" font-weight="300" style="fill:var(--accent)">${done}/${goal}</text>` : ''}</svg>`;
+  }
+  // Serie: mit laufendem Plan aufeinanderfolgende Plantage, sonst Wochen mit erreichtem Ziel
+  function currentStreak(){
+    const days = trainedDays(), t = localIso(new Date());
+    if(activeWeekPlan()){
+      const list = planList(); let n = 0, d = t;
+      for(let k = 0; k < 400; k++, d = addIsoDays(d, -1)){
+        const info = planDay(list, d);
+        if(info === undefined) break;
+        if(info === null) continue;
+        if(days[d]) n++; else if(d === t) continue; else break;
+      }
+      return { n, unit: n === 1 ? 'Training' : 'Trainings' };
+    }
+    const g = ownGoal() || 1; let n = 0, mon = monOfIso(t);
+    for(let k = 0; k < 120; k++, mon = addIsoDays(mon, -7)){
+      let c = 0; for(let i = 0; i < 7; i++) if(days[addIsoDays(mon, i)]) c++;
+      if(c >= g) n++; else if(k === 0) continue; else break;
+    }
+    return { n, unit: n === 1 ? 'Woche' : 'Wochen' };
+  }
+  // Neue Bestleistungen der letzten 30 Tage: Höchstgewicht je Übung, das zuletzt übertroffen wurde
+  function recentPRs(max){
+    const by = {};
+    entries.forEach(e => { const w = Number(e.weight); if(!(w > 0) || !e.exercise) return;
+      const k = e.exercise.trim().toLowerCase(), o = by[k] = by[k] || { name: e.exercise.trim(), days: {} }, d = entryDay(e);
+      o.days[d] = Math.max(o.days[d] || 0, w); });
+    const since = addIsoDays(localIso(new Date()), -30), out = [];
+    Object.values(by).forEach(o => {
+      let best = 0, prev = 0, at = null;
+      Object.keys(o.days).sort().forEach(d => { if(o.days[d] > best){ prev = best; best = o.days[d]; at = d; } });
+      if(prev > 0 && at >= since) out.push({ name: o.name, w: best, d: at, prev });
+    });
+    return out.sort((a, b) => b.d.localeCompare(a.d)).slice(0, max);
+  }
+  function heatHtml(){
+    const t = localIso(new Date()), start = addIsoDays(monOfIso(t), -7 * 11), days = trainedDays(), list = planList();
+    const counts = Object.values(days).sort((a, b) => a - b), p1 = counts[Math.floor(counts.length / 3)] || 0, p2 = counts[Math.floor(counts.length * 2 / 3)] || 0;
+    let cells = '', sum = 0;
+    for(let i = 0; i < 84; i++){
+      const d = addIsoDays(start, i), c = days[d], info = planDay(list, d);
+      let cls = '';
+      if(c){ cls = c <= p1 ? 'l1' : c <= p2 ? 'l2' : 'l3'; sum++; }
+      else if(info === null) cls = 'rest';
+      else if(info && d === t) cls = 'open';
+      else if(info && d < t) cls = 'miss';
+      else if(info) cls = 'open';
+      cells += `<i class="${cls}"></i>`;
+    }
+    const mon = Array.from({ length: 12 }, (_, w) => { const m = addIsoDays(start, 7 * w); return +m.slice(8) <= 7 ? MONTHS_S[+m.slice(5, 7) - 1] : ''; });
+    return `<div class="hm-months"><span></span>${mon.map(m => `<span>${m}</span>`).join('')}</div>
+      <div class="hm" role="img" aria-label="Deine letzten 12 Wochen: ${sum} Trainingstage. Dunklere Kästchen bedeuten mehr Sätze an dem Tag."><div class="hm-wd">${WDN.map(x => `<span>${x}</span>`).join('')}</div><div class="hm-grid">${cells}</div></div>
+      <div class="hm-leg"><span>Training:</span><span><i style="opacity:.35"></i><i style="opacity:.65"></i><i></i>je dunkler, desto mehr Sätze</span></div>
+      <div class="hm-leg"><span>gestrichelt: Ruhetag</span><span>Umriss: noch offen</span></div>`;
+  }
+  function renderProgressCard(){
+    const box = document.getElementById('progressCardBox');
+    if(!box) return;
+    if(!entries.length){ box.innerHTML = ''; return; }
+    const g = weekGoal(), st = currentStreak(), pr = recentPRs(1)[0];
+    const bits = [];
+    if(st.n >= 1) bits.push(`<b>${st.n} ${st.unit}</b> in Folge`);
+    if(pr && pr.d >= addIsoDays(localIso(new Date()), -14)) bits.push(`neue Bestleistung bei ${escapeHtml(pr.name)}`);
+    box.innerHTML = `<button type="button" class="pr-open" id="progressOpen">${ringSvg(g.done, g.goal || 0, 60, g.goal ? `${g.done} von ${g.goal} Trainings diese Woche` : 'Wochenziel')}<span class="grow"><b>Dein Fortschritt</b><small>${bits.length ? bits.join(' · ') : 'Wochenziel, Serie und Bestleistungen'}</small></span><span aria-hidden="true">›</span></button>`;
+  }
+  document.getElementById('progressCardBox').addEventListener('click', ev => { if(ev.target.closest('#progressOpen')) openProgress(); });
+  function openProgress(){ renderProgress(); showScreen('progress'); window.scrollTo(0, 0); }
+  document.getElementById('progressBackBtn').addEventListener('click', () => { renderOverview(); showScreen('overview'); });
+  function renderProgress(){
+    const g = weekGoal(), st = currentStreak(), days = trainedDays(), t = localIso(new Date());
+    document.getElementById('progressSub').textContent = g.kind === 'plan' ? `${g.ctx.plan.name} · Woche ${g.ctx.wi + 1} von ${g.ctx.wochen.length}` : 'Dein eigenes Training';
+    let goalBox;
+    if(g.kind === 'plan'){
+      const WDL = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+      const left = g.goal - g.done;
+      const txt = g.goal === 0 ? 'Diese Woche ist Erholung angesagt.' : left <= 0 ? 'Wochenziel erreicht. Stark!' : `Noch <b>${left} ${left === 1 ? 'Training' : 'Trainings'}</b> bis zum Ziel.${g.next ? ` Als Nächstes: ${WDL[g.next.i]}, ${escapeHtml(g.next.slot.name)}.` : ''}`;
+      goalBox = `<div class="pr-card pr-goal">${ringSvg(g.done, g.goal, 84, g.goal ? `${g.done} von ${g.goal} Trainings diese Woche` : 'Wochenziel')}<div class="t"><b style="font-size:1rem;">Wochenziel</b><div>${txt}</div></div></div>`;
+    } else if(g.goal){
+      const left = g.goal - g.done;
+      goalBox = `<div class="pr-card"><div class="pr-goal">${ringSvg(g.done, g.goal, 84, `${g.done} von ${g.goal} Trainings diese Woche`)}<div class="t"><b style="font-size:1rem;">Wochenziel</b><div>${left <= 0 ? 'Ziel erreicht. Stark!' : `Noch <b>${left} ${left === 1 ? 'Training' : 'Trainings'}</b> bis zum Ziel.`}</div></div></div>
+        <div class="pr-step"><button type="button" data-goal="-1" aria-label="Ziel verringern">−</button><span><b>${g.goal}</b> Trainings pro Woche</span><button type="button" data-goal="1" aria-label="Ziel erhöhen">+</button></div></div>`;
+    } else {
+      goalBox = `<div class="pr-card"><div class="pr-goal">${ringSvg(g.done, 0, 84, 'Wochenziel')}<div class="t"><b style="font-size:1rem;">Wochenziel</b><div>Lege fest, wie oft du pro Woche trainieren willst. Diese Woche: ${g.done} ${g.done === 1 ? 'Training' : 'Trainings'}.</div></div></div>
+        <div class="pr-step"><button type="button" class="pr-btn" style="width:auto;" data-goal-set="3">Ziel festlegen: 3 pro Woche</button></div></div>`;
+    }
+    const total = Object.keys(days).length, month = Object.keys(days).filter(d => d.slice(0, 7) === t.slice(0, 7)).length;
+    const tiles = `<div class="pr-tiles"><div class="pr-tile"><div class="k">Aktuelle Serie</div><div class="v">${st.n} <small>${st.unit}</small></div></div><div class="pr-tile"><div class="k">Dieser Monat</div><div class="v">${month} <small>${month === 1 ? 'Training' : 'Trainings'}</small></div></div><div class="pr-tile"><div class="k">Seit Start</div><div class="v">${total} <small>${total === 1 ? 'Training' : 'Trainings'}</small></div></div></div>`;
+    // Wochen in Folge mit mindestens einem Training
+    let run = 0, mon = monOfIso(t);
+    for(let k = 0; k < 60; k++, mon = addIsoDays(mon, -7)){
+      let c = 0; for(let i = 0; i < 7; i++) if(days[addIsoDays(mon, i)]) c++;
+      if(c) run++; else if(k === 0) continue; else break;
+    }
+    const line = run >= 2 ? `Du hast <b>${run} Wochen in Folge</b> trainiert.` : 'Jedes Training zählt. Fang diese Woche mit einem an.';
+    const prs = recentPRs(5);
+    const recs = prs.length ? prs.map(p => `<div class="pr-rec"><span><b>${escapeHtml(p.name)}</b><small>neu am ${formatShort(p.d)} · vorher ${fmtW(p.prev)} kg</small></span><b class="v">${fmtW(p.w)} kg</b></div>`).join('') : '<p class="pr-note">Noch keine neue Bestleistung in den letzten 30 Tagen. Die nächste ist nah.</p>';
+    document.getElementById('progressBody').innerHTML = goalBox + tiles
+      + `<div class="pr-h">Deine letzten 12 Wochen</div><div class="pr-card">${heatHtml()}</div><p class="pr-note">${line}</p>`
+      + `<div class="pr-h">Neue Bestleistungen</div><div class="pr-card" style="padding-top:6px;padding-bottom:6px;">${recs}</div>`
+      + `<button type="button" class="pr-btn" id="strengthOpen">Kraftverlauf ansehen</button><button type="button" class="pr-btn ghost" id="statsOpen2">Alle Auswertungen</button>`;
+  }
+  document.getElementById('progressBody').addEventListener('click', async ev => {
+    const gb = ev.target.closest('[data-goal]'), gs = ev.target.closest('[data-goal-set]');
+    if(gb || gs){
+      const cur = ownGoal() || 3, n = gs ? parseInt(gs.dataset.goalSet) : cur + parseInt(gb.dataset.goal);
+      goalOverride = Math.max(1, Math.min(7, n)); renderProgress(); await setOwnGoal(n); return;
+    }
+    if(ev.target.closest('#strengthOpen')) openStrength();
+    if(ev.target.closest('#statsOpen2')) openStats();
+  });
+  // Kraftverlauf je Übung
+  let strEx = null, strPer = '3';
+  function lineSvg(pts, o){
+    const W = 326, H = 130, P = 18, n = pts.length;
+    let lo = Math.min(...pts.map(p => p.v)), hi = Math.max(...pts.map(p => p.v));
+    if(hi - lo < 1e-9){ lo -= 1; hi += 1; }
+    const pad = (hi - lo) * 0.15; lo -= pad; hi += pad;
+    const X = i => n === 1 ? W / 2 : P + (W - 2 * P) * i / (n - 1), Y = v => H - P - (H - 2 * P) * (v - lo) / (hi - lo);
+    let g = '';
+    for(let k = 0; k < 4; k++){ const y = P + (H - 2 * P) * k / 3; g += `<line x1="${P}" y1="${y.toFixed(1)}" x2="${W - P}" y2="${y.toFixed(1)}" style="stroke:var(--border)"/>`; }
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(p.v).toFixed(1)}`).join(' ');
+    g += `<path d="${d}" fill="none" style="stroke:${o.color || 'var(--accent)'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    if(n <= 16) pts.forEach((p, i) => { g += `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="3.5" style="fill:var(--surface);stroke:${o.color || 'var(--accent)'}" stroke-width="2"/>`; });
+    if(o.star) g += `<circle cx="${X(n - 1).toFixed(1)}" cy="${Y(pts[n - 1].v).toFixed(1)}" r="7" fill="none" style="stroke:var(--accent)" stroke-width="2"/>`;
+    g += `<text x="${X(n - 1).toFixed(1)}" y="${(Y(pts[n - 1].v) - 12).toFixed(1)}" text-anchor="end" font-size="11" font-weight="700">${fmtW(pts[n - 1].v)} kg</text>`;
+    if(n > 1) g += `<text x="${(X(0) + 2).toFixed(1)}" y="${(Y(pts[0].v) - 8).toFixed(1)}" font-size="10">${fmtW(pts[0].v)}</text>`;
+    const marks = n <= 5 ? pts.map((_, i) => i) : [0, Math.round((n - 1) / 2), n - 1];
+    marks.forEach(i => { g += `<text x="${X(i).toFixed(1)}" y="${H + 1}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}" font-size="10">${escapeHtml(pts[i].l)}</text>`; });
+    return `<svg class="pr-svg" viewBox="0 0 ${W} ${H + 4}" width="100%" role="img" aria-label="${escapeHtml(o.aria)}">${g}</svg>`;
+  }
+  function openStrength(){ renderStrength(); showScreen('strength'); window.scrollTo(0, 0); }
+  document.getElementById('strengthBackBtn').addEventListener('click', () => { renderProgress(); showScreen('progress'); });
+  function renderStrength(){
+    const t = localIso(new Date()), months = strPer === 'all' ? null : parseInt(strPer);
+    const from = months ? (() => { const d = parseIso(t); d.setMonth(d.getMonth() - months); return localIso(d); })() : '0000-00-00';
+    const ex = {};
+    entries.forEach(e => { if(!(Number(e.weight) > 0) || !e.exercise) return; const k = e.exercise.trim().toLowerCase(), o = ex[k] = ex[k] || { name: e.exercise.trim(), days: new Set() }; o.days.add(entryDay(e)); });
+    const list = Object.entries(ex).sort((a, b) => b[1].days.size - a[1].days.size).slice(0, 6);
+    let h = '';
+    if(!list.length){ document.getElementById('strengthBody').innerHTML = '<p class="pr-note">Sobald du Übungen mit Gewicht einträgst, siehst du hier deinen Verlauf.</p>'; return; }
+    if(!strEx || !ex[strEx]) strEx = list[0][0];
+    h += `<div class="pr-chips">${list.map(([k, o]) => `<button type="button" class="pr-chip" data-ex="${escapeHtml(k)}" aria-pressed="${k === strEx}">${escapeHtml(o.name)}</button>`).join('')}</div>`;
+    h += `<div class="pr-chips">${[['3', '3 Monate'], ['6', '6 Monate'], ['all', 'Alles']].map(([k, l]) => `<button type="button" class="pr-chip" data-per="${k}" aria-pressed="${k === strPer}">${l}</button>`).join('')}</div>`;
+    const wk = {};
+    entries.forEach(e => { if(!e.exercise || e.exercise.trim().toLowerCase() !== strEx || !(Number(e.weight) > 0)) return; const d = entryDay(e); if(d < from) return; const m = monOfIso(d); wk[m] = Math.max(wk[m] || 0, Number(e.weight)); });
+    const ks = Object.keys(wk).sort(), nm = ex[strEx].name;
+    if(ks.length >= 2){
+      const pts = ks.map(k => ({ v: wk[k], l: dm(k) })), a = pts[0].v, b = pts[pts.length - 1].v, diff = Math.round((b - a) * 10) / 10;
+      const best = Math.max(...pts.map(p => p.v));
+      h += `<div class="pr-card"><div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1rem;">${escapeHtml(nm)}</b><b style="font-size:1.6rem;font-weight:300;color:var(--accent);">${diff > 0 ? '+' : diff < 0 ? '−' : '±'}${fmtW(Math.abs(diff))} kg</b></div><div style="font-size:0.74rem;margin-bottom:6px;">seit ${formatShort(ks[0])} · von ${fmtW(a)} auf ${fmtW(b)} kg${a > 0 && diff !== 0 ? ` (${diff > 0 ? '+' : '−'}${Math.abs(Math.round(diff / a * 100))} %)` : ''}</div>${lineSvg(pts, { star: b === best, aria: `${nm}, Höchstgewicht je Woche: ${pts.map(p => fmtW(p.v)).join(', ')} Kilogramm.` })}</div>`;
+    } else h += `<p class="pr-note">Für ${escapeHtml(nm)} gibt es im Zeitraum noch zu wenig Wochen mit Gewicht.</p>`;
+    // Nächstes Ziel laut Plan
+    const ctx = activeWeekPlan();
+    if(ctx){
+      const WDL = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'], stt = weekStatus(ctx);
+      for(const x of stt){
+        if(x.rest || x.done || x.i < ctx.wd) continue;
+        const u = (x.slot.uebungen || []).find(u => u.exercise && u.exercise.trim().toLowerCase() === strEx && Number(u.gewicht) > 0);
+        if(u){ h += `<div class="pr-card hl"><div class="pr-h" style="margin:0 0 4px;">Nächstes Ziel laut Plan</div><div style="font-size:1rem;"><b>${escapeHtml(nm)}</b> · ${u.sets} × ${u.reps || '?'} mit ${fmtW(Number(u.gewicht))} kg</div><div style="font-size:0.74rem;">Am ${WDL[x.i]} im Training ${escapeHtml(x.slot.name)}.</div></div>`; break; }
+      }
+    }
+    // Körpergewicht im selben Zeitraum
+    const bw = (typeof body !== 'undefined' ? body : []).filter(r => Number(r.gewicht) > 0 && r.datum >= from);
+    h += '<div class="pr-h">Körpergewicht</div>';
+    if(bw.length >= 2){
+      const pts = bw.map(r => ({ v: Number(r.gewicht), l: dm(r.datum) })), d = Math.round((pts[pts.length - 1].v - pts[0].v) * 10) / 10;
+      h += `<div class="pr-card">${lineSvg(pts, { color: '#B59A5D', aria: `Körpergewicht von ${fmtW(pts[0].v)} auf ${fmtW(pts[pts.length - 1].v)} Kilogramm.` })}<p class="pr-note" style="margin-top:4px;"><b>${d > 0 ? '+' : d < 0 ? '−' : '±'}${fmtW(Math.abs(d))} kg</b> im Zeitraum</p></div>`;
+    } else h += '<p class="pr-note">Trage dein Gewicht unter Körperwerte ein, dann erscheint hier der Verlauf.</p>';
+    if(hasCoachPlan()) h += '<p class="pr-note">Dein Coach kann deine Einträge und Körperwerte einsehen, um den Plan anzupassen.</p>';
+    document.getElementById('strengthBody').innerHTML = h;
+  }
+  document.getElementById('strengthBody').addEventListener('click', ev => {
+    const e = ev.target.closest('[data-ex]'), p = ev.target.closest('[data-per]');
+    if(e){ strEx = e.dataset.ex; renderStrength(); }
+    else if(p){ strPer = p.dataset.per; renderStrength(); }
   });
 
   // ---------- Init ----------
