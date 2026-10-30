@@ -3697,7 +3697,15 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function renderTodayCard(){
     const box = document.getElementById('todayCard');
     const ctx = activeWeekPlan();
-    if(!ctx){ box.innerHTML = ''; return; }
+    if(!ctx){
+      // Plan noch nicht gestartet: nächster Start als Vorschau, damit die Zuweisung sichtbar ist
+      const today = localIso(new Date());
+      const next = plans.filter(p => isWeekPlan(p) && p.start > today).sort((x, y) => x.start.localeCompare(y.start))[0];
+      if(!next){ box.innerHTML = ''; return; }
+      const first = normWochen(next)[0].tage.map((sl, i) => sl ? `${WDN[i]} ${escapeHtml(sl.name)}` : null).filter(Boolean);
+      box.innerHTML = `<div class="today-card"><div class="today-label">${escapeHtml(next.name)} · vom Coach</div><div class="today-name">Startet am ${escapeHtml(WDN[(parseIso(next.start).getDay() + 6) % 7])} ${formatShort(next.start)}</div><div class="today-sub">${first.length ? 'Woche 1: ' + first.join(' · ') : ''}</div></div>`;
+      return;
+    }
     const st = weekStatus(ctx);
     const t = st[ctx.wd];
     const catchUp = st.filter(x => !x.rest && !x.done && x.i < ctx.wd);
