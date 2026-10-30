@@ -3497,7 +3497,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     if(isCardioName(it.exercise)) return 'Laufband';
     let t = `${it.sets} × ${it.reps || '?'} Wdh.`;
     if(it.gewicht > 0) t += ` · ${fmtKg(it.gewicht)} kg`;
-    if(it.rir !== undefined && it.rir !== null && it.rir !== '') t += ` · RiR ${it.rir}`;
+    if(it.rir !== undefined && it.rir !== null && it.rir !== '') t += ` · Reserve ${it.rir}`;
     return t;
   }
   function planRemaining(it){
@@ -3626,6 +3626,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
           <div class="field"><label>Trainingstag</label><input type="text" class="pe-in pe-dayname" maxlength="80" value="${escapeHtml(t.name)}"></div>
           <button type="button" class="pe-ico pe-delday" aria-label="Tag löschen"${pe.tage.length < 2 ? ' disabled' : ''}>✕</button>
         </div>
+        <div style="font-size:0.75rem; opacity:0.65; margin:0 0 6px;">Reserve: Wie viele Wiederholungen wären noch gegangen? (leer = keine Vorgabe)</div>
         ${t.uebungen.map((u, ei) => `
           <div class="pe-ex" data-e="${ei}">
             <div class="pe-row1">
@@ -3638,7 +3639,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
               <div><label>Sätze</label><input type="number" class="pe-in pe-sets" inputmode="numeric" min="1" value="${u.sets}"></div>
               <div><label>Wdh.</label><input type="number" class="pe-in pe-reps" inputmode="numeric" min="0" value="${u.reps || ''}"></div>
               <div><label>kg</label><input type="number" class="pe-in pe-kg" inputmode="decimal" step="0.5" min="0" value="${u.gewicht || ''}"></div>
-              <div><label>RiR</label><input type="number" class="pe-in pe-rir" inputmode="numeric" min="0" max="10" value="${u.rir === null || u.rir === undefined ? '' : u.rir}"></div>
+              <div><label title="Wie viele Wiederholungen wären noch gegangen?">Reserve</label><input type="number" class="pe-in pe-rir" inputmode="numeric" min="0" max="10" value="${u.rir === null || u.rir === undefined ? '' : u.rir}"></div>
             </div>
           </div>`).join('')}
         <button type="button" class="pe-add pe-addex">+ Übung hinzufügen</button>
