@@ -256,6 +256,34 @@
   /* Fortschritt */
   #progress-screen .head, #strength-screen .head{ padding: 16px 18px 4px; }
   #progressCardBox{ padding: 0 18px; }
+  /* Tests (Messungen) */
+  #tests-screen .head{ padding: 16px 18px 4px; }
+  .tp{ display:flex; flex-direction:column; gap:12px; margin:0 0 14px; }
+  .tp-hint{ font-size:0.85rem; opacity:0.8; }
+  .tp-plan{ font-size:0.82rem; color: var(--accent); font-weight:600; }
+  .tp-clock{ font-variant-numeric: tabular-nums; font-size:3.4rem; font-weight:300; text-align:center; letter-spacing:1px; color: var(--accent); padding:6px 0; }
+  .tp-big{ width:100%; min-height:72px; font-size:1.15rem; }
+  .tp-frozen{ display:none; flex-direction:column; gap:8px; background: var(--surface); border:2px solid var(--accent); border-radius: calc(var(--radius) + 4px); padding:12px 14px; text-align:center; }
+  .tp-frozen b{ font-size:1.5rem; }
+  .tp-row{ display:flex; gap:8px; }
+  .tp-row > *{ flex:1; }
+  .tp-manual{ display:flex; gap:8px; align-items:flex-end; }
+  .tp-manual .field{ flex:1; margin:0; }
+  .tp-card{ background: var(--surface); border:1px solid var(--border); border-radius: calc(var(--radius) + 4px); padding:12px 14px; }
+  .tp-card h3{ margin:0 0 8px; font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color: var(--accent); }
+  .tp-line{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 0; border-top:1px solid var(--border); font-size:0.92rem; }
+  .tp-line:first-of-type{ border-top:0; }
+  .tp-best{ font-weight:700; color: var(--accent); }
+  .tp-del{ background:none; border:1px solid var(--border); color: var(--text); border-radius:6px; min-height:36px; padding:0 10px; font:inherit; font-size:0.8rem; }
+  .tp-del.sure{ border-color:#c0504d; color:#c0504d; }
+  .tp-msg{ min-height:1.2em; font-size:0.88rem; }
+  .tp-msg.ok{ color: var(--accent); font-weight:600; }
+  .tp-msg.error{ color:#c0504d; }
+  .tp-list{ display:flex; flex-direction:column; gap:10px; padding:0 18px 24px; }
+  .tp-item{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; text-align:left; background: var(--surface); border:1px solid var(--border); border-radius: calc(var(--radius) + 4px); padding:12px 14px; color: var(--text); font:inherit; cursor:pointer; }
+  .tp-item b{ font-size:1rem; }
+  .tp-item small{ opacity:0.75; }
+  #testsDetail{ padding:0 18px 24px; }
   .pr-wrap{ padding: 0 18px 24px; display:flex; flex-direction:column; gap:14px; }
   .pr-card{ background: var(--surface); border:1px solid var(--border); border-radius: calc(var(--radius) + 4px); padding:14px 16px; }
   .pr-card.hl{ border:2px solid var(--accent); }
@@ -890,6 +918,10 @@
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
       <span class="tile-t">Verlauf<small>alle Einheiten, Kalender</small></span>
     </button>
+    <button type="button" class="tile" id="testsTileBtn" style="display:none;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2h5"/></svg>
+      <span class="tile-t">Tests<small>Zeit stoppen, Bestwerte</small></span>
+    </button>
   </div>
   <button class="stats-link" id="coachLink" style="display:none;">🧑‍🏫 Coach-Bereich</button>
   <section id="designBox">
@@ -951,6 +983,21 @@
     <p class="sub">Dein Höchstgewicht je Woche</p>
   </div>
   <div class="pr-wrap" id="strengthBody"></div>
+</div>
+
+<!-- ========== Tests ========== -->
+<div class="screen" id="tests-screen">
+  <button class="screen-back" id="testsBackBtn">← Übersicht</button>
+  <div class="head">
+    <h2>Tests</h2>
+    <p class="sub" id="testsSub">Messungen mit Stoppuhr oder Zähler</p>
+  </div>
+  <div class="tp-list" id="testsList"></div>
+  <div id="testsDetail" style="display:none;">
+    <button type="button" class="btn" id="testsAllBtn" style="width:100%; margin-bottom:12px;">← Alle Tests</button>
+    <h2 id="testsDetailName" style="margin:0 0 8px;"></h2>
+    <div id="testsPanel"></div>
+  </div>
 </div>
 
 <!-- ========== Körperwerte ========== -->
@@ -1180,6 +1227,7 @@
       <textarea id="noteText" rows="2" maxlength="500" placeholder="z. B. Sitzhöhe 4, enger Griff"></textarea>
       <div class="note-state" id="noteState"></div>
     </div>
+    <div id="testPanel" style="display:none;"></div>
     <button type="button" class="btn btn-primary" id="startSetBtn" style="width:100%; margin-bottom:14px;">Satz beginnen</button>
     <div class="phase-row" id="phaseRow" role="group" aria-label="Phase">
       <button type="button" class="phase-btn" data-typ="aufwaermen">Aufwärmen</button>
@@ -1367,7 +1415,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     week: document.getElementById('week-screen'),
     body: document.getElementById('body-screen'),
     progress: document.getElementById('progress-screen'),
-    strength: document.getElementById('strength-screen')
+    strength: document.getElementById('strength-screen'),
+    tests: document.getElementById('tests-screen')
   };
   const loadingState = document.getElementById('loadingState');
 
@@ -1482,7 +1531,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       entries = [];
       console.error('Laden fehlgeschlagen', e);
     }
-    await Promise.all([loadMuscleMap(), loadCatalog(), loadPlans(), loadNotes(), loadBody()]);
+    await Promise.all([loadMuscleMap(), loadCatalog(), loadPlans(), loadNotes(), loadBody(), loadTests()]);
     loadingState.style.display = 'none';
     renderOverview();
     updateExerciseList();
@@ -2763,6 +2812,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     updateLastHint();
     updateProgHint();
     resetSetState();
+    applyTestMode(testByName(exerciseName));
     showSubsection('detail');
   }
 
@@ -2840,6 +2890,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     if(!qItem) return null;
     const today = document.getElementById('fDate').value;
     const key = activeTraining ? activeTraining.id : null;
+    const tn = testDoneCount(exerciseName, today);
+    if(tn !== null) return Math.max(0, qItem.sets - tn);
     const loggedToday = entries.filter(e => e.exercise === exerciseName &&
       (key ? (e.training_id === key || (!e.training_id && e.date.slice(0,10) === today)) : e.date.slice(0,10) === today)).length;
     return Math.max(0, qItem.sets - loggedToday);
@@ -3016,6 +3068,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function updateExerciseList(){
     const names = [...new Set(entries.map(e => e.exercise))].sort();
     if(!names.some(n => isCardioName(n))) names.push('Laufband');
+    tests.forEach(t => { if(!names.some(n => normName(n) === normName(t.name))) names.push(t.name); });
     // Eigene Übungen zuerst, danach die Katalogübungen mit ihrer Muskelgruppe als Zusatz
     const own = new Set(names.map(n => normName(n)));
     const fromCatalog = catalog.filter(c => !own.has(c.norm)).sort((x, y) => x.name.localeCompare(y.name, 'de'));
@@ -3634,6 +3687,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
 
   function planSollText(it){
     if(isCardioName(it.exercise)) return 'Laufband';
+    if(testByName(it.exercise)) return `${it.sets} ${it.sets === 1 ? 'Versuch' : 'Versuche'}`;
     let t = `${it.sets} × ${it.reps || '?'} Wdh.`;
     if(it.gewicht > 0) t += ` · ${fmtKg(it.gewicht)} kg`;
     if(it.rir !== undefined && it.rir !== null && it.rir !== '') t += ` · Reserve ${it.rir}`;
@@ -3642,6 +3696,8 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function planRemaining(it){
     const key = activeTraining ? activeTraining.id : null;
     const today = document.getElementById('fDate').value;
+    const tn = testDoneCount(it.exercise, today);
+    if(tn !== null) return Math.max(0, it.sets - tn);
     const n = entries.filter(e => e.exercise === it.exercise &&
       (key ? (e.training_id === key || (!e.training_id && e.date.slice(0,10) === today)) : e.date.slice(0,10) === today)).length;
     return Math.max(0, it.sets - n);
@@ -4141,6 +4197,16 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     const groups = groupEntries(dayEntries);
     const used = new Set();
     const rows = plan.items.map(it => {
+      const tt = testByName(it.exercise);
+      if(tt){
+        const day = document.getElementById('fDate').value;
+        const list = testRes.filter(r => r.test === tt.id && r.quelle === 'selbst' && r.datum === day);
+        const okT = list.length >= it.sets;
+        const istT = list.length ? `${list.length} ${list.length === 1 ? 'Versuch' : 'Versuche'}, Bestwert ${fmtTestWert(tt, testBest(tt, list))}` : 'nicht gemacht';
+        return `<div class="soll-row"><div><div class="soll-ex">${escapeHtml(it.exercise)}</div>
+        <div class="soll-txt">Soll: ${it.sets} ${it.sets === 1 ? 'Versuch' : 'Versuche'}<br>Ist: ${escapeHtml(istT)}</div></div>
+        <span class="soll-mark ${okT ? 'ok' : 'warn'}">${okT ? '✓' : (list.length ? list.length + '/' + it.sets : '–')}</span></div>`;
+      }
       const g = groups.find(x => x.name === it.exercise);
       if(g) used.add(g.name);
       const n = g ? groupSetCount(g) : 0;
@@ -4830,6 +4896,255 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     if(e){ strEx = e.dataset.ex; renderStrength(); }
     else if(p){ strPer = p.dataset.per; renderStrength(); }
   });
+
+  // ---------- Tests (Messungen): Stoppuhr oder Zähler, mehrere Versuche ----------
+  // Tests legt der Coach an (Sammlung `tests`). Heißt eine Übung wie ein Test, zeigt die Übungsansicht
+  // statt Gewicht und Wiederholungen die Stoppuhr oder den Zähler. Jeder Versuch ist ein Eintrag in
+  // `test_ergebnisse`; selbst gemessene und vom Coach gemessene Ergebnisse haben getrennte Verläufe.
+  let tests = [];
+  let testRes = [];
+  async function loadTests(){
+    tests = []; testRes = [];
+    try{ tests = (await pb.collection('tests').getFullList({ sort: 'name' })).filter(t => t.aktiv !== false); }catch(e){ tests = []; }
+    if(tests.length){
+      try{ testRes = await pb.collection('test_ergebnisse').getFullList({ sort: '-datum' }); }catch(e){ testRes = []; }
+    }
+    const tile = document.getElementById('testsTileBtn');
+    if(tile) tile.style.display = tests.length ? '' : 'none';
+  }
+  function testByName(name){
+    const n = normName(name);
+    return n ? (tests.find(t => normName(t.name) === n) || null) : null;
+  }
+  // Anzahl der eigenen Versuche an einem Tag; null, wenn die Übung kein Test ist
+  function testDoneCount(exercise, day){
+    const t = testByName(exercise);
+    if(!t) return null;
+    return testRes.filter(r => r.test === t.id && r.quelle === 'selbst' && r.datum === day).length;
+  }
+  function fmtClock(sec){
+    const m = Math.floor(sec / 60), s = (sec - m * 60).toFixed(2).replace('.', ',');
+    return m ? `${m}:${s.padStart(5, '0')}` : s;
+  }
+  function fmtTestWert(t, v){
+    v = Number(v) || 0;
+    if(t.art === 'zeit'){
+      const m = Math.floor(v / 60), s = (v - m * 60).toFixed(2).replace('.', ',');
+      return m ? `${m}:${s.padStart(5, '0')} min` : `${s} s`;
+    }
+    const n = String(Math.round(v * 100) / 100).replace('.', ',');
+    if(t.art === 'anzahl') return `${n}×`;
+    return n + (t.einheit ? ' ' + t.einheit : '');
+  }
+  function testBetter(t, a, b){ return t.besser === 'niedrig' ? a < b : a > b; }
+  function testBest(t, list){
+    return list.reduce((m, r) => (m === null || testBetter(t, r.wert, m)) ? r.wert : m, null);
+  }
+
+  const tp = {};            // Zustand je Container: { test, getDate, planInfo, running, t0, elapsed, armed, msg, ok, err }
+  let tpTimer = null;
+  function tpTick(){
+    let any = false;
+    Object.keys(tp).forEach(id => {
+      const st = tp[id];
+      if(!st.running) return;
+      any = true;
+      const el = document.querySelector('#' + id + ' [data-clock]');
+      if(el) el.textContent = fmtClock((performance.now() - st.t0) / 1000);
+    });
+    if(!any && tpTimer){ clearInterval(tpTimer); tpTimer = null; }
+  }
+  function tpStopAll(){ Object.keys(tp).forEach(id => { tp[id].running = false; }); }
+
+  function tpHist(t, quelle, titel){
+    const list = testRes.filter(r => r.test === t.id && r.quelle === quelle);
+    if(!list.length) return '';
+    const bestAll = testBest(t, list);
+    const bestRec = list.find(r => r.wert === bestAll);
+    const byDay = {};
+    list.forEach(r => { (byDay[r.datum] = byDay[r.datum] || []).push(r); });
+    const days = Object.keys(byDay).sort().reverse().slice(0, 8);
+    return `<div class="tp-card"><h3>${titel}</h3>
+      <div class="tp-line"><span>Bestleistung</span><span class="tp-best">${fmtTestWert(t, bestAll)} <small>· ${formatShort(bestRec.datum)}</small></span></div>` +
+      days.map(d => `<div class="tp-line"><span>${formatShort(d)}</span><span>${fmtTestWert(t, testBest(t, byDay[d]))}${byDay[d].length > 1 ? ` <small>· ${byDay[d].length} Versuche</small>` : ''}</span></div>`).join('') + '</div>';
+  }
+
+  function tpDraw(boxId){
+    const box = document.getElementById(boxId), st = tp[boxId];
+    if(!box || !st) return;
+    const t = st.test, day = st.getDate();
+    const today = testRes.filter(r => r.test === t.id && r.quelle === 'selbst' && r.datum === day)
+      .sort((a, b) => (a.versuch || 0) - (b.versuch || 0));
+    let h = '<div class="tp">';
+    if(t.hinweis) h += `<div class="tp-hint">${escapeHtml(t.hinweis)}</div>`;
+    if(st.planInfo) h += `<div class="tp-plan">Plan: ${st.planInfo.sets} ${st.planInfo.sets === 1 ? 'Versuch' : 'Versuche'} · bisher ${today.length}</div>`;
+    if(t.art === 'zeit'){
+      const clock = st.running ? fmtClock((performance.now() - st.t0) / 1000) : (st.elapsed !== null ? fmtClock(st.elapsed) : '0,00');
+      h += `<div class="tp-clock" data-clock>${clock}</div>`;
+      if(st.elapsed === null){
+        h += `<button type="button" class="btn btn-primary tp-big" data-act="startstop">${st.running ? 'Stopp' : 'Start'}</button>`;
+      } else {
+        h += `<div class="tp-frozen" style="display:flex;"><div>Zeit: <b>${fmtTestWert(t, st.elapsed)}</b></div>
+          <div class="tp-row"><button type="button" class="btn btn-primary" data-act="savefrozen">Versuch speichern</button><button type="button" class="btn" data-act="discard">Verwerfen</button></div></div>`;
+      }
+      h += `<details class="tp-man"><summary>Zeit von Hand eintragen</summary>
+        <div class="tp-manual"><div class="field"><label for="${boxId}-v">Sekunden</label><input type="number" id="${boxId}-v" step="0.01" min="0" inputmode="decimal" placeholder="0,00"></div>
+        <button type="button" class="btn btn-primary" data-act="manual">Speichern</button></div></details>`;
+    } else {
+      const label = t.art === 'anzahl' ? 'Anzahl' : 'Wert' + (t.einheit ? ' (' + escapeHtml(t.einheit) + ')' : '');
+      h += `<div class="tp-manual"><div class="field"><label for="${boxId}-v">${label}</label>
+        <input type="number" id="${boxId}-v" step="${t.art === 'anzahl' ? 1 : 0.01}" min="0" inputmode="decimal"></div>
+        <button type="button" class="btn btn-primary" data-act="manual">Versuch speichern</button></div>`;
+    }
+    h += `<div class="tp-msg${st.ok ? ' ok' : (st.err ? ' error' : '')}">${escapeHtml(st.msg || '')}</div>`;
+    if(today.length){
+      const best = testBest(t, today);
+      h += `<div class="tp-card"><h3>Heute</h3>` + today.map(r => `<div class="tp-line"><span>Versuch ${r.versuch || ''} · <b${today.length > 1 && r.wert === best ? ' class="tp-best"' : ''}>${fmtTestWert(t, r.wert)}</b></span>
+        <button type="button" class="tp-del${st.armed === r.id ? ' sure' : ''}" data-act="del" data-id="${escapeHtml(r.id)}">${st.armed === r.id ? 'Wirklich löschen?' : 'Löschen'}</button></div>`).join('') +
+        (today.length > 1 ? `<div class="tp-line"><span>Bestwert heute</span><span class="tp-best">${fmtTestWert(t, best)}</span></div>` : '') + '</div>';
+    }
+    h += tpHist(t, 'selbst', 'Selbst gemessen') + tpHist(t, 'coach', 'Vom Coach gemessen');
+    h += '</div>';
+    box.innerHTML = h;
+  }
+
+  function tpRender(boxId, test, getDate, planInfo){
+    const box = document.getElementById(boxId);
+    tp[boxId] = { test, getDate, planInfo: planInfo || null, running: false, t0: 0, elapsed: null, armed: null, msg: '', ok: false, err: false };
+    tpDraw(boxId);
+    if(!box.dataset.bound){ box.dataset.bound = '1'; box.addEventListener('click', ev => tpClick(boxId, ev)); }
+  }
+
+  // In der Übungsansicht: Plan-Anzeige aktualisieren und Abschluss-Banner zeigen, wenn alle Versuche gemacht sind
+  function tpAfter(boxId){
+    if(boxId !== 'testPanel') return;
+    const it = currentPlanItem();
+    if(it && tp.testPanel){ tp.testPanel.planInfo = { sets: it.sets }; tpDraw('testPanel'); }
+    const rem = computeRemainingSets(fExercise.value.trim());
+    if(rem !== null && rem <= 0) document.getElementById('exerciseCompleteBanner').style.display = 'block';
+  }
+
+  async function tpSave(boxId, wert){
+    const st = tp[boxId], t = st.test, day = st.getDate();
+    const own = testRes.filter(r => r.test === t.id && r.quelle === 'selbst');
+    const versuch = own.filter(r => r.datum === day).reduce((m, r) => Math.max(m, r.versuch || 0), 0) + 1;
+    const vorher = own.length ? testBest(t, own) : null;
+    if(t.art === 'anzahl') wert = Math.round(wert);
+    try{
+      const rec = await pb.collection('test_ergebnisse').create({
+        test: t.id, test_name: t.name, member: pb.authStore.model.id, datum: day, versuch, wert, quelle: 'selbst'
+      });
+      testRes.unshift(rec);
+      st.elapsed = null; st.err = false; st.ok = true; st.armed = null;
+      const rekord = vorher !== null && testBetter(t, wert, vorher);
+      st.msg = rekord ? `🏆 Neue Bestleistung: ${fmtTestWert(t, wert)}` : `✓ Versuch ${versuch} gespeichert: ${fmtTestWert(t, wert)}`;
+      if(rekord && navigator.vibrate){ try{ navigator.vibrate(200); }catch(e){} }
+    }catch(e){
+      console.error('Test nicht gespeichert', e);
+      st.msg = 'Nicht gespeichert. Bitte noch einmal versuchen.'; st.ok = false; st.err = true;
+    }
+    tpDraw(boxId);
+    tpAfter(boxId);
+  }
+
+  async function tpClick(boxId, ev){
+    const b = ev.target.closest('[data-act]');
+    const st = tp[boxId];
+    if(!b || !st) return;
+    const act = b.dataset.act;
+    if(act === 'startstop'){
+      if(!st.running){
+        st.running = true; st.t0 = performance.now(); st.msg = ''; st.ok = false; st.err = false;
+        if(!tpTimer) tpTimer = setInterval(tpTick, 50);
+      } else {
+        st.running = false;
+        st.elapsed = Math.round((performance.now() - st.t0) / 10) / 100;
+      }
+      tpDraw(boxId);
+    } else if(act === 'discard'){
+      st.elapsed = null; st.msg = ''; st.ok = false; st.err = false;
+      tpDraw(boxId);
+    } else if(act === 'savefrozen'){
+      await tpSave(boxId, st.elapsed);
+    } else if(act === 'manual'){
+      const inp = document.getElementById(boxId + '-v');
+      const v = parseFloat(String(inp.value).replace(',', '.'));
+      if(!(v > 0)){ st.msg = 'Bitte einen Wert eintragen.'; st.ok = false; st.err = true; tpDraw(boxId); return; }
+      await tpSave(boxId, Math.round(v * 100) / 100);
+    } else if(act === 'del'){
+      const id = b.dataset.id;
+      if(st.armed !== id){ st.armed = id; tpDraw(boxId); return; }
+      try{
+        await pb.collection('test_ergebnisse').delete(id);
+        testRes = testRes.filter(r => r.id !== id);
+        st.msg = 'Versuch gelöscht.'; st.ok = false; st.err = false;
+      }catch(e){ st.msg = 'Löschen nicht möglich.'; st.err = true; st.ok = false; }
+      st.armed = null;
+      tpDraw(boxId);
+      tpAfter(boxId);
+    }
+  }
+
+  // Übungsansicht: heißt die Übung wie ein Test, ersetzt das Test-Feld die Satz-Eingabe
+  const TEST_HIDE = ['weightField', 'repsField', 'bwRow', 'tendenzPicker', 'progHint', 'remainingSetsWrap', 'planSoll', 'setDuration', 'lastHint', 'startSetBtn'];
+  function applyTestMode(t){
+    const box = document.getElementById('testPanel');
+    const row = document.querySelector('#detail-section .set-actions-row');
+    tpStopAll();
+    if(!t){
+      box.style.display = 'none'; box.innerHTML = '';
+      document.getElementById('startSetBtn').style.display = '';
+      document.getElementById('lastHint').style.display = '';
+      if(row) row.style.display = '';
+      return;
+    }
+    box.style.display = 'block';
+    TEST_HIDE.forEach(id => { document.getElementById(id).style.display = 'none'; });
+    if(row) row.style.display = 'none';
+    const it = currentPlanItem();
+    tpRender('testPanel', t, () => document.getElementById('fDate').value, it ? { sets: it.sets } : null);
+  }
+
+  // Eigener Bildschirm "Tests": alle Tests mit Bestleistung, Antippen öffnet die Messung (ohne Training)
+  let testsSel = null;
+  function renderTestsScreen(){
+    const list = document.getElementById('testsList'), det = document.getElementById('testsDetail');
+    const t = testsSel ? tests.find(x => x.id === testsSel) : null;
+    if(t){
+      list.style.display = 'none'; det.style.display = 'block';
+      document.getElementById('testsDetailName').textContent = t.name;
+      tpRender('testsPanel', t, () => localIso(new Date()), null);
+      return;
+    }
+    tpStopAll();
+    det.style.display = 'none'; list.style.display = '';
+    list.innerHTML = tests.length ? tests.map(x => {
+      const own = testRes.filter(r => r.test === x.id && r.quelle === 'selbst');
+      const co = testRes.filter(r => r.test === x.id && r.quelle === 'coach');
+      const parts = [];
+      if(own.length) parts.push('Selbst ' + fmtTestWert(x, testBest(x, own)));
+      if(co.length) parts.push('Coach ' + fmtTestWert(x, testBest(x, co)));
+      return `<button type="button" class="tp-item" data-id="${escapeHtml(x.id)}"><b>${escapeHtml(x.name)}</b><small>${parts.length ? 'Bestleistung · ' + parts.join(' · ') : 'noch keine Messung'}</small></button>`;
+    }).join('') : '<p class="plan-empty">Noch keine Tests angelegt.</p>';
+  }
+  function openTests(){
+    testsSel = null;
+    renderTestsScreen();
+    showScreen('tests');
+    window.scrollTo(0, 0);
+    // Ergebnisse vom Coach nachladen, solange noch die Liste sichtbar ist
+    loadTests().then(() => { if(!testsSel && screens.tests.classList.contains('active')) renderTestsScreen(); });
+  }
+  document.getElementById('testsTileBtn').addEventListener('click', openTests);
+  document.getElementById('testsList').addEventListener('click', ev => {
+    const b = ev.target.closest('.tp-item');
+    if(!b) return;
+    testsSel = b.dataset.id;
+    renderTestsScreen();
+    window.scrollTo(0, 0);
+  });
+  document.getElementById('testsAllBtn').addEventListener('click', () => { testsSel = null; renderTestsScreen(); });
+  document.getElementById('testsBackBtn').addEventListener('click', () => { tpStopAll(); renderOverview(); showScreen('overview'); });
 
   // ---------- Init ----------
   updateSetButtons();
