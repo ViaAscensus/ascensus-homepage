@@ -364,6 +364,7 @@
   .cal-day.today{ border-color: var(--text-dim); }
   .cal-day.trained{ background: var(--accent); color: var(--accent-text); font-weight:700; cursor:pointer; }
   .cal-day.trained:active{ opacity:0.7; }
+  .cal-day.xh-sel{ outline:2px solid var(--text); outline-offset:1px; }
   #dayList{ padding: 0 18px 18px; }
   .day-row{
     display:flex; align-items:center; justify-content:space-between;
@@ -791,6 +792,22 @@
   .tendenz-btn[data-val="leicht"].active{ border-color: var(--leicht); color: var(--leicht); }
   .tendenz-btn[data-val="okay"].active{ border-color: var(--okay); color: var(--okay); }
   .tendenz-btn[data-val="hart"].active{ border-color: var(--hart); color: var(--hart); }
+
+  /* ---------- Übungsansicht: Sätze ändern, Kalender ---------- */
+  .xh-h{ font-size:0.8rem; text-transform:uppercase; letter-spacing:0.06em; color: var(--text-dim); margin:18px 0 8px; font-weight:600; }
+  .xh-row{ display:flex; justify-content:space-between; align-items:center; width:100%; text-align:left; padding:12px 14px; margin-bottom:6px;
+    background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family:inherit; font-size:0.92rem; cursor:pointer; }
+  .xh-row.plain{ cursor:default; }
+  .xh-row small{ color: var(--text-dim); }
+  .xh-edit{ padding:12px 14px; margin:-2px 0 8px; background: var(--surface); border:1px solid var(--border-strong); border-radius: var(--radius); }
+  .xh-edit .xh-fields{ display:flex; gap:10px; margin-bottom:10px; }
+  .xh-edit label{ flex:1; font-size:0.75rem; color: var(--text-dim); display:block; }
+  .xh-edit input{ width:100%; margin-top:4px; padding:10px; font-size:1rem; border:1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); font-family:inherit; box-sizing:border-box; }
+  .xh-edit .tendenz-picker{ margin-bottom:10px; }
+  .xh-actions{ display:flex; gap:8px; }
+  .xh-actions .btn{ flex:1; margin-top:0; }
+  .xh-note{ color: var(--text-dim); font-size:0.85rem; margin:6px 0 10px; }
+  .xh-err{ color: var(--hart); font-size:0.85rem; margin-top:8px; }
 
   /* ---------- Auswertung ---------- */
   .stats-link{
@@ -1284,7 +1301,7 @@
       <button type="button" class="btn btn-primary" id="saveEntry" disabled>Satz beenden</button>
     </div>
     <div class="record-msg" id="recordMsg" style="display:none;"></div>
-    <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Übung beenden</button>
+    <button type="button" class="btn" id="otherExerciseBtn" style="width:100%; margin-top:10px;">Andere Übung wählen</button>
     <button type="button" class="btn" id="busyBtn" style="width:100%; margin-top:10px; display:none;">Gerät besetzt – Übung ans Ende</button>
     <div class="save-confirm" id="endExConfirm">
       <div class="save-confirm-msg" id="endExMsg"></div>
@@ -1299,6 +1316,17 @@
   </section>
 
   <button class="btn btn-finish" id="finishDayBtn" style="width: calc(100% - 36px); margin: 0 18px 18px;">Training fertig</button>
+
+  <!-- Sätze dieser Übung ändern und Kalender der Übung (nur in der Übungsansicht) -->
+  <section id="exHistory" style="display:none; margin: 0 18px 28px;">
+    <div id="xhSetsBox">
+      <h3 class="xh-h">Sätze heute</h3>
+      <div id="xhSets"></div>
+    </div>
+    <h3 class="xh-h" id="xhCalTitle">Kalender dieser Übung</h3>
+    <div id="xhCal"></div>
+    <div id="xhDay"></div>
+  </section>
 </div>
 
 <!-- Zusammenfassung nach beendetem Training -->
@@ -2582,6 +2610,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     // Fester Plan: keine freie Übungswahl
     document.getElementById('pickFree').style.display = (activeTraining && activeTraining.plan && activeTraining.plan.typ === 'fest') ? 'none' : '';
     document.getElementById('detail-section').style.display = name === 'detail' ? 'block' : 'none';
+    if(name !== 'detail') document.getElementById('exHistory').style.display = 'none';
     // Timer-Leiste nur, wenn wirklich trainiert wird
     document.getElementById('timerBar').style.display = (name === 'pick' || name === 'detail') ? 'block' : 'none';
     // Button "Letztes Training": nur im normalen Training und wenn es ein früheres gibt
@@ -2813,6 +2842,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     updateProgHint();
     resetSetState();
     applyTestMode(testByName(exerciseName));
+    xhOpen();
     showSubsection('detail');
   }
 
@@ -3337,6 +3367,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       saveActive();
       await loadEntries();
       updateRemainingSetsDisplay();
+      xhRender();
 
       formMsg.classList.remove('error');
       if(cardio){
@@ -5145,6 +5176,187 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   });
   document.getElementById('testsAllBtn').addEventListener('click', () => { testsSel = null; renderTestsScreen(); });
   document.getElementById('testsBackBtn').addEventListener('click', () => { tpStopAll(); renderOverview(); showScreen('overview'); });
+
+  // ---------- Übungsansicht: gespeicherte Sätze ändern, Kalender der Übung ----------
+  let xhMonth = null;     // 'JJJJ-MM'
+  let xhSelDay = null;    // gewählter Tag im Kalender
+  let xhEditId = null;    // Satz im Editor
+  let xhTendenz = 'okay';
+
+  function xhName(){ return fExercise.value.trim(); }
+  function xhEntries(){
+    const q = xhName().toLowerCase();
+    return entries.filter(e => e.exercise.toLowerCase() === q);
+  }
+  function xhSetLine(e, k){
+    if(isCardioEntry(e)) return cardioText(e);
+    const w = e.weight > 0 ? fmtKg(e.weight) + ' kg' : 'Körpergewicht';
+    const n = Math.max(1, e.sets || 1);
+    return (n > 1 ? `${n} × ` : '') + `${w} × ${e.reps}`;
+  }
+
+  function xhOpen(){
+    const own = xhEntries().map(e => e.date.slice(0,10)).sort();
+    xhMonth = own.length ? own[own.length - 1].slice(0,7) : todayIso().slice(0,7);
+    xhSelDay = null; xhEditId = null;
+    xhRender();
+  }
+
+  function xhRender(){
+    const box = document.getElementById('exHistory');
+    const name = xhName();
+    if(!name || testByName(name)){ box.style.display = 'none'; return; }
+    const mine = xhEntries();
+    // Sätze heute: die dieser Übung im laufenden Training
+    const heute = activeTraining
+      ? mine.filter(e => sessionKey(e) === activeTraining.id).sort((a,b) => (a.created || '').localeCompare(b.created || ''))
+      : [];
+    document.getElementById('xhSetsBox').style.display = heute.length ? '' : 'none';
+    let html = '';
+    heute.forEach((e, i) => {
+      const cardio = isCardioEntry(e);
+      const t = cardio ? '' : ` · <small>${escapeHtml(e.tendenz || '')}</small>`;
+      html += cardio
+        ? `<div class="xh-row plain"><span>Einheit ${i + 1} · ${escapeHtml(xhSetLine(e))}</span></div>`
+        : `<button type="button" class="xh-row" data-xh-id="${e.id}"><span>Satz ${i + 1} · ${escapeHtml(xhSetLine(e))}${t}</span><small>ändern ›</small></button>`;
+      if(xhEditId === e.id && !cardio){
+        html += `<div class="xh-edit" data-xh-edit="${e.id}">
+          <div class="xh-fields">
+            <label>Gewicht (kg)<input type="number" id="xhW" step="0.5" min="0" inputmode="decimal" value="${e.weight || ''}" placeholder="Körpergewicht"></label>
+            <label>Wiederholungen<input type="number" id="xhR" step="1" min="1" inputmode="numeric" value="${e.reps}"></label>
+          </div>
+          <div class="tendenz-picker">
+            ${['leicht','okay','hart'].map(v => `<div class="tendenz-btn xh-t${xhTendenz === v ? ' active' : ''}" data-val="${v}">${v[0].toUpperCase() + v.slice(1)}</div>`).join('')}
+          </div>
+          <div class="xh-actions">
+            <button type="button" class="btn btn-primary" data-xh="save">Speichern</button>
+            <button type="button" class="btn" data-xh="del">Satz löschen</button>
+            <button type="button" class="btn" data-xh="cancel">Abbrechen</button>
+          </div>
+          <div class="xh-err" id="xhErr"></div>
+        </div>`;
+      }
+    });
+    document.getElementById('xhSets').innerHTML = html;
+
+    // Kalender
+    const days = new Set(mine.map(e => e.date.slice(0,10)));
+    document.getElementById('xhCalTitle').textContent = 'Kalender: ' + name;
+    const calBox = document.getElementById('xhCal');
+    if(!days.size){
+      calBox.innerHTML = '<div class="xh-note">Diese Übung wurde noch nie trainiert.</div>';
+      document.getElementById('xhDay').innerHTML = '';
+      box.style.display = '';
+      return;
+    }
+    const sorted = [...days].sort();
+    const first = sorted[0].slice(0,7), last = sorted[sorted.length - 1];
+    const thisMonth = todayIso().slice(0,7);
+    const maxMonth = thisMonth > last.slice(0,7) ? thisMonth : last.slice(0,7);
+    const [y, m] = xhMonth.split('-').map(Number);
+    const label = new Date(y, m - 1, 1).toLocaleDateString('de-DE', { month:'long', year:'numeric' });
+    const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;
+    const total = new Date(y, m, 0).getDate();
+    const inMonth = [...days].filter(d => d.slice(0,7) === xhMonth).length;
+    const pad = n => String(n).padStart(2, '0');
+    let cells = '';
+    for(let i = 0; i < lead; i++) cells += '<span class="cal-day out"></span>';
+    for(let d = 1; d <= total; d++){
+      const iso = `${xhMonth}-${pad(d)}`;
+      const cls = 'cal-day' + (days.has(iso) ? ' trained' : '') + (iso === todayIso() ? ' today' : '') + (iso === xhSelDay ? ' xh-sel' : '');
+      cells += days.has(iso)
+        ? `<button type="button" class="${cls}" data-xh-day="${iso}" aria-label="${formatDateHeading(iso)}">${d}</button>`
+        : `<span class="${cls}">${d}</span>`;
+    }
+    calBox.innerHTML =
+      `<div class="xh-note">Zuletzt trainiert: ${formatDateHeading(last)}</div>
+      <div class="cal-head">
+        <button type="button" class="cal-nav" data-xh-nav="-1" aria-label="Vorheriger Monat"${xhMonth <= first ? ' disabled' : ''}>‹</button>
+        <div class="cal-title">${label}<small>${inMonth} Trainingstag${inMonth === 1 ? '' : 'e'}</small></div>
+        <button type="button" class="cal-nav" data-xh-nav="1" aria-label="Nächster Monat"${xhMonth >= maxMonth ? ' disabled' : ''}>›</button>
+      </div>
+      <div class="cal-grid">${['Mo','Di','Mi','Do','Fr','Sa','So'].map(w => `<span class="cal-wd">${w}</span>`).join('')}${cells}</div>`;
+
+    const dayBox = document.getElementById('xhDay');
+    if(xhSelDay && days.has(xhSelDay)){
+      const list = mine.filter(e => e.date.slice(0,10) === xhSelDay).sort((a,b) => (a.created || '').localeCompare(b.created || ''));
+      dayBox.innerHTML = `<h3 class="xh-h">${formatDateHeading(xhSelDay)}</h3>` +
+        list.map((e, i) => `<div class="xh-row plain"><span>Satz ${i + 1} · ${escapeHtml(xhSetLine(e))}${isCardioEntry(e) ? '' : ' · <small>' + escapeHtml(e.tendenz || '') + '</small>'}</span></div>`).join('');
+    } else {
+      dayBox.innerHTML = '<div class="xh-note">Tag antippen, um die Sätze zu sehen.</div>';
+    }
+    box.style.display = '';
+  }
+
+  async function xhAfterChange(){
+    updateExerciseList();
+    updateRemainingSetsDisplay();
+    updateLastHint();
+    updateProgHint();
+    renderQuickChips();
+    xhRender();
+  }
+
+  document.getElementById('exHistory').addEventListener('click', async (ev) => {
+    const nav = ev.target.closest('[data-xh-nav]');
+    if(nav && !nav.disabled){
+      const [y, m] = xhMonth.split('-').map(Number);
+      const d = new Date(y, m - 1 + Number(nav.dataset.xhNav), 1);
+      xhMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      xhSelDay = null;
+      xhRender();
+      return;
+    }
+    const day = ev.target.closest('[data-xh-day]');
+    if(day){ xhSelDay = day.dataset.xhDay; xhRender(); return; }
+    const row = ev.target.closest('[data-xh-id]');
+    if(row){
+      const id = row.dataset.xhId;
+      if(xhEditId === id){ xhEditId = null; }
+      else{
+        xhEditId = id;
+        const e = entries.find(x => x.id === id);
+        xhTendenz = (e && ['leicht','okay','hart'].includes(e.tendenz)) ? e.tendenz : 'okay';
+      }
+      xhRender();
+      return;
+    }
+    const t = ev.target.closest('.xh-t');
+    if(t){
+      xhTendenz = t.dataset.val;
+      document.querySelectorAll('#exHistory .xh-t').forEach(b => b.classList.toggle('active', b === t));
+      return;
+    }
+    const act = ev.target.closest('[data-xh]');
+    if(!act || !xhEditId) return;
+    const id = xhEditId;
+    const err = document.getElementById('xhErr');
+    if(act.dataset.xh === 'cancel'){ xhEditId = null; xhRender(); return; }
+    if(act.dataset.xh === 'del'){
+      if(!confirm('Diesen Satz löschen?')) return;
+      try{
+        await pb.collection('trainingsbuch_entries').delete(id);
+        entries = entries.filter(e => e.id !== id);
+        xhEditId = null;
+        await xhAfterChange();
+      }catch(e){ console.error(e); err.textContent = 'Löschen fehlgeschlagen.'; }
+      return;
+    }
+    if(act.dataset.xh === 'save'){
+      const num = v => parseFloat(String(v).replace(',', '.'));
+      const w = num(document.getElementById('xhW').value);
+      const r = parseInt(document.getElementById('xhR').value, 10);
+      if(!(r > 0)){ err.textContent = 'Bitte Wiederholungen eintragen.'; return; }
+      const weight = w > 0 ? w : 0;
+      try{
+        const rec = await pb.collection('trainingsbuch_entries').update(id, { weight, reps: r, tendenz: xhTendenz });
+        const e = entries.find(x => x.id === id);
+        if(e){ e.weight = 'weight' in rec ? rec.weight : weight; e.reps = 'reps' in rec ? rec.reps : r; e.tendenz = 'tendenz' in rec ? rec.tendenz : xhTendenz; }
+        xhEditId = null;
+        await xhAfterChange();
+      }catch(e){ console.error(e); err.textContent = 'Änderung konnte nicht gespeichert werden.'; }
+    }
+  });
 
   // ---------- Init ----------
   updateSetButtons();
