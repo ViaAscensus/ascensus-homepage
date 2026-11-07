@@ -1936,6 +1936,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
   function openDay(date){
     selectedDate = date;
     dayExpanded = new Set();
+    dayEditId = null;
     renderDayDetail();
     showScreen('day');
     window.scrollTo(0, 0);
@@ -1947,6 +1948,26 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     else { renderOverview(); showScreen('overview'); }
   }
   let dayFromSessions = false;
+
+  // Satz in der Tagesansicht ändern: Gewicht, Wiederholungen, Härte
+  let dayEditId = null;
+  let dayTendenz = 'okay';
+  function dayEditorHtml(e){
+    return `<div class="xh-edit day-edit">
+      <div class="xh-fields">
+        <label>Gewicht (kg)<input type="number" id="dayW" step="0.5" min="0" inputmode="decimal" value="${e.weight || ''}" placeholder="Körpergewicht"></label>
+        <label>Wiederholungen<input type="number" id="dayR" step="1" min="1" inputmode="numeric" value="${e.reps}"></label>
+      </div>
+      <div class="tendenz-picker">
+        ${['leicht','okay','hart'].map(v => `<div class="tendenz-btn xh-t${dayTendenz === v ? ' active' : ''}" data-val="${v}">${v[0].toUpperCase() + v.slice(1)}</div>`).join('')}
+      </div>
+      <div class="xh-actions">
+        <button type="button" class="btn btn-primary" data-dx="save">Speichern</button>
+        <button type="button" class="btn" data-dx="cancel">Abbrechen</button>
+      </div>
+      <div class="xh-err"></div>
+    </div>`;
+  }
 
   function renderDayDetail(){
     document.getElementById('dayHeading').textContent = formatDateHeading(selectedDate);
@@ -1980,9 +2001,10 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
                   <span class="dot ${r.e.tendenz}"></span>
                   ${r.e.tendenz}
                 </span>`}
+                ${isCardioEntry(r.e) ? '' : `<button class="del" data-edit="${r.e.id}" data-gk="${escapeHtml(gk)}" aria-label="Satz ändern" style="font-size:0.95rem;">✎</button>`}
                 <button class="del" data-id="${r.e.id}" aria-label="Eintrag löschen">×</button>
               </div>
-            </div>`).join('')}
+            </div>${dayEditId === r.e.id ? dayEditorHtml(r.e) : ''}`).join('')}
         </div>
       </div>`;
     }).join('');
@@ -2001,7 +2023,49 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       });
     });
 
-    container.querySelectorAll('.del').forEach(btn => {
+    container.querySelectorAll('.del[data-edit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.edit;
+        if(dayEditId === id){ dayEditId = null; }
+        else{
+          dayEditId = id;
+          const e = entries.find(x => x.id === id);
+          dayTendenz = (e && ['leicht','okay','hart'].includes(e.tendenz)) ? e.tendenz : 'okay';
+          dayExpanded.add(btn.dataset.gk);
+        }
+        renderDayDetail();
+      });
+    });
+    container.querySelectorAll('.day-edit .xh-t').forEach(t => {
+      t.addEventListener('click', () => {
+        dayTendenz = t.dataset.val;
+        container.querySelectorAll('.day-edit .xh-t').forEach(b => b.classList.toggle('active', b === t));
+      });
+    });
+    container.querySelectorAll('.day-edit [data-dx]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const err = container.querySelector('.day-edit .xh-err');
+        if(btn.dataset.dx === 'cancel'){ dayEditId = null; renderDayDetail(); return; }
+        const num = v => parseFloat(String(v).replace(',', '.'));
+        const w = num(document.getElementById('dayW').value);
+        const r = parseInt(document.getElementById('dayR').value, 10);
+        if(!(r > 0)){ err.textContent = 'Bitte Wiederholungen eintragen.'; return; }
+        const weight = w > 0 ? w : 0;
+        try{
+          const rec = await pb.collection('trainingsbuch_entries').update(dayEditId, { weight, reps: r, tendenz: dayTendenz });
+          const e = entries.find(x => x.id === dayEditId);
+          if(e){ e.weight = 'weight' in rec ? rec.weight : weight; e.reps = 'reps' in rec ? rec.reps : r; e.tendenz = 'tendenz' in rec ? rec.tendenz : dayTendenz; }
+          dayEditId = null;
+          updateExerciseList();
+          renderDayDetail();
+        }catch(e){
+          console.error('Ändern fehlgeschlagen', e);
+          err.textContent = 'Änderung konnte nicht gespeichert werden.';
+        }
+      });
+    });
+
+    container.querySelectorAll('.del[data-id]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         try{
