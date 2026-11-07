@@ -3896,7 +3896,12 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
       // Plan noch nicht gestartet: nächster Start als Vorschau, damit die Zuweisung sichtbar ist
       const today = localIso(new Date());
       const next = plans.filter(p => isWeekPlan(p) && p.start > today).sort((x, y) => x.start.localeCompare(y.start))[0];
-      if(!next){ box.innerHTML = ''; return; }
+      if(!next){
+        // Ohne Coach-Plan: gleiche Karte mit freiem Training, damit die Startseite für alle gleich aufgebaut ist
+        const WDL0 = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+        box.innerHTML = `<div class="today-card"><div class="today-label">Heute · ${WDL0[(parseIso(today).getDay() + 6) % 7]}</div><div class="today-name">Heute frei trainieren</div><div class="today-sub">Ohne Plan, Du wählst die Übungen.</div><button type="button" class="today-go" data-free="1">Training starten</button></div>`;
+        return;
+      }
       const first = normWochen(next)[0].tage.map((sl, i) => sl ? `${WDN[i]} ${escapeHtml(sl.name)}` : null).filter(Boolean);
       box.innerHTML = `<div class="today-card"><div class="today-label">${escapeHtml(next.name)} · vom Coach</div><div class="today-name">Startet am ${escapeHtml(WDN[(parseIso(next.start).getDay() + 6) % 7])} ${formatShort(next.start)}</div><div class="today-sub">${first.length ? 'Woche 1: ' + first.join(' · ') : ''}</div></div>`;
       return;
@@ -3914,6 +3919,7 @@ const BODY_ASSETS = {"male":{"front":{"viewBox":"0 0 724 1448","outline":["M 309
     box.innerHTML = html;
   }
   document.getElementById('todayCard').addEventListener('click', (ev) => {
+    if(ev.target.closest('[data-free]')){ document.getElementById('newTrainingBtn').click(); return; }
     const b = ev.target.closest('[data-start]'); if(!b) return;
     startWeekDay(parseInt(b.dataset.start));
   });
