@@ -44,18 +44,34 @@
     "@type": "Person",
     "name": "Patrick Spengler",
     "jobTitle": "Nutrition Consultant (B License) & Running Coach",
-    "hasCredential": {
-      "@type": "EducationalOccupationalCredential",
-      "name": "Nutrition Consultant B License",
-      "credentialCategory": "License",
-      "educationalLevel": "Qualification level 3",
-      "dateCreated": "2026-06-14",
-      "url": "https://ascensus.fit/zertifikat-ernaehrungsberater.pdf",
-      "recognizedBy": {
-        "@type": "Organization",
-        "name": "Akademie für Sport und Gesundheit"
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "Ostfalia University of Applied Sciences"
+    },
+    "hasCredential": [
+      {
+        "@type": "EducationalOccupationalCredential",
+        "name": "Diplom-Kaufmann (FH), degree programme Sports Management",
+        "credentialCategory": "degree",
+        "dateCreated": "2010-09-07",
+        "recognizedBy": {
+          "@type": "CollegeOrUniversity",
+          "name": "Ostfalia University of Applied Sciences"
+        }
+      },
+      {
+        "@type": "EducationalOccupationalCredential",
+        "name": "Nutrition Consultant B License",
+        "credentialCategory": "License",
+        "educationalLevel": "Qualification level 3",
+        "dateCreated": "2026-06-14",
+        "url": "https://ascensus.fit/zertifikat-ernaehrungsberater.pdf",
+        "recognizedBy": {
+          "@type": "Organization",
+          "name": "Akademie für Sport und Gesundheit"
+        }
       }
-    }
+    ]
   },
   "sameAs": [
     "https://www.instagram.com/via_ascensus/",
@@ -326,6 +342,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
   display:flex;gap:1.1rem;align-items:flex-start;
 }
 .cred-icon{flex-shrink:0;width:34px;height:34px;color:var(--sand)}
+.cred+.cred{margin-top:1rem}
+.cred-badge{flex-shrink:0;width:68px;height:68px;color:var(--olive)}
+.cred-badge .cb-ring{fill:none;stroke:var(--olive);stroke-width:1.6}
+.cred-badge .cb-inner{fill:none;stroke:var(--sand);stroke-width:.9}
+.cred-badge text{font-family:Inter,system-ui,sans-serif;text-anchor:middle;fill:var(--olive)}
+.cred-badge .cb-small{font-size:6.4px;font-weight:600;letter-spacing:.12em}
+.cred-badge .cb-big{font-size:19px;font-weight:500;fill:var(--sand)}
+@media(max-width:480px){.cred-badge{width:56px;height:56px}}
 .cred-title{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive)}
 .cred-meta{margin-top:.35rem !important;font-size:.88rem;color:var(--ink-60);line-height:1.5}
 .cred-link{display:inline-block;margin-top:.55rem;font-size:.82rem;color:var(--sand);font-weight:600;
@@ -785,7 +809,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
         <img src="patrick.jpg" alt="Patrick Spengler, founder of ASCENSUS" width="600" height="374">
         <figcaption>
           Patrick Spengler
-          <small>Founder · Certified nutrition consultant (B license) · Running coach</small>
+          <small>Founder · Dipl.-Kfm. (FH) Sports Management · Certified nutrition consultant (B license) · Running coach</small>
         </figcaption>
       </figure>
 
@@ -822,9 +846,31 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
         In the end, what matters is not the number on the scale. What matters is your well-being and how well you perform in everyday life.
       </p>
 
+      <p>
+        I studied sports management at Ostfalia University of Applied Sciences and graduated with a Diplom-Kaufmann (FH) degree. Training as a nutrition consultant came later. For me, sport and nutrition belong together.
+      </p>
+
       <div class="cred">
-        <svg class="cred-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-          <circle cx="12" cy="9" r="6"/><path d="M8.5 13.9 7 22l5-2.6 5 2.6-1.5-8.1"/><path d="m9.5 9 1.7 1.7L14.8 7"/>
+        <svg class="cred-badge" viewBox="0 0 72 72" role="img" aria-label="Diplom-Kaufmann (FH), degree programme Sports Management">
+          <circle class="cb-ring" cx="36" cy="36" r="34"/>
+          <circle class="cb-inner" cx="36" cy="36" r="29"/>
+          <text class="cb-small" x="36" y="28">DIPL.-KFM.</text>
+          <text class="cb-big" x="36" y="47">FH</text>
+        </svg>
+        <div>
+          <p class="cred-title">Dipl.-Kfm. (FH) · Sports management</p>
+          <p class="cred-meta">
+            Diplom-Kaufmann (FH), degree programme Sports Management · Ostfalia University of Applied Sciences · 2010
+          </p>
+        </div>
+      </div>
+
+      <div class="cred">
+        <svg class="cred-badge" viewBox="0 0 72 72" role="img" aria-label="Nutrition consultant, B license">
+          <circle class="cb-ring" cx="36" cy="36" r="34"/>
+          <circle class="cb-inner" cx="36" cy="36" r="29"/>
+          <text class="cb-small" x="36" y="28">LICENSE</text>
+          <text class="cb-big" x="36" y="47">B</text>
         </svg>
         <div>
           <p class="cred-title">Nutrition consultant, B license</p>
