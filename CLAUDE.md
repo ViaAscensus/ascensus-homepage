@@ -124,7 +124,7 @@ Der Lauf ist idempotent. Details und wie ein neues Rezept veröffentlicht wird:
 `tools/README.md`.
 
 Von Hand gepflegt werden dagegen: `tools/rezepte-en.json` (Rezepttexte auf Englisch), `index.html`, `pakete*.html`, `wissen*.html`,
-die Rechtstexte, `anamnese*.html`, `trainingsbuch.html`, die `mitglieder-*.html`
+die Rechtstexte, `anamnese*.html`, die `mitglieder-*.html`
 und `social-planer.html`.
 
 ## Englische Fassung
@@ -179,6 +179,18 @@ die `-en`-Seite.** Neue Artikel gehören in beide Übersichten (`wissen.html` un
   machen** (das Skript ist identisch, die englischen Texte stehen zusätzlich fest im HTML).
 - Das Coaching selbst ist auf Deutsch und Englisch möglich (FAQ-Eintrag auf
   `index.html` und `index-en.html`, auch im JSON-LD).
+
+## Kraftwerk (früher Trainingsbuch)
+
+Das Trainingsbuch ist als installierbare App **Kraftwerk** in ein eigenes Repo
+(`ViaAscensus/kraftwerk`) und auf `https://kraftwerk.ascensus.fit/` umgezogen.
+`trainingsbuch.html` hier ist nur noch eine Weiterleitung (noindex); die
+`mitglieder-*.html` verlinken die neue Adresse. Die Daten liegen unverändert in
+PocketBase (`trainingsbuch_entries` u. a.), Dashboard und Badges lesen sie weiter.
+Änderungen am Trainingsbuch gehören **nicht** mehr hierher, sondern ins Repo
+`kraftwerk` (siehe dessen `CLAUDE.md`). Die Anmeldung gilt je Adresse: wer die App
+erstmals öffnet, meldet sich dort einmal an. Die Datenschutzerklärung (beide
+Sprachen) nennt Kraftwerk im Abschnitt „Trainingsbuch und Fitness-Tests“.
 
 ## Social-Media-Planer
 
