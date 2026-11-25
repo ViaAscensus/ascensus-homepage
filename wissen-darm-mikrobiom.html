@@ -214,6 +214,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--sand);outline-offse
 .disclaimer{margin-top:1.4rem;font-size:.8rem;color:var(--ink-40);line-height:1.55}
 
 /* ---------- Erstgespräch-Hinweis ---------- */
+.cta-big{text-align:center;margin:2rem 0 0}
+.cta-big .btn{display:block;width:100%;max-width:520px;margin:0 auto;padding:1.25rem 1.5rem;font-size:.95rem;text-align:center}
 .call-mini{
   background:var(--paper);border:1px solid var(--line);
   padding:2rem 1.8rem;margin:3.5rem 0 1rem;display:flex;flex-wrap:wrap;gap:1.4rem;
@@ -493,6 +495,10 @@ html,body{overflow-x:clip}
         <span>Patrick Spengler · ASCENSUS</span>
       </div>
     </section>
+
+    <div class="cta-big">
+      <a class="btn" href="https://cal.meetergo.com/ascensus/erstgesprach" target="_blank" rel="noopener" onclick="gtag('event', 'erstgespraech_klick');">Kostenloses Erstgespräch buchen</a>
+    </div>
 
     <!-- ============ 6 · QUELLEN & ERSTGESPRÄCH ============ -->
     <section class="sources" aria-labelledby="src-h">
